@@ -1,0 +1,22 @@
+{
+  "template": "/home/jonas/Dokumente/Programmieren/public/cookiecutter-ansible-role",
+  "commit": "cc36d1956440d30996abe4e08555a5c7795a7e53",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "full_name": "Jonas Pammer",
+      "email": "opensource@jonaspammer.at",
+      "code_of_conduct_enforcement_contact_email": "opensource@jonaspammer.at",
+      "github_username": "JonasPammer",
+      "galaxy_name": "jonaspammer",
+      "min_ansible_version": "2.9",
+      "allow_duplicates": "no",
+      "ansible_user_needs_to_become": "True",
+      "role_name": "checkmk-server",
+      "project_slug": "ansible-role-checkmk-server",
+      "project_short_purpose": "installing CheckMK RAW edition, setting up an initial site and configuring vital parameters of that site",
+      "_template": "/home/jonas/Dokumente/Programmieren/public/cookiecutter-ansible-role"
+    }
+  },
+  "directory": null
+}

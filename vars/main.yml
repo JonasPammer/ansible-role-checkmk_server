@@ -1,0 +1,15 @@
+---
+# vars file of ansible-role jonaspammer.checkmk-server
+# (tl;dr: almost not overwrite-able variables)
+
+_checkmk-server_somevar:
+  Debian: ""
+  Debian_10: ""
+  RedHat: ""
+
+checkmk-server_somevar: "{{
+  _checkmk-server_somevar[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
+  _checkmk-server_somevar[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk-server_somevar[ansible_distribution])|default(
+  _checkmk-server_somevar[ansible_os_family])|default(
+  _checkmk-server_somevar['default']) }}"
