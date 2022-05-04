@@ -51,7 +51,19 @@
       val: "{{ checkmk_server_site_conf_TMPFS }}"
   when: checkmk_server_site_conf
 
+- name: execute command to get omd status
+  ansible.builtin.command: "omd status"
+  changed_when: false
+  register: checkmk_server__register_command_omd_status_before
+
 - name: Execute command to start OMD site.
   ansible.builtin.command: "{{ checkmk_server_omd_start_command }}"
   args:
     creates: "{{ checkmk_server_omd_start_creates }}"
+  changed_when: false
+  register: checkmk_server__register_command_omd_start
+
+- name: execute command to get omd status
+  ansible.builtin.command: "omd status"
+  changed_when: checkmk_server__register_command_omd_status_before.stdout != checkmk_server__register_command_omd_start.stdout
+  register: checkmk_server__register_command_omd_status_after
