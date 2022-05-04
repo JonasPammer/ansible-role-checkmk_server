@@ -15,6 +15,6 @@
     - name: Check http://localhost/master
       ansible.builtin.uri:
         url: "http://localhost/master"
-        return_content: yes
+        return_content: true
       register: this_verify
       failed_when: "'Checkmk Local site master' not in this_verify.content"

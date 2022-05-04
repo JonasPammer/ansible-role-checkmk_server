@@ -15,7 +15,7 @@
     group: "{{ checkmk_server_log_group }}"
     owner: "{{ checkmk_server_log_owner }}"
     mode: "{{ checkmk_server_log_mode }}"
-    force: no
+    force: false
   when: checkmk_server_htpasswd is undefined
 
 - name: Change OMD site admin httpassword (when admin password is defined).
