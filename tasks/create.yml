@@ -35,6 +35,6 @@
 
 - name: Start and enable Apache2 service.
   ansible.builtin.service:
-    name: "{{ apache__service }}"
+    name: "{{ apache__service|default('apache2') }}"
     state: started
     enabled: true

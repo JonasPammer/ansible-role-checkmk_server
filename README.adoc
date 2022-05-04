@@ -250,6 +250,11 @@ is meant to be used not just internally.
 // plus any details in regard to parameters that may need to be set for other roles,
 // or variables that are used from other roles.
 
+[source,yaml]
+----
+apache__service: 'apache2'
+----
+Name of service to restart at end of site creation.
 
 
 [[example_playbooks]]
