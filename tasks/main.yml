@@ -9,6 +9,9 @@
 - name: Include Tasks for installing CheckMk by using the system package manager.
   ansible.builtin.include_tasks: "install.yml"
 
+- name: Include Tasks for creating defined CheckMk site and ensuring its started.
+  ansible.builtin.include_tasks: "create.yml"
+
 - name: Include Tasks for editing site configuration variables (may stop the site).
   ansible.builtin.include_tasks: "edit_site_conf_variable.yml"
   loop:
