@@ -20,7 +20,7 @@
 
 - name: Change OMD site admin httpassword (when admin password is defined).
   community.general.htpasswd:
-    create: yes
+    create: true
     group: "{{ checkmk_server_htpasswd_group }}"
     owner: "{{ checkmk_server_htpasswd_owner }}"
     mode: "{{ checkmk_server_htpasswd_mode }}"
@@ -30,11 +30,11 @@
   become: true
   become_user: "{{ checkmk_server_htpasswd_owner }}"
   vars:
-    ansible_ssh_pipelining: yes
+    ansible_ssh_pipelining: true
   when: checkmk_server_htpasswd is defined
 
 - name: Start and enable Apache2 service.
   ansible.builtin.service:
     name: "{{ apache__service }}"
     state: started
-    enabled: yes
+    enabled: true

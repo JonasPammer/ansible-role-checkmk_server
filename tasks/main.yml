@@ -12,50 +12,40 @@
 - name: Include Tasks for editing site configuration variables (may stop the site).
   ansible.builtin.include_tasks: "edit_site_conf_variable.yml"
   loop:
-    - { var: "ADMIN_MAIL", val: "{{ checkmk_server_site_conf_ADMIN_MAIL }}" }
-    - { var: "APACHE_MODE", val: "{{ checkmk_server_site_conf_APACHE_MODE }}" }
-    - {
-        var: "APACHE_TCP_ADDR",
-        val: "{{ checkmk_server_site_conf_APACHE_TCP_ADDR }}",
-      }
-    - {
-        var: "APACHE_TCP_PORT",
-        val: "{{ checkmk_server_site_conf_APACHE_TCP_PORT }}",
-      }
-    - { var: "AUTOSTART", val: "{{ checkmk_server_site_conf_AUTOSTART }}" }
-    - { var: "CORE", val: "{{ checkmk_server_site_conf_CORE }}" }
-    - {
-        var: "LIVESTATUS_TCP",
-        val: "{{ checkmk_server_site_conf_LIVESTATUS_TCP }}",
-      }
-    - { var: "MKEVENTD", val: "{{ checkmk_server_site_conf_MKEVENTD }}" }
-    - {
-        var: "MKEVENTD_SNMPTRAP",
-        val: "{{ checkmk_server_site_conf_MKEVENTD_SNMPTRAP }}",
-      }
-    - {
-        var: "MKEVENTD_SYSLOG",
-        val: "{{ checkmk_server_site_conf_MKEVENTD_SYSLOG }}",
-      }
-    - {
-        var: "MKEVENTD_SYSLOG_TCP",
-        val: "{{ checkmk_server_site_conf_MKEVENTD_SYSLOG_TCP }}",
-      }
-    - {
-        var: "MULTISITE_AUTHORISATION",
-        val: "{{ checkmk_server_site_conf_MULTISITE_AUTHORISATION }}",
-      }
-    - {
-        var: "MULTISITE_COOKIE_AUTH",
-        val: "{{ checkmk_server_site_conf_MULTISITE_COOKIE_AUTH }}",
-      }
-    - {
-        var: "NAGIOS_THEME",
-        val: "{{ checkmk_server_site_conf_NAGIOS_THEME }}",
-      }
-    - { var: "NSCA", val: "{{ checkmk_server_site_conf_NSCA }}" }
-    - { var: "PNP4NAGIOS", val: "{{ checkmk_server_site_conf_PNP4NAGIOS }}" }
-    - { var: "TMPFS", val: "{{ checkmk_server_site_conf_TMPFS }}" }
+    - var: "ADMIN_MAIL"
+      val: "{{ checkmk_server_site_conf_ADMIN_MAIL }}"
+    - var: "APACHE_MODE"
+      val: "{{ checkmk_server_site_conf_APACHE_MODE }}"
+    - var: "APACHE_TCP_ADDR"
+      val: "{{ checkmk_server_site_conf_APACHE_TCP_ADDR }}"
+    - var: "APACHE_TCP_PORT"
+      val: "{{ checkmk_server_site_conf_APACHE_TCP_PORT }}"
+    - var: "AUTOSTART"
+      val: "{{ checkmk_server_site_conf_AUTOSTART }}"
+    - var: "CORE"
+      val: "{{ checkmk_server_site_conf_CORE }}"
+    - var: "LIVESTATUS_TCP"
+      val: "{{ checkmk_server_site_conf_LIVESTATUS_TCP }}"
+    - var: "MKEVENTD"
+      val: "{{ checkmk_server_site_conf_MKEVENTD }}"
+    - var: "MKEVENTD_SNMPTRAP"
+      val: "{{ checkmk_server_site_conf_MKEVENTD_SNMPTRAP }}"
+    - var: "MKEVENTD_SYSLOG"
+      val: "{{ checkmk_server_site_conf_MKEVENTD_SYSLOG }}"
+    - var: "MKEVENTD_SYSLOG_TCP"
+      val: "{{ checkmk_server_site_conf_MKEVENTD_SYSLOG_TCP }}"
+    - var: "MULTISITE_AUTHORISATION"
+      val: "{{ checkmk_server_site_conf_MULTISITE_AUTHORISATION }}"
+    - var: "MULTISITE_COOKIE_AUTH"
+      val: "{{ checkmk_server_site_conf_MULTISITE_COOKIE_AUTH }}"
+    - var: "NAGIOS_THEME"
+      val: "{{ checkmk_server_site_conf_NAGIOS_THEME }}"
+    - var: "NSCA"
+      val: "{{ checkmk_server_site_conf_NSCA }}"
+    - var: "PNP4NAGIOS"
+      val: "{{ checkmk_server_site_conf_PNP4NAGIOS }}"
+    - var: "TMPFS"
+      val: "{{ checkmk_server_site_conf_TMPFS }}"
   when: checkmk_server_site_conf
 
 - name: Execute command to start OMD site.

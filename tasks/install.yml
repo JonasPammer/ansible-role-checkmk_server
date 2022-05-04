@@ -5,7 +5,7 @@
   ansible.builtin.apt:
     name: "{{ checkmk_server_prerequisites }}"
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: "{{ checkmk_server_cache_valid_time }}"
   when: ansible_pkg_mgr == "apt"
 
@@ -13,7 +13,7 @@
   ansible.builtin.dnf:
     name: "{{ checkmk_server_prerequisites }}"
     state: present
-    update_cache: yes
+    update_cache: true
     enablerepo: "PowerTools"
   when: ansible_pkg_mgr == "dnf"
 
@@ -21,7 +21,7 @@
   ansible.builtin.yum:
     name: "{{ checkmk_server_prerequisites }}"
     state: present
-    update_cache: yes
+    update_cache: true
   when: ansible_pkg_mgr == "yum"
 
 - name: Import Check_MK-pubkey from URL (not apt).
@@ -47,7 +47,7 @@
   ansible.builtin.apt:
     deb: "{{ checkmk_server_download_dest }}"
     state: present
-    update_cache: yes
+    update_cache: true
     cache_valid_time: "{{ checkmk_server_install_cache_valid_time }}"
   when: ansible_pkg_mgr == "apt"
 

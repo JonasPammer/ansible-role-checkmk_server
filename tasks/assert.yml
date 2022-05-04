@@ -6,4 +6,4 @@
     that:
       - checkmk_site_url is defined
       - checkmk_site_url | type_debug in ["AnsibleUnicode", "str"]
-    quiet: yes
+    quiet: true
