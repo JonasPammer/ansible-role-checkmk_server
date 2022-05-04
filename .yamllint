@@ -3,7 +3,7 @@ extends: default # https://yamllint.readthedocs.io/en/stable/configuration.html#
 
 rules:
   line-length:
-    max: 140
+    max: 160
   comments:
     min-spaces-from-content: 1 # https://github.com/prettier/prettier/issues/6780
 
