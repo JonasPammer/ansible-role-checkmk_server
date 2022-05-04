@@ -13,7 +13,7 @@ checkmk_server_prerequisites: "{{
   _checkmk_server_prerequisites[ansible_distribution])|default(
   _checkmk_server_prerequisites[ansible_os_family])|default(
   _checkmk_server_prerequisites['default']) }}"
-checkmk_server_cache_valid_time: "3600"
+checkmk_server_install_cache_valid_time: "3600"
 
 checkmk_server_download_package: "{{
   _checkmk_server_download_package[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
