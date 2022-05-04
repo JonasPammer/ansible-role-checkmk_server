@@ -1,0 +1,63 @@
+---
+# tasks file of ansible-role jonaspammer.checkmk-server
+
+- name: Install pre-requisites from package manager (apt).
+  ansible.builtin.apt:
+    name: "{{ checkmk_server_prerequisites }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{ checkmk_server_cache_valid_time }}"
+  when: ansible_pkg_mgr == "apt"
+
+- name: Install pre-requisites from package manager (dnf).
+  ansible.builtin.dnf:
+    name: "{{ checkmk_server_prerequisites }}"
+    state: present
+    update_cache: yes
+    enablerepo: "PowerTools"
+  when: ansible_pkg_mgr == "dnf"
+
+- name: Install pre-requisites (yum).
+  ansible.builtin.yum:
+    name: "{{ checkmk_server_prerequisites }}"
+    state: present
+    update_cache: yes
+  when: ansible_pkg_mgr == "yum"
+
+- name: Import Check_MK-pubkey from URL (not apt).
+  ansible.builtin.rpm_key:
+    key: "{{ checkmk_server_download_pubkey_url }}"
+    state: present
+  when: ansible_pkg_mgr != "apt"
+
+- name: Download CheckMk package.
+  ansible.builtin.get_url:
+    dest: "{{ checkmk_server_download_dest }}"
+    mode: "{{ checkmk_server_download_mode }}"
+    url: "{{ checkmk_server_download_url }}"
+    checksum: "{{ checkmk_server_download_checksum }}"
+
+- name: Make sure the man8 folder exists.
+  ansible.builtin.file:
+    path: "{{ checkmk_server_man_path }}"
+    state: directory
+    mode: "{{ checkmk_server_man_mode }}"
+
+- name: Install CheckMK RAW (apt).
+  ansible.builtin.apt:
+    deb: "{{ checkmk_server_download_dest }}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{ checkmk_server_install_cache_valid_time }}"
+  when: ansible_pkg_mgr == "apt"
+
+- name: Install CheckMK RAW (other).
+  ansible.builtin.package:
+    name: "{{ checkmk_server_download_dest }}"
+    state: present
+  when: ansible_pkg_mgr != "apt"
+
+- name: Execute command to setup CheckMk.
+  ansible.builtin.command: "{{ checkmk_server_omd_setup_command }}"
+  args:
+    creates: "{{ checkmk_server_omd_setup_creates }}"

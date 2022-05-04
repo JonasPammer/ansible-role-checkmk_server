@@ -4,6 +4,7 @@ Jonas Pammer <opensource@jonaspammer.at>;
 :toclevels: 3
 :toc-placement!:
 :source-highlighter: rouge
+:no_change_needed: These variables do not need to be changed under normal circumstances, and certainly not if you are using the default version of the server.
 
 ifdef::env-github[]
 // https://gist.github.com/dcode/0cfbf2699a1fe9b46ff04c41721dda74#admonitions
@@ -34,6 +35,10 @@ endif::[]
 
 An Ansible role for installing CheckMK RAW edition, setting up an initial site and configuring vital parameters of that site.
 
+This role does *not*
+
+* configure NTP (recommended by CheckMk)
+* configure a SMTP-Server
 
 toc::[]
 
@@ -71,24 +76,163 @@ must be installed on the Ansible controller.
 
 [source,yaml]
 ----
-variable: default value
+checkmk_site_url:
 ----
-Description
-
-
-[source,yaml]
-----
-variable: [OS-specific by default, see /vars directory]
-----
-Description
-
+#Required.# URL resolving to the CheckMk site. Must not end with an `/`.
 
 [source,yaml]
 ----
-variable: [OS-specific by default, see /vars directory]
+checkmk_server_site: "main"
+----
+Name of OMD "site" to create;
+this is often shown as `my-site` in the CheckMK documentation examples.
+
+[source,yaml]
+----
+checkmk_server_version: "2.0.0p17"
+----
+Version of CheckMK RAW edition to install
+
+
+[[variables::installation]]
+=== Role Variables used for installing
+[source,yaml]
+----
+checkmk_server_prerequisites: [OS-specific by default, see /vars directory]
+----
+List of packages to install using the system's package manager.
+
+Note that this role makes use of the
+https://linuxhint.com/enable-powertools-repository-centos/[PowerTools]
+repository if `dnf` is the system's package manager (as defined by `ansible_pkg_mgr`).
+
+[source,yaml]
+----
+checkmk_server_install_cache_valid_time: "3600"
 ----
 (Debian/Ubuntu only)
-Description
+`cache_valid_time` passed to the `apt` module.
+
+[source,yaml]
+----
+checkmk_server_download_package: [OS-specific by default, see /vars directory]
+checkmk_server_download_checksum: [OS-specific by default, see /vars directory]
+checkmk_server_download_url: "https://download.checkmk.com/checkmk/{{ checkmk_server_version }}/{{ checkmk_server_download_package }}"
+checkmk_server_download_pubkey_url: "https://download.checkmk.com/checkmk/Check_MK-pubkey.gpg"
+checkmk_server_download_dest: "{{ checkmk_server_download_dest_folder }}/{{ checkmk_server_download_package }}"
+checkmk_server_download_dest_folder: "/opt"
+checkmk_server_download_mode: u=rw,g=r,o=r
+
+checkmk_server_man_path: "/usr/share/man/man8"
+checkmk_server_man_mode: u=rwx,g=rx,o=rx
+
+checkmk_server_omd_setup_command: "omd setup"
+checkmk_server_omd_setup_creates: "/opt/omd"
+----
+_{no_change_needed}_
+
+
+[[variables::site]]
+=== Role Variables used for site creation
+
+[source,yaml]
+----
+checkmk_server_htpasswd: ~  # not defined by default
+----
+If not defined, CheckMk generates a random password and outputs it into `checkmk_server_omd_create_creates`.
+
+[source,yaml]
+----
+checkmk_server_omd_create_command: "omd create {{ checkmk_server_site }}"
+checkmk_server_omd_create_creates: "/opt/omd/sites/{{ checkmk_server_site }}"
+checkmk_server_log_dest: "/opt/omd/sites/{{ checkmk_server_site }}/omd-create.log"
+checkmk_server_log_group: "{{ checkmk_server_site }}"
+checkmk_server_log_mode: 'u=rw,g=,o='
+checkmk_server_log_owner: "{{ checkmk_server_site }}"
+
+checkmk_server_htpasswd_group: "{{ checkmk_server_site }}"
+checkmk_server_htpasswd_mode: u=rw,g=rw,o=
+checkmk_server_htpasswd_name: "cmkadmin"
+checkmk_server_htpasswd_owner: "{{ checkmk_server_site }}"
+checkmk_server_htpasswd_path: "/opt/omd/sites/{{ checkmk_server_site }}/etc/htpasswd"
+
+checkmk_server_omd_start_command: "omd start {{ checkmk_server_site }}"
+checkmk_server_omd_start_creates: "/opt/omd/sites/{{ checkmk_server_site }}/tmp/apache/run/apache.pid"
+----
+_{no_change_needed}_
+
+
+[[variables::component_config]]
+=== Role Variables used to configure CheckMk's components
+
+OMD is a system that integrates multiple software components into a monitoring system.
+In so doing, some components are optional, and for some there are alternatives or different operational settings.
+https://docs.checkmk.com/latest/en/omd_basics.html#omdconfig[All of this]
+can be comfortably configured with these variables (actually issues `omd config`).
+
+#Note that the CheckMk site must temporarily be stopped if a change is required.#
+
+The most important are:
+
+CORE::
+Selection of the monitoring core.
+MKEVENTD::
+Activates the Checkmk Event Console, with which the syslog messages, SNMP-Traps and other events can be processed
+MKNOTIFYD::
+Enterprise Editions: Activates the notification spooler.
+AUTOSTART::
+This is primarily of interest for test installations that should not normally start by themselves.
+LIVESTATUS_TCP::
+Allows external access to the status data for this site.
+A distributed monitoring can be constructed with this.
+The status of this instance can be incorporated into the central instance.
+Please only activate it in a secure network.
+
+
+[source,yaml]
+----
+checkmk_server_site_conf: true
+----
+Enable/Disable configuration of site configuration by this role.
+
+==== General
+
+[source,yaml]
+----
+checkmk_server_site_conf_ADMIN_MAIL:
+checkmk_server_site_conf_AUTOSTART: "on"
+checkmk_server_site_conf_CORE: nagios
+checkmk_server_site_conf_TMPFS: "on"
+----
+
+==== Web GUI
+
+[source,yaml]
+----
+checkmk_server_site_conf_APACHE_MODE: own
+checkmk_server_site_conf_APACHE_TCP_ADDR: 127.0.0.1
+checkmk_server_site_conf_APACHE_TCP_PORT: 5000
+checkmk_server_site_conf_MULTISITE_AUTHORISATION: "on"
+checkmk_server_site_conf_MULTISITE_COOKIE_AUTH: "on"
+checkmk_server_site_conf_NAGIOS_THEME: classicui
+----
+
+==== Addons
+[source,yaml]
+----
+checkmk_server_site_conf_MKEVENTD: "on"
+checkmk_server_site_conf_MKEVENTD_SNMPTRAP: "off"
+checkmk_server_site_conf_MKEVENTD_SYSLOG: "off"
+checkmk_server_site_conf_MKEVENTD_SYSLOG_TCP: "off"
+checkmk_server_site_conf_PNP4NAGIOS: "on"
+----
+
+==== Distributed Monitoring
+[source,yaml,subs="+quotes,macros"]
+----
+checkmk_server_site_conf_LIVESTATUS_TCP: "off"
+checkmk_server_site_conf_NSCA: "off"
+----
 
 
 [[public_vars]]

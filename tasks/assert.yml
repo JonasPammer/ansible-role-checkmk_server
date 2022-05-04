@@ -1,10 +1,9 @@
 ---
 # tasks file for testing that variables of ansible-role jonaspammer.checkmk-server are set correctly
 
-# - name: test if variable_name is set correctly
-#   ansible.builtin.assert:
-#     that:
-#       - variable_name is defined
-#       - variable_name is number
-#       - variable_name >= 0
-#     quiet: true
+- name: test if checkmk_site_url is set correctly
+  ansible.builtin.assert:
+    that:
+      - checkmk_site_url is defined
+      - checkmk_site_url | type_debug in ["AnsibleUnicode", "str"]
+    quiet: yes
