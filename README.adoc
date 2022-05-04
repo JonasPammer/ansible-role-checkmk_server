@@ -39,6 +39,7 @@ This role does *not*
 
 * configure NTP (recommended by CheckMk)
 * configure a SMTP-Server
+* support SUSE Linux Enterprise Server (pull request welcome if requested, though)
 
 toc::[]
 
