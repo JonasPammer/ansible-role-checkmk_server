@@ -6,7 +6,7 @@
     name: "{{ checkmk_server_prerequisites }}"
     state: present
     update_cache: true
-    cache_valid_time: "{{ checkmk_server_cache_valid_time }}"
+    cache_valid_time: "{{ checkmk_server_install_cache_valid_time }}"
   when: ansible_pkg_mgr == "apt"
 
 - name: Install pre-requisites from package manager (dnf).
