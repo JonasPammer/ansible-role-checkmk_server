@@ -151,8 +151,8 @@ checkmk_server_log_mode: 'u=rw,g=,o='
 checkmk_server_log_owner: "{{ checkmk_server_site }}"
 
 checkmk_server_htpasswd_group: "{{ checkmk_server_site }}"
-checkmk_server_htpasswd_mode: u=rw,g=rw,o=
-checkmk_server_htpasswd_name: "cmkadmin"
+checkmk_server_htpasswd_mode: u=rw,g=rw,o= # pragma: allowlist secret
+checkmk_server_htpasswd_name: "cmkadmin" # pragma: allowlist secret
 checkmk_server_htpasswd_owner: "{{ checkmk_server_site }}"
 checkmk_server_htpasswd_path: "/opt/omd/sites/{{ checkmk_server_site }}/etc/htpasswd"
 
