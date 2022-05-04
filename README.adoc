@@ -76,9 +76,9 @@ must be installed on the Ansible controller.
 
 [source,yaml]
 ----
-checkmk_site_url:
+checkmk_site_url: "http://localhost/{{ checkmk_server_site }}"
 ----
-#Required.# URL resolving to the CheckMk site. Must not end with an `/`.
+URL resolving to the CheckMk site. Must not end with an `/`.
 
 [source,yaml]
 ----
