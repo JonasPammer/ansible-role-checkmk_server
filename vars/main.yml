@@ -7,16 +7,6 @@ _checkmk_server_download_package:
   Debian: &_checkmk_server_download__debian "check-mk-raw-{{ checkmk_server_version }}_0.{{ ansible_distribution_release }}_amd64.deb"
   default: *_checkmk_server_download__debian
 
-_checkmk_server_download_checksum:
-  CentOS_7: "sha256:faff4ad49ec0e073cc341466eb1191cc404ec2c2dea548d9a7072e529cb75231"
-  CentOS_8: "sha256:501a5ae7dd7d14b18cc2164c54a8509e6ebbc50cdb4f40c65616bfad77814669"
-  Debian_9: "sha256:eeed6aa1e346fe5e26571d81954ee77d6aeba39faab9af29ca6e16ae51c7a918"
-  Debian_10: "sha256:60257216b65a9d6819d125ecb735746bde8c72bd9266f979764792e4c2aec254"
-  Debian_11: "sha256:f65bfd7f9b17922c2a4349077a29dd78463717d5fa9de86af18ca651e85896b8"
-  Ubuntu_18: "sha256:f9635b1b418e30b7d2e9de76808649580a63be071fc78f9cd31992adedf78ed9"
-  Ubuntu_20: "sha256:1f37d5e8e4ad7812c59eebe7771f7271d08380a87c7170ddb66c20de34d87871"
-  Ubuntu_21: "sha256:cae982d79fd51d4ad203cc0c649c4f54586ee364b19d07d8f1204e114e38e38e"
-
 _checkmk_server_prerequisites:
   CentOS_7:
     - cronie
@@ -28,16 +18,7 @@ _checkmk_server_prerequisites:
   Debian_9:
     - python-apt
     - python-passlib
-  Debian_10:
+  Debian_10: &_checkmk_server_prerequisites__debian10
     - python3-apt
     - python3-passlib
-  Debian_11:
-    - python3-apt
-    - python3-passlib
-  Ubuntu_18: &_checkmk_server_prerequisites__ubuntu18
-    - python3-apt
-    - python3-passlib
-  Ubuntu_20:
-    - python3-apt
-    - python3-passlib
-  default: *_checkmk_server_prerequisites__ubuntu18
+  default: *_checkmk_server_prerequisites__debian10
