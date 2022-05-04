@@ -29,10 +29,14 @@ _checkmk_server_download_checksum: # default checksums for default of '{{ checkm
   Debian_11: "sha256:f65bfd7f9b17922c2a4349077a29dd78463717d5fa9de86af18ca651e85896b8"
   Ubuntu_16: "sha256:3d45c34388aeff93ce0dd68f709942ba313c842f735fae8a72b64023c2b6f8a5"
   Ubuntu_18: "sha256:f9635b1b418e30b7d2e9de76808649580a63be071fc78f9cd31992adedf78ed9"
-  Ubuntu_20: "sha256:1f37d5e8e4ad7812c59eebe7771f7271d08380a87c7170ddb66c20de34d87871"
+  Ubuntu_20.04: "sha256:7ba21704654116260f7d43fb28875b6cbd8eb73d116eecfe7b51d5cc814e0a25"
+  Ubuntu_20.10: "sha256:06e2077e0a4bb3a80c83c2188af3086d41d3319266dfd106c7a356e6f406f483"
+  Ubuntu_21.04: "sha256:2ab38e0c993b06188039f30220d3a9cfa5e5513f057b4fc309cf6c8c4892a5b4"
+  Ubuntu_21.10: "sha256:87144b2b8ed171c242d2eb1ce1cb110a770530665ef9de99fbe268226a9fb65e"
   Ubuntu_21: "sha256:cae982d79fd51d4ad203cc0c649c4f54586ee364b19d07d8f1204e114e38e38e"
 checkmk_server_download_checksum: "{{
-  _checkmk_server_download_checksum[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
+  _checkmk_server_download_checksum[ansible_distribution ~ '_' ~ ansible_distribution_major_version ~ '.' ansible_distribution_minor_version]|default(
+  _checkmk_server_download_checksum[ansible_distribution ~ '_' ~ ansible_distribution_major_version])|default(
   _checkmk_server_download_checksum[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
   _checkmk_server_download_checksum[ansible_distribution])|default(
   _checkmk_server_download_checksum[ansible_os_family])|default(
