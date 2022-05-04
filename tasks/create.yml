@@ -1,5 +1,5 @@
 ---
-# tasks file of ansible-role jonaspammer.checkmk-server
+# tasks file of ansible-role jonaspammer.checkmk_server
 
 - name: Execute command to create defined CheckMk site.
   ansible.builtin.command: "{{ checkmk_server_omd_create_command }}"

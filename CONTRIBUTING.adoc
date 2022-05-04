@@ -46,7 +46,7 @@ A few general guidelines that cover both:
 ==== Issues
 
 Issues should be used to report problems, request a new feature, or to discuss potential changes *before* a PR is created.
-When you https://github.com/JonasPammer/ansible-role-checkmk-server/issues/new[
+When you https://github.com/JonasPammer/ansible-role-checkmk_server/issues/new[
 create a new Issue], a template will be loaded that will guide you through collecting and providing the information we need to investigate.
 
 If you find an Issue that addresses the problem you're having,

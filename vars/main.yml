@@ -1,5 +1,5 @@
 ---
-# vars file of ansible-role jonaspammer.checkmk-server
+# vars file of ansible-role jonaspammer.checkmk_server
 # (tl;dr: almost not overwrite-able variables)
 
 _checkmk_server_download_package:

@@ -1,5 +1,5 @@
 ---
-# tasks file of ansible-role jonaspammer.checkmk-server
+# tasks file of ansible-role jonaspammer.checkmk_server
 
 - name: check if all variables have been set correctly
   ansible.builtin.import_tasks: assert.yml

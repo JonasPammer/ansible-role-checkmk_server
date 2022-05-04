@@ -1,5 +1,5 @@
 ---
-# defaults file of ansible-role jonaspammer.checkmk-server
+# defaults file of ansible-role jonaspammer.checkmk_server
 # See README.adoc for documentation. If you change a default here, also update it in the README.
 
 checkmk_server_site: "main"

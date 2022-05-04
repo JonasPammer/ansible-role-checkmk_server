@@ -1,4 +1,4 @@
-= ansible-role-checkmk-server
+= ansible-role-checkmk_server
 Jonas Pammer <opensource@jonaspammer.at>;
 :toc:
 :toclevels: 3
@@ -16,20 +16,20 @@ ifdef::env-github[]
 endif::[]
 
 // Very Relevant Status Badges
-https://github.com/JonasPammer/ansible-role-checkmk-server/actions/workflows/ci.yml[image:https://github.com/JonasPammer/ansible-role-checkmk-server/actions/workflows/ci.yml/badge.svg[Testing CI]]
+https://github.com/JonasPammer/ansible-role-checkmk_server/actions/workflows/ci.yml[image:https://github.com/JonasPammer/ansible-role-checkmk_server/actions/workflows/ci.yml/badge.svg[Testing CI]]
 
 // Badges about Conventions in this Project
 https://conventionalcommits.org[image:https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg[Conventional Commits]]
-https://results.pre-commit.ci/latest/github/JonasPammer/ansible-role-checkmk-server/master[image:https://results.pre-commit.ci/badge/github/JonasPammer/ansible-role-checkmk-server/master.svg[pre-commit.ci status]]
+https://results.pre-commit.ci/latest/github/JonasPammer/ansible-role-checkmk_server/master[image:https://results.pre-commit.ci/badge/github/JonasPammer/ansible-role-checkmk_server/master.svg[pre-commit.ci status]]
 // image:https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white[pre-commit, link=https://github.com/pre-commit/pre-commit]
-https://open.vscode.dev/JonasPammer/ansible-role-checkmk-server[image:https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc[Open in Visual Studio Code]]
+https://open.vscode.dev/JonasPammer/ansible-role-checkmk_server[image:https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc[Open in Visual Studio Code]]
 image:https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square[PRs Welcome]
 
 
 ifdef::env-github[]
 [TIP]
-__A single-page version of this README can be found at https://JonasPammer.github.io/ansible-role-checkmk-server[
-JonasPammer.github.io/ansible-role-checkmk-server].__
+__A single-page version of this README can be found at https://JonasPammer.github.io/ansible-role-checkmk_server[
+JonasPammer.github.io/ansible-role-checkmk_server].__
 endif::[]
 
 
@@ -273,8 +273,8 @@ include::molecule/default/prepare.yml[]
 The following diagram is a compilation of the "soft dependencies" of this role
 as well as the recursive tree of their soft dependencies.
 
-image:https://raw.githubusercontent.com/JonasPammer/ansible-roles/master/graphs/dependencies_checkmk-server.svg[
-requirements.yml dependency graph of jonaspammer.checkmk-server]
+image:https://raw.githubusercontent.com/JonasPammer/ansible-roles/master/graphs/dependencies_checkmk_server.svg[
+requirements.yml dependency graph of jonaspammer.checkmk_server]
 ====
 
 .Minimum Viable Play
@@ -282,7 +282,7 @@ requirements.yml dependency graph of jonaspammer.checkmk-server]
 [source,yaml]
 ----
 roles:
-  - "jonaspammer.checkmk-server"
+  - "jonaspammer.checkmk_server"
 
 vars:
   some_var: "some_value"
@@ -303,9 +303,9 @@ include::CONTRIBUTING.adoc[]
 [[changelog]]
 == 🗒 Changelog
 Please refer to the
-https://github.com/JonasPammer/ansible-role-checkmk-server/releases[Release Page of this Repository]
+https://github.com/JonasPammer/ansible-role-checkmk_server/releases[Release Page of this Repository]
 for a human changelog of the corresponding
-https://github.com/JonasPammer/ansible-role-checkmk-server/tags[Tags (Versions) of this Project].
+https://github.com/JonasPammer/ansible-role-checkmk_server/tags[Tags (Versions) of this Project].
 
 Note that this Project adheres to Semantic Versioning.
 Please report any accidental breaking changes of a minor version update.
