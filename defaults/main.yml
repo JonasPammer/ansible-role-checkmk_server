@@ -72,7 +72,7 @@ checkmk_server_omd_start_creates: "/opt/omd/sites/{{ checkmk_server_site }}/tmp/
 checkmk_server_site_conf: true
 
 ## General
-checkmk_server_site_conf_ADMIN_MAIL:
+checkmk_server_site_conf_ADMIN_MAIL: ""
 checkmk_server_site_conf_AUTOSTART: "on"
 checkmk_server_site_conf_CORE: nagios
 checkmk_server_site_conf_TMPFS: "on"
