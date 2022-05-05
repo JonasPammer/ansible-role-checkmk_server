@@ -68,6 +68,14 @@ checkmk_server_htpasswd_path: "/opt/omd/sites/{{ checkmk_server_site }}/etc/htpa
 checkmk_server_omd_start_command: "omd start {{ checkmk_server_site }}"
 checkmk_server_omd_start_creates: "/opt/omd/sites/{{ checkmk_server_site }}/tmp/apache/run/apache.pid"
 
+checkmk_apache_service: "{{ apache__service|default(
+  _checkmk_apache_service[ansible_distribution ~ '_' ~ ansible_distribution_release])|default(
+  _checkmk_apache_service[ansible_distribution ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk_apache_service[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk_apache_service[ansible_distribution])|default(
+  _checkmk_apache_service[ansible_os_family])|default(
+  _checkmk_apache_service['default']) }}"
+
 # CONFIG
 checkmk_server_site_conf: true
 

@@ -116,8 +116,8 @@ checkmk_server_install_cache_valid_time: "3600"
 
 [source,yaml]
 ----
-checkmk_server_download_package: [OS-specific by default, see /vars directory]
-checkmk_server_download_checksum: [OS-specific by default, see /vars directory]
+checkmk_server_download_package: [OS-specific, see /defaults directory]
+checkmk_server_download_checksum: [OS-specific, see /defaults directory]
 checkmk_server_download_url: "https://download.checkmk.com/checkmk/{{ checkmk_server_version }}/{{ checkmk_server_download_package }}"
 checkmk_server_download_pubkey_url: "https://download.checkmk.com/checkmk/Check_MK-pubkey.gpg"
 checkmk_server_download_dest: "{{ checkmk_server_download_dest_folder }}/{{ checkmk_server_download_package }}"
@@ -159,6 +159,8 @@ checkmk_server_htpasswd_path: "/opt/omd/sites/{{ checkmk_server_site }}/etc/htpa
 
 checkmk_server_omd_start_command: "omd start {{ checkmk_server_site }}"
 checkmk_server_omd_start_creates: "/opt/omd/sites/{{ checkmk_server_site }}/tmp/apache/run/apache.pid"
+
+checkmk_apache_service: [OS-specific, see /defaults directory]
 ----
 _{no_change_needed}_
 
@@ -250,11 +252,8 @@ is meant to be used not just internally.
 // plus any details in regard to parameters that may need to be set for other roles,
 // or variables that are used from other roles.
 
-[source,yaml]
-----
-apache__service: 'apache2'
-----
-Name of service to restart at end of site creation.
+apache__service::
+Overwrites this role's version of the default for `checkmk_apache_service`
 
 
 [[example_playbooks]]

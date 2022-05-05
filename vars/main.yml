@@ -2,6 +2,10 @@
 # vars file of ansible-role jonaspammer.checkmk_server
 # (tl;dr: almost not overwrite-able variables)
 
+_checkmk_apache_service:
+  Debian: apache2
+  RedHat: httpd
+
 _checkmk_server_download_package:
   RedHat: "check-mk-raw-{{ checkmk_server_version }}-el{{ ansible_distribution_major_version }}-38.x86_64.rpm"
   Debian: &_checkmk_server_download__debian "check-mk-raw-{{ checkmk_server_version }}_0.{{ ansible_distribution_release }}_amd64.deb"
