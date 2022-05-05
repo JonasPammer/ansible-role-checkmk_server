@@ -1,6 +1,6 @@
 {
   "template": "/home/jonas/Dokumente/Programmieren/public/cookiecutter-ansible-role",
-  "commit": "cc36d1956440d30996abe4e08555a5c7795a7e53",
+  "commit": "27809eabeebb952ee685cb30f1f80bf38f0d74af",
   "checkout": null,
   "context": {
     "cookiecutter": {
