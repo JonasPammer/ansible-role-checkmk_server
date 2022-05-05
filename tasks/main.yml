@@ -67,5 +67,5 @@
 
 - name: execute command to get omd status
   ansible.builtin.command: "omd status"
-  changed_when: checkmk_server__register_command_omd_status_before.stdout != checkmk_server__register_command_omd_start.stdout
+  changed_when: checkmk_server__register_command_omd_status_before.stdout != checkmk_server__register_command_omd_status_after.stdout
   register: checkmk_server__register_command_omd_status_after
