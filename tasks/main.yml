@@ -54,6 +54,8 @@
 - name: execute command to get omd status
   ansible.builtin.command: "omd status"
   changed_when: false
+  # command returns non-zero return code if any services (or overall?) are stopped
+  failed_when: false
   register: checkmk_server__register_command_omd_status_before
 
 - name: Execute command to start OMD site.
