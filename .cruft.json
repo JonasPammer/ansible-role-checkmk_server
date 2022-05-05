@@ -1,6 +1,6 @@
 {
   "template": "/home/jonas/Dokumente/Programmieren/public/cookiecutter-ansible-role",
-  "commit": "cc36d1956440d30996abe4e08555a5c7795a7e53",
+  "commit": "27809eabeebb952ee685cb30f1f80bf38f0d74af",
   "checkout": null,
   "context": {
     "cookiecutter": {
@@ -12,6 +12,7 @@
       "min_ansible_version": "2.9",
       "allow_duplicates": "no",
       "ansible_user_needs_to_become": "True",
+      "_role_name": null,
       "role_name": "checkmk-server",
       "project_slug": "ansible-role-checkmk-server",
       "project_short_purpose": "installing CheckMK RAW edition, setting up an initial site and configuring vital parameters of that site",
