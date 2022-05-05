@@ -33,7 +33,9 @@ JonasPammer.github.io/ansible-role-checkmk_server].__
 endif::[]
 
 
-An Ansible role for installing CheckMK RAW edition, setting up an initial site and configuring vital parameters of that site.
+An Ansible role for installing
+https://checkmk.com/product/raw-edition[CheckMK RAW edition],
+setting up a site and configuring basic CheckMk functionality parameters.
 
 This role does *not*
 
@@ -90,7 +92,7 @@ this is often shown as `my-site` in the CheckMK documentation examples.
 
 [source,yaml]
 ----
-checkmk_server_version: "2.0.0p17"
+checkmk_server_version: "2.0.0p23"
 ----
 Version of CheckMK RAW edition to install
 
