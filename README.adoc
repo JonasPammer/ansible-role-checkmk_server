@@ -97,7 +97,7 @@ checkmk_server_version: "2.0.0p23"
 Version of CheckMK RAW edition to install
 
 
-[[variables::installation]]
+[[variables--installation]]
 === Role Variables used for installing
 [source,yaml]
 ----
@@ -135,7 +135,7 @@ checkmk_server_omd_setup_creates: "/opt/omd"
 _{no_change_needed}_
 
 
-[[variables::site]]
+[[variables--site]]
 === Role Variables used for site creation
 
 [source,yaml]
@@ -167,7 +167,7 @@ checkmk_apache_service: [OS-specific, see /defaults directory]
 _{no_change_needed}_
 
 
-[[variables::component_config]]
+[[variables--component_config]]
 === Role Variables used to configure CheckMk's components
 
 OMD is a system that integrates multiple software components into a monitoring system.
