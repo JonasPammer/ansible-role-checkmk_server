@@ -1,3 +1,105 @@
 ---
-# defaults file of ansible-role jonaspammer.checkmk-server
+# defaults file of ansible-role jonaspammer.checkmk_server
 # See README.adoc for documentation. If you change a default here, also update it in the README.
+
+checkmk_site_url: "http://localhost/{{ checkmk_server_site }}"
+checkmk_server_site: "main"
+checkmk_server_version: "2.0.0p23"
+
+# INSTALL
+checkmk_server_prerequisites: "{{
+  _checkmk_server_prerequisites[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
+  _checkmk_server_prerequisites[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk_server_prerequisites[ansible_distribution])|default(
+  _checkmk_server_prerequisites[ansible_os_family])|default(
+  _checkmk_server_prerequisites['default']) }}"
+checkmk_server_install_cache_valid_time: "3600"
+
+checkmk_server_download_package: "{{
+  _checkmk_server_download_package[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
+  _checkmk_server_download_package[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk_server_download_package[ansible_distribution])|default(
+  _checkmk_server_download_package[ansible_os_family])|default(
+  _checkmk_server_download_package['default']) }}"
+_checkmk_server_download_checksum: # default checksums for default of '{{ checkmk_server_version }}'
+  CentOS_7: "sha1:cb545872dd3fec457f06ed14339f037835bb5bc8"
+  CentOS_8: "sha1:d6e05fb124aaf4b19791e33872587ea6d38f8ade"
+  Debian_stretch: "sha1:16a560bee2adc1a97e76af280b1435d43e0a25d2"
+  Debian_buster: "sha1:6eabdbe4b2e879ebf7538025b528d429a77d0529"
+  Debian_bullseye: "sha1:2980f0a1c899ffc4e2a55af5c6bf139ef99d7a5d"
+  Ubuntu_xenial: "sha1:6218e5d3cf31d469e82fdb0f69070ee9a3e9882f"
+  Ubuntu_bionic: "sha1:6e7a02365314eb8011f643e12f6a121038b664d0"
+  Ubuntu_focal: "sha1:044d71e5c56701d49df938215583dcc81a24fb70"
+  Ubuntu_hirsute: "sha1:39db6db1ccaa9de2582a87f3ed090de90f91b33d"
+  Ubuntu_impish: "sha1:de31c8d767fa9c722fd904d62761b1d526b8afd5"
+checkmk_server_download_checksum: "{{
+  _checkmk_server_download_checksum[ansible_distribution ~ '_' ~ ansible_distribution_release]|default(
+  _checkmk_server_download_checksum[ansible_distribution ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk_server_download_checksum[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk_server_download_checksum[ansible_distribution])|default(
+  _checkmk_server_download_checksum[ansible_os_family])|default(
+  _checkmk_server_download_checksum['default']) }}"
+checkmk_server_download_url: "https://download.checkmk.com/checkmk/{{ checkmk_server_version }}/{{ checkmk_server_download_package }}"
+checkmk_server_download_pubkey_url: "https://download.checkmk.com/checkmk/Check_MK-pubkey.gpg"
+checkmk_server_download_dest: "{{ checkmk_server_download_dest_folder }}/{{ checkmk_server_download_package }}"
+checkmk_server_download_dest_folder: "/opt"
+checkmk_server_download_mode: u=rw,g=r,o=r
+
+checkmk_server_man_mode: u=rwx,g=rx,o=rx
+checkmk_server_man_path: "/usr/share/man/man8"
+
+checkmk_server_omd_setup_command: "omd setup"
+checkmk_server_omd_setup_creates: "/opt/omd"
+
+# SITE CREATION
+checkmk_server_omd_create_command: "omd create {{ checkmk_server_site }}"
+checkmk_server_omd_create_creates: "/opt/omd/sites/{{ checkmk_server_site }}"
+checkmk_server_log_dest: "/opt/omd/sites/{{ checkmk_server_site }}/omd-create.log"
+checkmk_server_log_group: "{{ checkmk_server_site }}"
+checkmk_server_log_mode: "u=rw,g=,o="
+checkmk_server_log_owner: "{{ checkmk_server_site }}"
+
+checkmk_server_htpasswd_group: "{{ checkmk_server_site }}"
+checkmk_server_htpasswd_mode: u=rw,g=rw,o= # pragma: allowlist secret
+checkmk_server_htpasswd_name: "cmkadmin" # pragma: allowlist secret
+checkmk_server_htpasswd_owner: "{{ checkmk_server_site }}"
+checkmk_server_htpasswd_path: "/opt/omd/sites/{{ checkmk_server_site }}/etc/htpasswd"
+
+checkmk_server_omd_start_command: "omd start {{ checkmk_server_site }}"
+checkmk_server_omd_start_creates: "/opt/omd/sites/{{ checkmk_server_site }}/tmp/apache/run/apache.pid"
+
+checkmk_apache_service: "{{ apache__service|default(
+  _checkmk_apache_service[ansible_distribution ~ '_' ~ ansible_distribution_release])|default(
+  _checkmk_apache_service[ansible_distribution ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk_apache_service[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk_apache_service[ansible_distribution])|default(
+  _checkmk_apache_service[ansible_os_family])|default(
+  _checkmk_apache_service['default']) }}"
+
+# CONFIG
+checkmk_server_site_conf: true
+
+## General
+checkmk_server_site_conf_ADMIN_MAIL: ""
+checkmk_server_site_conf_AUTOSTART: "on"
+checkmk_server_site_conf_CORE: nagios
+checkmk_server_site_conf_TMPFS: "on"
+
+## Web GUI
+checkmk_server_site_conf_APACHE_MODE: own
+checkmk_server_site_conf_APACHE_TCP_ADDR: 127.0.0.1
+checkmk_server_site_conf_APACHE_TCP_PORT: 5000
+checkmk_server_site_conf_MULTISITE_AUTHORISATION: "on"
+checkmk_server_site_conf_MULTISITE_COOKIE_AUTH: "on"
+checkmk_server_site_conf_NAGIOS_THEME: classicui
+
+## Addons
+checkmk_server_site_conf_MKEVENTD: "on"
+checkmk_server_site_conf_MKEVENTD_SNMPTRAP: "off"
+checkmk_server_site_conf_MKEVENTD_SYSLOG: "off"
+checkmk_server_site_conf_MKEVENTD_SYSLOG_TCP: "off"
+checkmk_server_site_conf_PNP4NAGIOS: "on"
+
+## Distributed Monitoring (most important to alter)
+checkmk_server_site_conf_LIVESTATUS_TCP: "off"
+checkmk_server_site_conf_NSCA: "off"

@@ -12,3 +12,9 @@
   hosts: all
 
   tasks:
+    - name: Check http://localhost/main
+      ansible.builtin.uri:
+        url: "http://localhost/main"
+        return_content: true
+      register: this_verify
+      failed_when: "'Checkmk Local site main' not in this_verify.content"

@@ -27,7 +27,7 @@ body:
           name: Role Test
 
           roles:
-            - checkmk-server
+            - checkmk_server
       render: yaml
     validations:
       required: true

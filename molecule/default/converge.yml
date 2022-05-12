@@ -3,4 +3,4 @@
   hosts: all
 
   roles:
-    - role: "ansible-role-checkmk-server"
+    - role: "ansible-role-checkmk_server"

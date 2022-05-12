@@ -1,0 +1,40 @@
+---
+# tasks file of ansible-role jonaspammer.checkmk_server
+
+- name: Execute command to create defined CheckMk site.
+  ansible.builtin.command: "{{ checkmk_server_omd_create_command }}"
+  args:
+    creates: "{{ checkmk_server_omd_create_creates }}"
+  register: checkmk_server__register_command_omd_create
+
+# the output is important as it contains the randomly generated password.
+- name: Log output of omd create command (when admin password is undefined).
+  ansible.builtin.copy:
+    content: "{{ checkmk_server__register_command_omd_create | to_nice_json }}"
+    dest: "{{ checkmk_server_log_dest }}"
+    group: "{{ checkmk_server_log_group }}"
+    owner: "{{ checkmk_server_log_owner }}"
+    mode: "{{ checkmk_server_log_mode }}"
+    force: false
+  when: checkmk_server_htpasswd is undefined
+
+- name: Change OMD site admin httpassword (when admin password is defined).
+  community.general.htpasswd:
+    create: true
+    group: "{{ checkmk_server_htpasswd_group }}"
+    owner: "{{ checkmk_server_htpasswd_owner }}"
+    mode: "{{ checkmk_server_htpasswd_mode }}"
+    name: "{{ checkmk_server_htpasswd_name }}"
+    path: "{{ checkmk_server_htpasswd_path }}"
+    password: "{{ checkmk_server_htpasswd }}"
+  become: true
+  become_user: "{{ checkmk_server_htpasswd_owner }}"
+  vars:
+    ansible_ssh_pipelining: true
+  when: checkmk_server_htpasswd is defined
+
+- name: Start and enable Apache2 service.
+  ansible.builtin.service:
+    name: "{{ checkmk_apache_service }}"
+    state: started
+    enabled: true

@@ -33,9 +33,9 @@ ____
 Versions are defined using https://git-scm.com/book/en/v2/Git-Basics-Tagging[Tags],
 which in turn are https://galaxy.ansible.com/docs/contributing/version.html[recognized and used] by Ansible Galaxy.
 
-When a new tag is pushed, https://github.com/JonasPammer/ansible-role-checkmk-server/actions/workflows/release-to-galaxy.yml[
+When a new tag is pushed, https://github.com/JonasPammer/ansible-role-checkmk_server/actions/workflows/release-to-galaxy.yml[
 a GitHub CI workflow] takes care of importing the role to my Ansible Galaxy Account.
-image:https://github.com/JonasPammer/ansible-role-checkmk-server/actions/workflows/release-to-galaxy.yml/badge.svg[Release CI]
+image:https://github.com/JonasPammer/ansible-role-checkmk_server/actions/workflows/release-to-galaxy.yml/badge.svg[Release CI]
 
 ==== 🕗 Changelog
 When a new tag is pushed, an appropriate GitHub Release will be created

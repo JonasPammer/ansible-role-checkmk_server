@@ -69,8 +69,6 @@ jobs:
           - centos8
           - debian10
           - debian11
-          - fedora35
-          - rockylinux8
           - ubuntu1604
           - ubuntu1804
           - ubuntu2004

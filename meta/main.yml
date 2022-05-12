@@ -1,7 +1,8 @@
 ---
 galaxy_info:
-  role_name: "checkmk-server"
-  description: "An ansible role for installing CheckMK RAW edition, setting up an initial site and configuring vital parameters of that site."
+  role_name: "checkmk_server"
+  description: "An ansible role for installing CheckMK RAW edition,
+    setting up an initial site and configuring vital parameters of that site."
 
   author: "jonaspammer"
   license: MIT
@@ -11,10 +12,7 @@ galaxy_info:
     - name: EL # (Enterprise Linux)
       versions:
         - "7" # actively tested: centos7
-        - "8" # actively tested: rockylinux8, centos8
-    - name: Fedora
-      versions:
-        - "35"
+        - "8" # actively tested: centos8
     - name: Debian
       versions:
         - buster # debian10 (actively tested)
@@ -24,6 +22,8 @@ galaxy_info:
         - xenial # ubuntu1604 (actively tested)
         - bionic # ubuntu1804 (actively tested)
         - focal # ubuntu2004 (actively tested)
+        - hirsute # ubuntu2104
+        - impish # ubuntu2110
 
   galaxy_tags: []
 
