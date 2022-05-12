@@ -1,5 +1,5 @@
 {
-  "template": "/home/jonas/Dokumente/Programmieren/public/cookiecutter-ansible-role",
+  "template": "https://github.com/JonasPammer/cookiecutter-ansible-role",
   "commit": "27809eabeebb952ee685cb30f1f80bf38f0d74af",
   "checkout": null,
   "context": {
