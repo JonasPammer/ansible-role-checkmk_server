@@ -3,20 +3,20 @@
 
 - name: get current value of site configuration variable {{ item.var }}
   become_user: "{{ checkmk_server_site }}"
-  ansible.builtin.shell: omd config {{ checkmk_server_site }} show {{ item.var }}
+  ansible.builtin.command: omd config {{ checkmk_server_site }} show {{ item.var }}
   register: _register
   changed_when: false
 
 - block:
     - name: stop site if site configuration variable {{ item.var }} needs to be changed.
       become_user: "{{ checkmk_server_site }}"
-      ansible.builtin.shell: omd stop {{ checkmk_server_site }}
+      ansible.builtin.command: omd stop {{ checkmk_server_site }}
       register: __register
       changed_when: '"killing" in __register.stdout'
 
     - name: change value of site configuration variable {{ item.var }} (when different).
       become_user: "{{ checkmk_server_site }}"
-      ansible.builtin.shell: omd config {{ checkmk_server_site }} set {{ item.var }} {{ item.val }}
+      ansible.builtin.command: omd config {{ checkmk_server_site }} set {{ item.var }} {{ item.val }}
       changed_when: true
 
   when: _register.stdout != item.val|string
