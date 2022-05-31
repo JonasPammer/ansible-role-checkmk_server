@@ -957,10 +957,10 @@ Please only activate it in a secure network.</p>
 <h4 id="_general">General</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_site_conf_ADMIN_MAIL</span><span class="pi">:</span>
-<span class="na">checkmk_server_site_conf_AUTOSTART</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_site_conf_admin_mail</span><span class="pi">:</span>
+<span class="na">checkmk_server_site_conf_autostart</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span>
 <span class="na">checkmk_server_site_conf_CORE</span><span class="pi">:</span> <span class="s">nagios</span>
-<span class="na">checkmk_server_site_conf_TMPFS</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span></code></pre>
+<span class="na">checkmk_server_site_conf_tmpfs</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span></code></pre>
 </div>
 </div>
 </div>
@@ -968,12 +968,12 @@ Please only activate it in a secure network.</p>
 <h4 id="_web_gui">Web GUI</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_site_conf_APACHE_MODE</span><span class="pi">:</span> <span class="s">own</span>
-<span class="na">checkmk_server_site_conf_APACHE_TCP_ADDR</span><span class="pi">:</span> <span class="s">127.0.0.1</span>
-<span class="na">checkmk_server_site_conf_APACHE_TCP_PORT</span><span class="pi">:</span> <span class="m">5000</span>
-<span class="na">checkmk_server_site_conf_MULTISITE_AUTHORISATION</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span>
-<span class="na">checkmk_server_site_conf_MULTISITE_COOKIE_AUTH</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span>
-<span class="na">checkmk_server_site_conf_NAGIOS_THEME</span><span class="pi">:</span> <span class="s">classicui</span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_site_conf_apache_mode</span><span class="pi">:</span> <span class="s">own</span>
+<span class="na">checkmk_server_site_conf_apache_tcp_addr</span><span class="pi">:</span> <span class="s">127.0.0.1</span>
+<span class="na">checkmk_server_site_conf_apache_tcp_port</span><span class="pi">:</span> <span class="m">5000</span>
+<span class="na">checkmk_server_site_conf_multisite_authorisation</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span>
+<span class="na">checkmk_server_site_conf_multisite_cookie_auth</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span>
+<span class="na">checkmk_server_site_conf_nagios_theme</span><span class="pi">:</span> <span class="s">classicui</span></code></pre>
 </div>
 </div>
 </div>
@@ -981,11 +981,11 @@ Please only activate it in a secure network.</p>
 <h4 id="_addons">Addons</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_site_conf_MKEVENTD</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span>
-<span class="na">checkmk_server_site_conf_MKEVENTD_SNMPTRAP</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span>
-<span class="na">checkmk_server_site_conf_MKEVENTD_SYSLOG</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span>
-<span class="na">checkmk_server_site_conf_MKEVENTD_SYSLOG_TCP</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span>
-<span class="na">checkmk_server_site_conf_PNP4NAGIOS</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_site_conf_mkeventd</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span>
+<span class="na">checkmk_server_site_conf_mkeventd_snmptrap</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span>
+<span class="na">checkmk_server_site_conf_mkeventd_syslog</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span>
+<span class="na">checkmk_server_site_conf_mkeventd_syslog_tcp</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span>
+<span class="na">checkmk_server_site_conf_pnp4nagios</span><span class="pi">:</span> <span class="s2">"</span><span class="s">on"</span></code></pre>
 </div>
 </div>
 </div>
@@ -993,8 +993,8 @@ Please only activate it in a secure network.</p>
 <h4 id="_distributed_monitoring">Distributed Monitoring</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_site_conf_LIVESTATUS_TCP</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span>
-<span class="na">checkmk_server_site_conf_NSCA</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_site_conf_livestatus_tcp</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span>
+<span class="na">checkmk_server_site_conf_ncsa</span><span class="pi">:</span> <span class="s2">"</span><span class="s">off"</span></code></pre>
 </div>
 </div>
 </div>
@@ -1563,7 +1563,7 @@ SOFTWARE.</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-05-31 09:58:45 UTC
+Last updated 2022-05-31 10:17:11 UTC
 </div>
 </div>
 </body>
