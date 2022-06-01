@@ -26,7 +26,7 @@
     - var: "AUTOSTART"
       val: "{{ checkmk_server_site_conf_autostart }}"
     - var: "CORE"
-      val: "{{ checkmk_server_site_conf_CORE }}"
+      val: "{{ checkmk_server_site_conf_core }}"
     - var: "LIVESTATUS_TCP"
       val: "{{ checkmk_server_site_conf_livestatus_tcp }}"
     - var: "MKEVENTD"

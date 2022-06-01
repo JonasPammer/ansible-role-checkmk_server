@@ -213,7 +213,7 @@ Enable/Disable configuration of site configuration by this role.
 ----
 checkmk_server_site_conf_admin_mail:
 checkmk_server_site_conf_autostart: "on"
-checkmk_server_site_conf_CORE: nagios
+checkmk_server_site_conf_core: nagios
 checkmk_server_site_conf_tmpfs: "on"
 ----
 
