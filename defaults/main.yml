@@ -8,19 +8,19 @@ checkmk_server_version: "2.0.0p23"
 
 # INSTALL
 checkmk_server_prerequisites: "{{
-  _checkmk_server_prerequisites[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
-  _checkmk_server_prerequisites[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
-  _checkmk_server_prerequisites[ansible_distribution])|default(
-  _checkmk_server_prerequisites[ansible_os_family])|default(
-  _checkmk_server_prerequisites['default']) }}"
+  _checkmk__server_prerequisites[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
+  _checkmk__server_prerequisites[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk__server_prerequisites[ansible_distribution])|default(
+  _checkmk__server_prerequisites[ansible_os_family])|default(
+  _checkmk__server_prerequisites['default']) }}"
 checkmk_server_install_cache_valid_time: "3600"
 
 checkmk_server_download_package: "{{
-  _checkmk_server_download_package[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
-  _checkmk_server_download_package[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
-  _checkmk_server_download_package[ansible_distribution])|default(
-  _checkmk_server_download_package[ansible_os_family])|default(
-  _checkmk_server_download_package['default']) }}"
+  _checkmk__server_download_package[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
+  _checkmk__server_download_package[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk__server_download_package[ansible_distribution])|default(
+  _checkmk__server_download_package[ansible_os_family])|default(
+  _checkmk__server_download_package['default']) }}"
 _checkmk_server_download_checksum: # default checksums for default of '{{ checkmk_server_version }}'
   CentOS_7: "sha1:cb545872dd3fec457f06ed14339f037835bb5bc8"
   CentOS_8: "sha1:d6e05fb124aaf4b19791e33872587ea6d38f8ade"
@@ -69,12 +69,12 @@ checkmk_server_omd_start_command: "omd start {{ checkmk_server_site }}"
 checkmk_server_omd_start_creates: "/opt/omd/sites/{{ checkmk_server_site }}/tmp/apache/run/apache.pid"
 
 checkmk_apache_service: "{{ apache__service|default(
-  _checkmk_apache_service[ansible_distribution ~ '_' ~ ansible_distribution_release])|default(
-  _checkmk_apache_service[ansible_distribution ~ '_' ~ ansible_distribution_major_version])|default(
-  _checkmk_apache_service[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
-  _checkmk_apache_service[ansible_distribution])|default(
-  _checkmk_apache_service[ansible_os_family])|default(
-  _checkmk_apache_service['default']) }}"
+  _checkmk__apache_service[ansible_distribution ~ '_' ~ ansible_distribution_release])|default(
+  _checkmk__apache_service[ansible_distribution ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk__apache_service[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk__apache_service[ansible_distribution])|default(
+  _checkmk__apache_service[ansible_os_family])|default(
+  _checkmk__apache_service['default']) }}"
 
 # CONFIG
 checkmk_server_site_conf: true

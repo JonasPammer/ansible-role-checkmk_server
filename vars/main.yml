@@ -2,16 +2,16 @@
 # vars file of ansible-role jonaspammer.checkmk_server
 # (tl;dr: almost not overwrite-able variables)
 
-_checkmk_apache_service:
+_checkmk__apache_service:
   Debian: apache2
   RedHat: httpd
 
-_checkmk_server_download_package:
+_checkmk__server_download_package:
   RedHat: "check-mk-raw-{{ checkmk_server_version }}-el{{ ansible_distribution_major_version }}-38.x86_64.rpm"
   Debian: &_checkmk_server_download__debian "check-mk-raw-{{ checkmk_server_version }}_0.{{ ansible_distribution_release }}_amd64.deb"
   default: *_checkmk_server_download__debian
 
-_checkmk_server_prerequisites:
+_checkmk__server_prerequisites:
   CentOS_7:
     - cronie
     - python-passlib
@@ -22,7 +22,7 @@ _checkmk_server_prerequisites:
   Debian_9:
     - python-apt
     - python-passlib
-  Debian_10: &_checkmk_server_prerequisites__debian10
+  Debian_10: &_checkmk__server_prerequisites__debian10
     - python3-apt
     - python3-passlib
-  default: *_checkmk_server_prerequisites__debian10
+  default: *_checkmk__server_prerequisites__debian10
