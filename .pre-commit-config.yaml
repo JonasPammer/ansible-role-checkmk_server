@@ -85,7 +85,7 @@ repos:
     rev: v0.950
     hooks:
       - id: mypy
-        additional_dependencies: [] # as per requirements.txt
+        additional_dependencies: ["types-PyYAML"]
 
   # pip-compile`s 'requirements.in' files as its recommended to have the 'requirements.txt' version
   # checked into source control too.
