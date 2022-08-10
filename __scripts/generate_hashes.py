@@ -90,7 +90,10 @@ def main() -> int:
     # TODO: quote str's with "
     print(
         yaml.dump(
-            {"_checkmk_server_download_checksum": results},
+            {
+                "checkmk_server_version": args.checkmk_server_version,
+                "_checkmk_server_download_checksum": results,
+            },
         )
     )
     return retv
