@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import logging
+from urllib.error import HTTPError
 from urllib.request import urlopen
 
 import yaml
@@ -31,11 +32,16 @@ def hash(remote, algorithm="sha1"):
 
 
 def get_remote_sum(url, algorithm="sha1"):
-    remote = urlopen(url)
-    return hash(remote, algorithm)
+    try: 
+        remote = urlopen(url)
+        return "sha1:" + hash(remote, algorithm)
+    except HTTPError as e:
+        if e.code != 404:
+            raise e
+        return "None"
 
-
-def main():
+def main() -> int:
+    retv = 0
     parser = argparse.ArgumentParser()
     parser.add_argument("checkmk_server_version", type=str)
     parser.add_argument(
@@ -51,7 +57,7 @@ def main():
     }
     rpm_distros = {"CentOS": {"7", "8"}}
     results = {}
-
+    
     for distro, releases in deb_distros.items():
         logging.debug(distro + " " + str(releases))
         for release in releases:
@@ -61,7 +67,7 @@ def main():
                 f"{args.checkmk_server_version}_0.{release}_amd64.deb"
             )
             logging.debug(url)
-            _ = results[distro + "_" + release] = f"sha1:{get_remote_sum(url)}"
+            _ = results[distro + "_" + release] = get_remote_sum(url)
             logging.debug(_)
     for distro, releases in rpm_distros.items():
         logging.debug(distro + " " + str(releases))
@@ -72,7 +78,7 @@ def main():
                 f"{args.checkmk_server_version}-el{release}-38.x86_64.rpm"
             )
             logging.debug(url)
-            _ = results[distro + "_" + release] = f"sha1:{get_remote_sum(url)}"
+            _ = results[distro + "_" + release] = get_remote_sum(url)
             logging.debug(_)
 
     # TODO: quote str's with "
@@ -81,6 +87,7 @@ def main():
             {"_checkmk_server_download_checksum": results},
         )
     )
+    return retv
 
 
 if __name__ == "__main__":
