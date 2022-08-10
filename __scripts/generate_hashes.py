@@ -32,13 +32,14 @@ def hash(remote, algorithm="sha1"):
 
 
 def get_remote_sum(url, algorithm="sha1"):
-    try: 
+    try:
         remote = urlopen(url)
         return "sha1:" + hash(remote, algorithm)
     except HTTPError as e:
         if e.code != 404:
             raise e
         return "None"
+
 
 def main() -> int:
     retv = 0
@@ -52,33 +53,41 @@ def main() -> int:
         logging.basicConfig(level=logging.DEBUG)
 
     deb_distros = {
-        "Debian": ["stretch", "buster", "bullseye"],
-        "Ubuntu": ["xenial", "bionic", "focal", "hirsute", "impish"],
+        "Debian": [["stretch", "9"], ["buster", "10"], ["bullseye", "11"]],
+        "Ubuntu": [
+            ["xenial", "16.04"],
+            ["bionic", "18.04"],
+            ["focal", "20.04"],
+            ["hirsute", "21.04"],
+            ["impish", "21.10"],
+            ["jammy", "22.04"],
+        ],
     }
     rpm_distros = {"CentOS": {"7", "8"}}
     results = {}
-    
+
     for distro, releases in deb_distros.items():
         logging.debug(distro + " " + str(releases))
         for release in releases:
+            release_name = release[0]
             url = (
                 f"https://download.checkmk.com/checkmk/"
                 f"{args.checkmk_server_version}/check-mk-raw-"
-                f"{args.checkmk_server_version}_0.{release}_amd64.deb"
+                f"{args.checkmk_server_version}_0.{release_name}_amd64.deb"
             )
             logging.debug(url)
-            _ = results[distro + "_" + release] = get_remote_sum(url)
+            _ = results[distro + "_" + release_name] = get_remote_sum(url)
             logging.debug(_)
-    for distro, releases in rpm_distros.items():
-        logging.debug(distro + " " + str(releases))
-        for release in releases:
+    for distro in rpm_distros:
+        logging.debug(distro + " " + str(rpm_distros[distro]))
+        for release_name in rpm_distros[distro]:
             url = (
                 f"https://download.checkmk.com/checkmk/"
                 f"{args.checkmk_server_version}/check-mk-raw-"
-                f"{args.checkmk_server_version}-el{release}-38.x86_64.rpm"
+                f"{args.checkmk_server_version}-el{release_name}-38.x86_64.rpm"
             )
             logging.debug(url)
-            _ = results[distro + "_" + release] = get_remote_sum(url)
+            _ = results[distro + "_" + release_name] = get_remote_sum(url)
             logging.debug(_)
 
     # TODO: quote str's with "
