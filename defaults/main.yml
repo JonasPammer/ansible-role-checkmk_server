@@ -4,7 +4,6 @@
 
 checkmk_site_url: "http://localhost/{{ checkmk_server_site }}"
 checkmk_server_site: "main"
-checkmk_server_version: "2.0.0p25"
 
 # INSTALL
 checkmk_server_prerequisites: "{{
@@ -15,12 +14,7 @@ checkmk_server_prerequisites: "{{
   _checkmk__server_prerequisites['default']) }}"
 checkmk_server_install_cache_valid_time: "3600"
 
-checkmk_server_download_package: "{{
-  _checkmk__server_download_package[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
-  _checkmk__server_download_package[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
-  _checkmk__server_download_package[ansible_distribution])|default(
-  _checkmk__server_download_package[ansible_os_family])|default(
-  _checkmk__server_download_package['default']) }}"
+checkmk_server_version: "2.0.0p25"
 _checkmk_server_download_checksum:
   CentOS_7: sha1:e0dc364be8047092313d211c1772da75447ab085
   CentOS_8: sha1:1cfd94362489c45cd83cec946b18a4091ec58d86
@@ -39,6 +33,12 @@ checkmk_server_download_checksum: "{{
   _checkmk_server_download_checksum[ansible_distribution])|default(
   _checkmk_server_download_checksum[ansible_os_family])|default(
   _checkmk_server_download_checksum['default']) }}"
+checkmk_server_download_package: "{{
+  _checkmk__server_download_package[ansible_distribution ~ '_' ~ ansible_distribution_major_version]|default(
+  _checkmk__server_download_package[ansible_os_family ~ '_' ~ ansible_distribution_major_version])|default(
+  _checkmk__server_download_package[ansible_distribution])|default(
+  _checkmk__server_download_package[ansible_os_family])|default(
+  _checkmk__server_download_package['default']) }}"
 checkmk_server_download_url: "https://download.checkmk.com/checkmk/{{ checkmk_server_version }}/{{ checkmk_server_download_package }}"
 checkmk_server_download_pubkey_url: "https://download.checkmk.com/checkmk/Check_MK-pubkey.gpg"
 checkmk_server_download_dest: "{{ checkmk_server_download_dest_folder }}/{{ checkmk_server_download_package }}"
