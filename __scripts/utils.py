@@ -5,6 +5,10 @@ import logging
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
+from github import Github
+
+logger = logging.getLogger()
+
 DEBIAN_DISTROS = {
     "Debian": [["stretch", "9"], ["buster", "10"], ["bullseye", "11"]],
     "Ubuntu": [
@@ -61,7 +65,7 @@ def get_remote_sum(url: str, algorithm="sha1"):
         or "None"if the url yieled a HTTP 404 Response Status Code.
     """
     try:
-        logging.debug("Fetching " + url + "...")
+        logger.debug("Fetching " + url + "...")
         remote = urlopen(url)
         return "sha1:" + hash(remote, algorithm)
     except HTTPError as e:
@@ -83,7 +87,7 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
     """
     results = {}
     for distro, releases in DEBIAN_DISTROS.items():
-        logging.debug(distro + " " + str(releases))
+        logger.debug(distro + " " + str(releases))
         for release in releases:
             release_name = release[0]
             url = (
@@ -93,7 +97,7 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
             )
             results[distro + "_" + release_name] = get_remote_sum(url)
     for distro in REDHAT_DISTROS:
-        logging.debug(distro + " " + str(REDHAT_DISTROS[distro]))
+        logger.debug(distro + " " + str(REDHAT_DISTROS[distro]))
         for release_name in REDHAT_DISTROS[distro]:
             url = (
                 f"https://download.checkmk.com/checkmk/"
@@ -102,3 +106,47 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
             )
             results[distro + "_" + release_name] = get_remote_sum(url)
     return results
+
+
+def get_checkmk_raw_tags_since(current_checkmk_server_version: str, github_api: Github):
+    """Query https://github.com/tribe29/checkmk/tags and return list of valid
+    tags that represent new releases that came out since
+    `current_checkmk_server_version`.
+
+    :param current_checkmk_server_version:
+        plain checkmk server version (e.g. "2.1.0p9", not "v2.1.0p9")
+    :param github_api:
+        PyGithub object to use.
+    :return:
+        A list of `github.Tag`'s in which the last item is the latest tag and the
+        first item is the tag that came directly after the given version.
+        Only "real" v2* version tags are included in the list.
+        Beta versions are skipped.
+    """
+    tags_since = []
+    for tag in github_api.get_repo("tribe29/checkmk").get_tags():
+        # this needs to be done because
+        # 1) there's alaways a transient tag "v9.9.9p9-rc9" and
+        # 2) v1 is still maintained too but this role is developed with only v2 in mind
+        if "v2" not in tag.name:
+            continue
+        if tag.name == f"v{current_checkmk_server_version}":
+            break
+        tags_since.append(tag)
+
+    current_checkmk_server_version_base = ".".join(
+        current_checkmk_server_version.split("p")[0].split(".")[0::1]
+    )
+    # skip betas and base of current version
+    new_tags_since = []
+    for tag in tags_since:
+        if tag.name == f"v{current_checkmk_server_version_base}":
+            continue
+        if "b" in tag.name:
+            continue
+        new_tags_since.append(tag)
+
+    # TODO: v2.1.0 needs to be before v2.1.0p[x] (but after v2.1.0b[x]), not at the end
+    # (which currently "means" to the program that its the latest)
+
+    return new_tags_since[::-1]

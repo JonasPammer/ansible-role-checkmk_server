@@ -10,6 +10,7 @@ import logging
 import yaml
 
 from .utils import get_all_remote_sums
+from .utils import logger
 
 
 def main() -> int:
@@ -21,7 +22,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG)
+        logger.setLevel(logging.DEBUG)
 
     # TODO: quote str's with "
     print(
