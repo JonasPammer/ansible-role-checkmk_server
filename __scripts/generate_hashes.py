@@ -31,8 +31,9 @@ def hash(remote, algorithm="sha1"):
     return hash.hexdigest()
 
 
-def get_remote_sum(url, algorithm="sha1"):
+def get_remote_sum(url: str, algorithm="sha1"):
     try:
+        logging.debug("Fetching " + url + "...")
         remote = urlopen(url)
         return "sha1:" + hash(remote, algorithm)
     except HTTPError as e:
@@ -75,9 +76,7 @@ def main() -> int:
                 f"{args.checkmk_server_version}/check-mk-raw-"
                 f"{args.checkmk_server_version}_0.{release_name}_amd64.deb"
             )
-            logging.debug(url)
-            _ = results[distro + "_" + release_name] = get_remote_sum(url)
-            logging.debug(_)
+            results[distro + "_" + release_name] = get_remote_sum(url)
     for distro in rpm_distros:
         logging.debug(distro + " " + str(rpm_distros[distro]))
         for release_name in rpm_distros[distro]:
@@ -86,9 +85,7 @@ def main() -> int:
                 f"{args.checkmk_server_version}/check-mk-raw-"
                 f"{args.checkmk_server_version}-el{release_name}-38.x86_64.rpm"
             )
-            logging.debug(url)
-            _ = results[distro + "_" + release_name] = get_remote_sum(url)
-            logging.debug(_)
+            results[distro + "_" + release_name] = get_remote_sum(url)
 
     # TODO: quote str's with "
     print(
