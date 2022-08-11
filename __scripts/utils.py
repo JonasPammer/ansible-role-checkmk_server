@@ -1,14 +1,20 @@
 from __future__ import annotations
 
 import hashlib
-import logging
+import os
+import pathlib
+import subprocess
+from typing import Any
+from typing import Callable
+from typing import Sequence
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
+import verboselogs
 import yaml
 from github import Github
 
-logger = logging.getLogger()
+logger = verboselogs.VerboseLogger("ansible-roles")
 
 DEBIAN_DISTROS = {
     "Debian": [["stretch", "9"], ["buster", "10"], ["bullseye", "11"]],
@@ -163,3 +169,50 @@ def get_checkmk_raw_tags_since(current_checkmk_server_version: str, github_api: 
     # (which currently "means" to the program that its the latest)
 
     return new_tags_since[::-1]
+
+
+# Copied from JonasPammer/ansible-roles
+def execute(
+    args: Sequence[str | os.PathLike[Any]],
+    path: pathlib.Path,
+    is_real_error: Callable[[subprocess.CalledProcessError], bool] | None = None,
+) -> str:
+    """Execute given command in the given directory with appropiate of logs,
+    returing the output if all went ok.
+
+    :param args:
+        The actual command to execute.
+    :param path:
+        The `cwd` to execute the subproccess in.
+    :param is_real_error:
+        If the exit code was non-zero, this function is used to determine
+        whether to throw and report about the thrown CalledProcessError
+        or wheter to just log and return the output like normal.
+        None is interpreted as "always True".
+        None by default.
+    :raises subproccess.CalledProcesssError:
+        If the exit code was non-zero and `is_real_error`
+        is either None or returns True,
+        this function raises a CalledProcessError.
+        The CalledProcessError object will have  the return code in the
+        returncode attribute and output in the output attribute.
+    :return: decoded output of command
+    """
+    cmd_str = " ".join([str(_) for _ in args])
+    logger.verbose(f"Executing '{cmd_str}'...")
+
+    result = None
+    try:
+        result = subprocess.check_output(args, cwd=path.absolute())
+        logger.verbose(result.decode())
+        return result.decode()
+    except subprocess.CalledProcessError as ex:
+        if is_real_error is not None and not is_real_error(ex):
+            logger.verbose(ex.stdout.decode())
+            return ex.stdout.decode()
+        logger.error(f"stdout: \n {ex.stdout.decode()}")
+        logger.error(
+            f"'{cmd_str}' for '{path}' returned non-zero exit status {ex.returncode}! "
+            f"See above for more information."
+        )
+        raise ex
