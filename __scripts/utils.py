@@ -5,6 +5,7 @@ import logging
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
+import yaml
 from github import Github
 
 logger = logging.getLogger()
@@ -106,6 +107,18 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
             )
             results[distro + "_" + release_name] = get_remote_sum(url)
     return results
+
+
+def generate_yaml(checkmk_server_version: str) -> str:
+    # TODO: quote str's with "
+    return yaml.dump(
+        {
+            "checkmk_server_version": checkmk_server_version,
+            "_checkmk_server_download_checksum": get_all_remote_sums(
+                checkmk_server_version
+            ),
+        },
+    )
 
 
 def get_checkmk_raw_tags_since(current_checkmk_server_version: str, github_api: Github):

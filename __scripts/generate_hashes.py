@@ -7,14 +7,11 @@ from __future__ import annotations
 import argparse
 import logging
 
-import yaml
-
-from .utils import get_all_remote_sums
+from .utils import generate_yaml
 from .utils import logger
 
 
 def main() -> int:
-    retv = 0
     parser = argparse.ArgumentParser()
     parser.add_argument("checkmk_server_version", type=str)
     parser.add_argument(
@@ -24,18 +21,8 @@ def main() -> int:
     if args.verbose:
         logger.setLevel(logging.DEBUG)
 
-    # TODO: quote str's with "
-    print(
-        yaml.dump(
-            {
-                "checkmk_server_version": args.checkmk_server_version,
-                "_checkmk_server_download_checksum": get_all_remote_sums(
-                    args.checkmk_server_version
-                ),
-            },
-        )
-    )
-    return retv
+    print(generate_yaml(args.checkmk_server_version))
+    return 0
 
 
 if __name__ == "__main__":
