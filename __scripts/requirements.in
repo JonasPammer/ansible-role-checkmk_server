@@ -1,0 +1,4 @@
+PyGitHub>=1,<2
+pyyaml
+rich>=12
+types-PyYAML
