@@ -1,4 +1,4 @@
-"""Generator for _checkmk_server_download_checksum.
+"""Inform about new checkmk tags after a given version.
 
 Invoke with `python3 -m __scripts.check_new_version`
 """
@@ -20,7 +20,6 @@ def main() -> int:
     github_api: Github = (
         Github(os.environ["GITHUB_TOKEN"]) if "GITHUB_TOKEN" in os.environ else Github()
     )
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--checkmk_server_version",
