@@ -114,7 +114,6 @@ def main() -> int:
     else:
         execute(["git", "branch", PR_BRANCH], repo_path)
     execute(["git", "checkout", PR_BRANCH], repo_path)
-    execute(["git", "branch", f"--set-upstream-to=origin/{PR_BRANCH}"], repo_path)
     execute(["git", "reset", "--hard", f"origin/{MASTER_BRANCH}"], repo_path)
     execute(["git", "clean", "-dfx"], repo_path)
 
@@ -136,6 +135,7 @@ def main() -> int:
     execute(["git", "add", "."], repo_path)
     execute(["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG], repo_path)
     execute(["git", "push", "--force"], repo_path)
+    execute(["git", "branch", f"--set-upstream-to=origin/{PR_BRANCH}"], repo_path)
 
     _pull_requests = repo.get_pulls()
     found_pr: PullRequest | None = None
