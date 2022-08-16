@@ -134,8 +134,10 @@ def main() -> int:
     logger.verbose(_defaults_yml_contents_diff)
     defaults_yml.write_text(defaults_yml_contents_new)
 
-    execute(["git", "add", "."], repo_path)
-    execute(["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG], repo_path)
+    _git_status = execute(["git", "status", "--porcelain"], repo_path)
+    if _git_status != "":
+        execute(["git", "add", "."], repo_path)
+        execute(["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG], repo_path)
     execute(
         ["git", "push", "--force", "--set-upstream", "origin", PR_BRANCH], repo_path
     )
