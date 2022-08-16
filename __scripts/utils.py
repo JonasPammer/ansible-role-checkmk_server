@@ -98,6 +98,7 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
         and the key is the result of `get_remote_sum`
         of the release in question (which may be the literal "None").
     """
+    checkmk_server_version = checkmk_server_version.replace("v", "")
     results = {}
     for distro, releases in DEBIAN_DISTROS.items():
         logger.debug(distro + " " + str(releases))
@@ -149,6 +150,8 @@ def get_checkmk_raw_tags_since(current_checkmk_server_version: str, github_api: 
         Beta versions are skipped.
         The name of tags include a "v" at the beginning!
     """
+    current_checkmk_server_version = current_checkmk_server_version.replace("v", "")
+
     tags_since = []
     for tag in github_api.get_repo("tribe29/checkmk").get_tags():
         # this needs to be done because
