@@ -80,9 +80,11 @@ def main() -> int:
         f"Next: '{next_checkmk_server_version}'"
     )
 
-    _git_branch_before = execute(
-        ["git", "symbolic-ref", "-q", "HEAD"], repo_path
-    ).replace("refs/heads/", "")
+    _git_branch_before = (
+        execute(["git", "symbolic-ref", "-q", "HEAD"], repo_path)
+        .replace("refs/heads/", "")
+        .strip()
+    )
 
     def atexit_handler() -> None:
         execute(["git", "checkout", _git_branch_before], repo_path)
