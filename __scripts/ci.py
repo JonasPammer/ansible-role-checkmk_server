@@ -111,7 +111,9 @@ def main() -> int:
             f"to accomodate potentially changed script behaviour."
         )
         sleep(5)
-    execute(["git", "checkout", "-b", PR_BRANCH], repo_path)
+    else:
+        execute(["git", "branch", PR_BRANCH], repo_path)
+    execute(["git", "checkout", PR_BRANCH], repo_path)
     execute(["git", "branch", f"--set-upstream-to=origin/{PR_BRANCH}"], repo_path)
     execute(["git", "reset", "--hard", f"origin/{MASTER_BRANCH}"], repo_path)
     execute(["git", "clean", "-dfx"], repo_path)
