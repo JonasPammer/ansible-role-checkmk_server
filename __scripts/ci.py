@@ -25,7 +25,7 @@ from .utils import logger
 from .utils import replace_text_between
 
 
-PR_BRANCH: str = "ci-refactor-checkmk_server_version"
+PR_BRANCH: str = "checkmk_server_version-autoupdate"
 MASTER_BRANCH: str = PR_BRANCH
 
 
