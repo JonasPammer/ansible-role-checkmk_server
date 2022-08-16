@@ -14,6 +14,7 @@ checkmk_server_prerequisites: "{{
   _checkmk__server_prerequisites['default']) }}"
 checkmk_server_install_cache_valid_time: "3600"
 
+#===== BEGIN generate_yaml MANAGED SECTION
 checkmk_server_version: "2.0.0p25"
 _checkmk_server_download_checksum:
   CentOS_7: sha1:e0dc364be8047092313d211c1772da75447ab085
@@ -26,6 +27,7 @@ _checkmk_server_download_checksum:
   Ubuntu_hirsute: sha1:c89597e9d6dea0b3ac099294281cae6a18863f20
   Ubuntu_impish: sha1:205efff39b6f23dd48ff84b0349d3f6983273715
   Ubuntu_xenial: sha1:b7c05640603fe4b826057b59dd751543e5e5b77a
+#===== END generate_yaml MANAGED SECTION
 checkmk_server_download_checksum: "{{
   _checkmk_server_download_checksum[ansible_distribution ~ '_' ~ ansible_distribution_release]|default(
   _checkmk_server_download_checksum[ansible_distribution ~ '_' ~ ansible_distribution_major_version])|default(

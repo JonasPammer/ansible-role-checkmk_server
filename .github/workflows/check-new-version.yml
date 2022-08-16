@@ -1,0 +1,45 @@
+---
+name: CI (Lint + Molecule)
+"on":
+  workflow_dispatch:
+    inputs:
+      lint:
+        description: "Lint"
+        required: true
+        default: true
+        type: boolean
+  schedule:
+    # At 05:00 on Sunday.
+    - cron: "0 5 * * 0"
+
+permissions:
+  contents: read
+
+jobs:
+  check-new-version:
+    name: Check New Version
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      ### GENERIC COOKIECUTTER INITIALIZATION STEPS ###
+      - name: check out the codebase
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b # tag=v3
+
+      - name: set up python 3
+        uses: actions/setup-python@b55428b1882923874294fa556849718a1d7f2ca5 # tag=v4
+        with:
+          python-version: "3.x"
+
+      - name: install python dependencies
+        run: |
+          python3 -m pip install -r __scripts/requirements.txt
+
+      - name: Run ci.py
+        id: script_output
+        run: |
+          python3 -m __scripts.ci
