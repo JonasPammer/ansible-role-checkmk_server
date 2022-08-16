@@ -106,7 +106,7 @@ def main() -> int:
     # Create pristine branch
     if PR_BRANCH in execute(["git", "branch", "--list"], repo_path):
         logger.notice(
-            f"Branch {PR_BRANCH} already exists. "
+            f"Branch '{PR_BRANCH}' already exists. "
             f"Note that this script will force-overwrite it "
             f"to accomodate potentially changed script behaviour."
         )
