@@ -134,8 +134,9 @@ def main() -> int:
 
     execute(["git", "add", "."], repo_path)
     execute(["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG], repo_path)
-    execute(["git", "push", "--force"], repo_path)
-    execute(["git", "branch", f"--set-upstream-to=origin/{PR_BRANCH}"], repo_path)
+    execute(
+        ["git", "push", "--force", "--set-upstream", "origin", PR_BRANCH], repo_path
+    )
 
     _pull_requests = repo.get_pulls()
     found_pr: PullRequest | None = None
