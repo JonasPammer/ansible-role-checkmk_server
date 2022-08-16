@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import atexit
 import difflib
 import getpass
 import os
@@ -82,6 +83,10 @@ def main() -> int:
     _git_branch_before = execute(
         ["git", "symbolic-ref", "-q", "HEAD"], repo_path
     ).replace("refs/heads/", "")
+
+    def atexit_handler() -> None:
+        execute(["git", "checkout", _git_branch_before], repo_path)
+
     _git_status_before = execute(["git", "status", "--porcelain"], repo_path)
     if _git_status_before != "":
         logger.error("Working directory is not clean! Aborting...")
@@ -114,6 +119,7 @@ def main() -> int:
     else:
         execute(["git", "branch", PR_BRANCH], repo_path)
     execute(["git", "checkout", PR_BRANCH], repo_path)
+    atexit.register(atexit_handler)
     execute(["git", "push"], repo_path, is_real_error=lambda _: False)
     execute(["git", "fetch"], repo_path)
     execute(["git", "reset", "--hard", f"origin/{MASTER_BRANCH}"], repo_path)
