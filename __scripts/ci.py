@@ -131,7 +131,7 @@ def main() -> int:
     logger.verbose(_defaults_yml_contents_diff)
     defaults_yml.write_text(defaults_yml_contents_new)
 
-    execute(["git", "add"], repo_path)
+    execute(["git", "add", "."], repo_path)
     execute(["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG], repo_path)
     execute(["git", "push", "--force"], repo_path)
 
