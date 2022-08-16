@@ -6,6 +6,7 @@ import getpass
 import os
 import platform
 from pathlib import Path
+from time import sleep
 from typing import Iterator
 
 import yaml
@@ -109,7 +110,7 @@ def main() -> int:
             f"Note that this script will force-overwrite it "
             f"to accomodate potentially changed script behaviour."
         )
-        pass
+        sleep(5)
     execute(["git", "checkout", "-b", PR_BRANCH], repo_path)
     execute(["git", "branch", f"--set-upstream-to=origin/{PR_BRANCH}"], repo_path)
     execute(["git", "reset", "--hard", f"origin/{MASTER_BRANCH}"], repo_path)
