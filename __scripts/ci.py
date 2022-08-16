@@ -25,8 +25,8 @@ from .utils import logger
 from .utils import replace_text_between
 
 
-MASTER_BRANCH: str = "master"
 PR_BRANCH: str = "ci-refactor-checkmk_server_version"
+MASTER_BRANCH: str = PR_BRANCH
 
 
 def _unidiff_output(expected: str, actual: str):
@@ -138,6 +138,7 @@ def main() -> int:
     _pull_requests = repo.get_pulls()
     found_pr: PullRequest | None = None
     for pr in _pull_requests:
+        logger.debug(f"{pr} {pr.head}")
         if (
             pr.head == PR_BRANCH
             and "refactor: update default checkmk_server_version" not in pr.title
