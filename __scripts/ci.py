@@ -114,6 +114,8 @@ def main() -> int:
     else:
         execute(["git", "branch", PR_BRANCH], repo_path)
     execute(["git", "checkout", PR_BRANCH], repo_path)
+    execute(["git", "push"], repo_path, is_real_error=lambda _: False)
+    execute(["git", "fetch"], repo_path)
     execute(["git", "reset", "--hard", f"origin/{MASTER_BRANCH}"], repo_path)
     execute(["git", "clean", "-dfx"], repo_path)
 
