@@ -24,6 +24,10 @@ from .utils import logger
 from .utils import replace_text_between
 
 
+MASTER_BRANCH: str = "master"
+PR_BRANCH: str = "ci-refactor-checkmk_server_version"
+
+
 def _unidiff_output(expected: str, actual: str):
     """Returns a string containing the unified diff of two multiline
     strings."""
@@ -99,17 +103,16 @@ def main() -> int:
     """
 
     # Create pristine branch
-    branch_name: str = "ci-refactor-checkmk_server_version"
-    if branch_name in execute(["git", "branch", "--list"], repo_path):
+    if PR_BRANCH in execute(["git", "branch", "--list"], repo_path):
         logger.info(
-            f"Branch {branch_name} already exists. "
+            f"Branch {PR_BRANCH} already exists. "
             f"Note that this script will force-overwrite it "
             f"to accomodate potentially changed script behaviour."
         )
         pass
-    execute(["git", "checkout", "-b", branch_name], repo_path)
-    execute(["git", "branch", f"--set-upstream-to=origin/{branch_name}"], repo_path)
-    execute(["git", "reset", "--hard", "origin/master"], repo_path)
+    execute(["git", "checkout", "-b", PR_BRANCH], repo_path)
+    execute(["git", "branch", f"--set-upstream-to=origin/{PR_BRANCH}"], repo_path)
+    execute(["git", "reset", "--hard", f"origin/{MASTER_BRANCH}"], repo_path)
     execute(["git", "clean", "-dfx"], repo_path)
 
     # make changes
@@ -135,7 +138,7 @@ def main() -> int:
     found_pr: PullRequest | None = None
     for pr in _pull_requests:
         if (
-            pr.head == branch_name
+            pr.head == PR_BRANCH
             and "refactor: update default checkmk_server_version" not in pr.title
         ):
             if found_pr is None:
@@ -155,10 +158,10 @@ def main() -> int:
                 f"{next_checkmk_server_version}! Aborting..."
             )
             exit(1)
-        found_pr.edit(title=COMMIT_TITLE, body=PR_BODY, state="open", base=branch_name)
+        found_pr.edit(title=COMMIT_TITLE, body=PR_BODY, state="open", base=PR_BRANCH)
     else:
         pr = repo.create_pull(
-            title=COMMIT_TITLE, body=PR_BODY, head=branch_name, base="master"
+            title=COMMIT_TITLE, body=PR_BODY, head=PR_BRANCH, base=MASTER_BRANCH
         )
 
     logger.verbose("Checking out previous branch and working tree again..")
