@@ -120,16 +120,15 @@ def main() -> int:
         "refactor: update default checkmk_server_version "
         f"to {next_checkmk_server_version}"
     )
-    SCRIPT_MSG: str = f"""
-Authored by `__scripts/ci.py` python script
-on {platform.node()} by {getpass.getuser()}
-({execute(["git", "rev-parse", "--verify", "HEAD"], repo_path).strip()})
-    """
-    PR_BODY: str = f"""
-NOTE: This should result in a new minor version release of this role!
-
-{SCRIPT_MSG}
-    """
+    SCRIPT_MSG: str = (
+        "Authored by `__scripts/ci.py` python script "
+        f"on {platform.node()} by {getpass.getuser()} "
+        f"({execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
+    )
+    PR_BODY: str = (
+        f"{SCRIPT_MSG} \n\n NOTE: This should result in a new minor version"
+        "release of this role!"
+    )
 
     # ENSURE PRISTINE BRANCH
     if f"/refs/heads/{PR_BRANCH}" in execute(
