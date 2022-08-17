@@ -73,6 +73,8 @@ def main() -> int:
     current_defaults_yml = yaml.safe_load(Path("defaults/main.yml").read_text())
     current_checkmk_server_version = current_defaults_yml["checkmk_server_version"]
 
+    # TODO: DRY and implement agent update/pr mechanic
+
     # https://git-blame.blogspot.com/2013/06/checking-current-branch-programatically.html
     _git_branch_before = (
         execute(["git", "symbolic-ref", "--short", "-q", "HEAD"], repo_path)
@@ -140,14 +142,17 @@ def main() -> int:
     DESCRIPTION: str = (
         f"Release Date of [{next_checkmk_server_version.name}]({__url}): "
         f"{__date.strftime('%Y-%m-%d')}"
+        f"\n\n"
+        f"* Accompanying `ansible-role-checkmk_agent` PR: "
+        f"https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO"
     )
     DESCRIPTION_NOTE = ""
     if len(tags_since) > 1:
         DESCRIPTION_NOTE = (
             f"\n\nNOTE: There have been **{len(tags_since)}** new versions since "
             f"{current_checkmk_server_version}. "
-            f"After this PR has been merged, the github workflow will run again "
-            f"and a new PR will open semi-immideatily. "
+            f"*After this PR has been merged, the github workflow will run again "
+            f"and a new PR will open semi-immideatily*. "
             f"Please **ensure to create a proper tag/release "
             f"for every merged ci.py PR**."
         )
