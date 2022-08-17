@@ -184,7 +184,8 @@ def main() -> int:
 
     logger.verbose("Checking out previous branch and working tree again..")
     execute(["git", "checkout", _git_branch_before], repo_path)
-    execute(["git", "stash", "pop"], repo_path)
+    if execute(["git", "stash", "list", "--porcelain"], repo_path).strip() != "":
+        execute(["git", "stash", "pop"], repo_path)
 
     return 0
 
