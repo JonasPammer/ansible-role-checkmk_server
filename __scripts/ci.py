@@ -255,7 +255,7 @@ def main() -> int:
             found_pr.edit(title=COMMIT_TITLE, body=PR_BODY, state="open")
     else:
         if not args.dry_run:
-            pr = repo.create_pull(
+            repo.create_pull(
                 title=COMMIT_TITLE, body=PR_BODY, head=PR_BRANCH, base=MASTER_BRANCH
             )
 
