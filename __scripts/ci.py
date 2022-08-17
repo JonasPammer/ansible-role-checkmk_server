@@ -121,14 +121,14 @@ def main() -> int:
         f"to {next_checkmk_server_version}"
     )
     SCRIPT_MSG: str = f"""
-    Authored by `__scripts/ci.py` python script
-    on {platform.node()} by {getpass.getuser()}
-    ({execute(["git", "rev-parse", "--verify", "HEAD"], repo_path).strip()})
+Authored by `__scripts/ci.py` python script
+on {platform.node()} by {getpass.getuser()}
+({execute(["git", "rev-parse", "--verify", "HEAD"], repo_path).strip()})
     """
     PR_BODY: str = f"""
-    NOTE: This should result in a new minor version release of this role!
+NOTE: This should result in a new minor version release of this role!
 
-    {SCRIPT_MSG}
+{SCRIPT_MSG}
     """
 
     # ENSURE PRISTINE BRANCH
