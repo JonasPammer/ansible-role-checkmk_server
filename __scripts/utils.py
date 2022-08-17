@@ -6,6 +6,7 @@ import os
 import pathlib
 import subprocess
 from argparse import ArgumentParser
+from functools import lru_cache
 from typing import Any
 from typing import Callable
 from typing import Sequence
@@ -58,6 +59,7 @@ def hash(remote, algorithm="sha1"):
     return hash.hexdigest()
 
 
+@lru_cache(maxsize=None)
 def get_remote_sum(url: str, algorithm="sha1"):
     """
     :param url:
@@ -88,6 +90,7 @@ def get_remote_sum(url: str, algorithm="sha1"):
         return "None"
 
 
+@lru_cache(maxsize=None)
 def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
     """Loop over `DEBIAN_DISTROS` / `REDHAT_DISTROS` and generate a dictionary
     containing all sha's for the given version.
