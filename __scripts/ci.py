@@ -119,9 +119,10 @@ def main() -> int:
     __date = next_checkmk_server_version.commit.commit.committer.date
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
-        f"to {next_checkmk_server_version.name} "
-        f"({__date.strftime('%Y-%m-%d')}) "
-        ":arrow_up:"
+        f"to {next_checkmk_server_version.name} arrow_up: \n\n"
+        f"Release Date of [{next_checkmk_server_version.name}]"
+        f"({next_checkmk_server_version.commit.url}): "
+        f"{__date.strftime('%Y-%m-%d')}"
     )
     SCRIPT_MSG: str = (
         "Authored by `__scripts/ci.py` python script"
