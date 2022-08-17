@@ -93,9 +93,9 @@ See <<changelog>> for an overview.
 [NOTE]
 Even though you could pin the version of this role to get a pinned version of checkmk,
 I recommend that you install the latest version of this role and
-change these variables yourself instead
-because I do not backport actual patches made to this role into older versions
-(if that is even possible)
+change these variables yourself instead as I do not backport
+actual patches made to this role into older versions
+(if that is even possible).
 
 
 [[variables--installation]]
