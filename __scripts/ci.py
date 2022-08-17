@@ -83,6 +83,10 @@ def main() -> int:
     )
 
     def atexit_handler() -> None:
+        logger.notice(
+            "The program terminated unexpectedly! "
+            "Checking out the branch we were previously on..."
+        )
         execute(["git", "checkout", _git_branch_before], repo_path)
 
     _git_status_before = execute(["git", "status", "--porcelain"], repo_path)
