@@ -170,7 +170,7 @@ NOTE: This should result in a new minor version release of this role!
 
     _git_status = execute(["git", "status", "--porcelain"], repo_path)
     if _git_status != "":
-        execute(["git", "add", "."], repo_path)
+        execute(["git", "add", "defaults/main.yml"], repo_path)
         execute(["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG], repo_path)
     if not args.dry_run:
         execute(
