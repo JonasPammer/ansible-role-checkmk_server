@@ -140,7 +140,7 @@ def main() -> int:
             f"for every merged ci.py PR**."
         )
     SCRIPT_MSG: str = (
-        "Authored by `__scripts/ci.py` python script "
+        ":robot: Authored by `__scripts/ci.py` python script "
         f"on {platform.node()} by {getpass.getuser()} "
         f"({execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
     )
