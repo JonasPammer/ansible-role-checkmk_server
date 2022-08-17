@@ -29,6 +29,7 @@ from .utils import replace_text_between
 PR_BRANCH: str = "checkmk_server_version-autoupdate"
 MASTER_BRANCH: str = "feat-checkmk_server_version-autoupdate"
 
+
 def _unidiff_output(expected: str, actual: str):
     """Returns a string containing the unified diff of two multiline
     strings."""
@@ -105,24 +106,24 @@ def main() -> int:
     {SCRIPT_MSG}
     """
 
-    # Create pristine branch
-    if PR_BRANCH in execute(["git", "branch", "--list"], repo_path):
+    # ENSURE PRISTINE BRANCH
+    if PR_BRANCH in execute(["git", "ls-remote", "--heads"], repo_path):
         logger.notice(
-            f"Branch '{PR_BRANCH}' already exists. "
+            f"Branch '{PR_BRANCH}' already exists on remotes. "
             f"Note that this script will force-overwrite it "
             f"to accomodate potentially changed script behaviour."
         )
         sleep(5)
     else:
         execute(["git", "branch", PR_BRANCH], repo_path)
+    execute(["git", "fetch"], repo_path)
     execute(["git", "checkout", PR_BRANCH], repo_path)
     atexit.register(atexit_handler)
-    execute(["git", "push"], repo_path, is_real_error=lambda _: False)
-    execute(["git", "fetch"], repo_path)
-    execute(["git", "reset", "--hard", f"origin/{MASTER_BRANCH}"], repo_path)
+
+    execute(["git", "reset", "--hard", f"{MASTER_BRANCH}"], repo_path)
     execute(["git", "clean", "-dfx"], repo_path)
 
-    # make changes
+    # MAKE CHANGES
     defaults_yml: Path = repo_path.joinpath("defaults/main.yml")
     defaults_yml_contents_old: str = defaults_yml.read_text()
     defaults_yml_contents_new: str = replace_text_between(
