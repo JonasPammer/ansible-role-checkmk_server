@@ -44,6 +44,11 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     add_argparse_verbosity_option(parser)
     add_argparse_silent_option(parser)
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Disable pushing the changes made and creating the PR.",
+    )
     args = parser.parse_args()
     init_logger(args.verbose, args.silent)
 
@@ -151,9 +156,10 @@ def main() -> int:
     if _git_status != "":
         execute(["git", "add", "."], repo_path)
         execute(["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG], repo_path)
-    execute(
-        ["git", "push", "--force", "--set-upstream", "origin", PR_BRANCH], repo_path
-    )
+    if not args.dry_run:
+        execute(
+            ["git", "push", "--force", "--set-upstream", "origin", PR_BRANCH], repo_path
+        )
 
     _pull_requests = repo.get_pulls()
     found_pr: PullRequest | None = None
@@ -172,19 +178,22 @@ def main() -> int:
             )
             exit(1)
 
-    if found_pr is not None:
-        if next_checkmk_server_version not in found_pr.title:
-            logger.warning(
-                f"{pr} seems to have been created by ci.py "
-                f"but it's title does not match "
-                f"{next_checkmk_server_version}! Aborting..."
+    if not args.dry_run:
+        if found_pr is not None:
+            if next_checkmk_server_version not in found_pr.title:
+                logger.warning(
+                    f"{pr} seems to have been created by ci.py "
+                    f"but it's title does not match "
+                    f"{next_checkmk_server_version}! Aborting..."
+                )
+                exit(1)
+            found_pr.edit(
+                title=COMMIT_TITLE, body=PR_BODY, state="open", base=PR_BRANCH
             )
-            exit(1)
-        found_pr.edit(title=COMMIT_TITLE, body=PR_BODY, state="open", base=PR_BRANCH)
-    else:
-        pr = repo.create_pull(
-            title=COMMIT_TITLE, body=PR_BODY, head=PR_BRANCH, base=MASTER_BRANCH
-        )
+        else:
+            pr = repo.create_pull(
+                title=COMMIT_TITLE, body=PR_BODY, head=PR_BRANCH, base=MASTER_BRANCH
+            )
 
     logger.verbose("Checking out previous branch and working tree again..")
     execute(["git", "checkout", _git_branch_before], repo_path)
