@@ -132,7 +132,7 @@ def main() -> int:
     )
     if len(tags_since) > 1:
         DESCRIPTION += (
-            f"\nNOTE: There have been **{len(tags_since)}** new versions since "
+            f"\n\nNOTE: There have been **{len(tags_since)}** new versions since "
             f"{current_checkmk_server_version}. "
             f"After this PR has been merged, the github workflow will run again "
             f"and a new PR will open semi-immideatily. "
