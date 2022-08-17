@@ -40,6 +40,17 @@ def _unidiff_output(expected: str, actual: str):
     return "".join(diff)
 
 
+def _pop_git_stash_if(old: str, repo_path: Path) -> None:
+    if old != "":
+        logger.notice(
+            "git contains a stash that has not been created by this script run. "
+            "Please resolve by 'git stash pop'ing yourself! "
+        )
+        return
+    if execute(["git", "stash", "list", "--porcelain"], repo_path).strip() != "":
+        execute(["git", "stash", "pop"], repo_path)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     add_argparse_verbosity_option(parser)
@@ -71,6 +82,9 @@ def main() -> int:
             f"Is: '{_git_branch_before}'. Aborting..."
         )
         exit(1)
+    _git_stash_list_before = execute(
+        ["git", "stash", "list", "--porcelain"], repo_path
+    ).strip()
 
     tags_since = get_checkmk_raw_tags_since(current_checkmk_server_version, github_api)
     if len(tags_since) == 0:
@@ -90,9 +104,11 @@ def main() -> int:
     def atexit_handler() -> None:
         logger.notice(
             "The program terminated unexpectedly! "
-            "Checking out the branch we were previously on..."
+            "Checking out the branch we were previously on "
+            "and popping stash..."
         )
         execute(["git", "checkout", _git_branch_before], repo_path)
+        _pop_git_stash_if(_git_stash_list_before, repo_path)
 
     _git_status_before = execute(["git", "status", "--porcelain"], repo_path)
     if _git_status_before != "":
@@ -197,8 +213,7 @@ def main() -> int:
 
     logger.verbose("Checking out previous branch and working tree again..")
     execute(["git", "checkout", _git_branch_before], repo_path)
-    if execute(["git", "stash", "list", "--porcelain"], repo_path).strip() != "":
-        execute(["git", "stash", "pop"], repo_path)
+    _pop_git_stash_if(_git_stash_list_before, repo_path)
 
     atexit.unregister(atexit_handler)
     return 0
