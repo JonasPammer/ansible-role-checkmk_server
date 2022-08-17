@@ -119,7 +119,9 @@ def main() -> int:
     __date = next_checkmk_server_version.commit.commit.committer.date
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
-        f"to {next_checkmk_server_version.name} arrow_up: \n\n"
+        f"to {next_checkmk_server_version.name} arrow_up:"
+    )
+    DESCRIPTION: str = (
         f"Release Date of [{next_checkmk_server_version.name}]"
         f"({next_checkmk_server_version.commit.url}): "
         f"{__date.strftime('%Y-%m-%d')}"
@@ -130,8 +132,8 @@ def main() -> int:
         f"({execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
     )
     PR_BODY: str = (
-        f"{SCRIPT_MSG} \n\n NOTE: This should result in a new minor version"
-        "release of this role!"
+        f"{SCRIPT_MSG} \n\n {DESCRIPTION} \n\n "
+        "NOTE: This should result in a new minor version release of this role!"
     )
 
     # ENSURE PRISTINE BRANCH
