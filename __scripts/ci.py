@@ -54,7 +54,7 @@ def _pop_git_stash_if(old: str, repo_path: Path) -> None:
         execute(["git", "stash", "pop"], repo_path)
 
 
-def main() -> int:
+def main() -> None:
     parser = argparse.ArgumentParser()
     add_argparse_verbosity_option(parser)
     add_argparse_silent_option(parser)
@@ -269,8 +269,7 @@ def main() -> int:
     _pop_git_stash_if(_git_stash_list_before, repo_path)
 
     atexit.unregister(atexit_handler)
-    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

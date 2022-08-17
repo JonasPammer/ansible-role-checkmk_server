@@ -16,7 +16,7 @@ from .utils import get_checkmk_raw_tags_since
 from .utils import logger
 
 
-def main() -> int:
+def main() -> None:
     github_api: Github = (
         Github(os.environ["GITHUB_TOKEN"]) if "GITHUB_TOKEN" in os.environ else Github()
     )
@@ -53,10 +53,8 @@ def main() -> int:
             f"that come after {current_checkmk_server_version}: \n* "
             + "\n* ".join([t.name for t in tags_since])
         )
-        return 1
-
-    return 0
+        exit(1)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()

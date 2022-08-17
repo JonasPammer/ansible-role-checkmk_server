@@ -22,8 +22,8 @@ def main() -> int:
         logger.setLevel(logging.DEBUG)
 
     print(generate_yaml(args.checkmk_server_version))
-    return 0
+    exit(1)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    main()
