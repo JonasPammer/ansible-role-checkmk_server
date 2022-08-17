@@ -215,6 +215,7 @@ def main() -> int:
     _git_status = execute(["git", "status", "--porcelain"], repo_path)
     if _git_status != "":
         execute(["git", "add", "defaults/main.yml"], repo_path)
+        execute(["git", "add", "README.orig.adoc"], repo_path)
         execute(
             ["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG, "-m", DESCRIPTION],
             repo_path,
