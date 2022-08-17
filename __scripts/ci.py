@@ -119,7 +119,8 @@ def main() -> int:
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
         f"to {next_checkmk_server_version.name} "
-        f"({next_checkmk_server_version.commit.commiter.date.split(' ')[0]}) :arrow_up:"
+        f"({next_checkmk_server_version.commit.committer.date.split(' ')[0]}) "
+        ":arrow_up:"
     )
     SCRIPT_MSG: str = (
         "Authored by `__scripts/ci.py` python script"
