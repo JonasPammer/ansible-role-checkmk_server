@@ -203,9 +203,7 @@ NOTE: This should result in a new minor version release of this role!
             )
             exit(1)
         if not args.dry_run:
-            found_pr.edit(
-                title=COMMIT_TITLE, body=PR_BODY, state="open", base=PR_BRANCH
-            )
+            found_pr.edit(title=COMMIT_TITLE, body=PR_BODY, state="open")
     else:
         if not args.dry_run:
             pr = repo.create_pull(
