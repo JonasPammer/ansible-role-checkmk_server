@@ -123,7 +123,7 @@ def main() -> int:
     )
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
-        f"to {next_checkmk_server_version.name} arrow_up:"
+        f"to {next_checkmk_server_version.name} :arrow_up:"
     )
     DESCRIPTION: str = (
         f"Release Date of [{next_checkmk_server_version.name}]({__url}): "
