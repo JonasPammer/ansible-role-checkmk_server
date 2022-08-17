@@ -94,11 +94,11 @@ def main() -> int:
             "'All good. Doing nothing'."
         )
         exit(0)
-    next_checkmk_server_version = tags_since[0].name
+    next_checkmk_server_version = tags_since[0]
     console.print(
         f"There have been {len(tags_since)} new versions since "
         f"'{current_checkmk_server_version}'! "
-        f"Next: '{next_checkmk_server_version}'"
+        f"Next: '{next_checkmk_server_version.name}'"
     )
 
     def atexit_handler() -> None:
@@ -118,7 +118,8 @@ def main() -> int:
 
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
-        f"to {next_checkmk_server_version} :arrow_up:"
+        f"to {next_checkmk_server_version.name} "
+        f"({next_checkmk_server_version.commit.commiter.date.split(' ')[0]}) :arrow_up:"
     )
     SCRIPT_MSG: str = (
         "Authored by `__scripts/ci.py` python script"
@@ -159,7 +160,7 @@ def main() -> int:
         defaults_yml_contents_old,
         "# ===== BEGIN generate_yaml MANAGED SECTION",
         "# ===== END generate_yaml MANAGED SECTION",
-        f"\n\n{generate_yaml(next_checkmk_server_version)}\n",
+        f"\n\n{generate_yaml(next_checkmk_server_version.name)}\n",
     )
     _defaults_yml_contents_diff: str = _unidiff_output(
         defaults_yml_contents_old, defaults_yml_contents_new
@@ -194,11 +195,11 @@ def main() -> int:
             exit(1)
 
     if found_pr is not None:
-        if next_checkmk_server_version not in found_pr.title:
+        if next_checkmk_server_version.name not in found_pr.title:
             logger.warning(
                 f"{pr} seems to have been created by ci.py "
                 f"but it's title does not match "
-                f"{next_checkmk_server_version}! Aborting..."
+                f"{next_checkmk_server_version.name}! Aborting..."
             )
             exit(1)
         if not args.dry_run:
