@@ -27,8 +27,7 @@ from .utils import replace_text_between
 
 
 PR_BRANCH: str = "checkmk_server_version-autoupdate"
-MASTER_BRANCH: str = PR_BRANCH
-
+MASTER_BRANCH: str = "feat-checkmk_server_version-autoupdate"
 
 def _unidiff_output(expected: str, actual: str):
     """Returns a string containing the unified diff of two multiline
@@ -55,13 +54,15 @@ def main() -> int:
     current_checkmk_server_version = current_defaults_yml["checkmk_server_version"]
 
     # https://git-blame.blogspot.com/2013/06/checking-current-branch-programatically.html
-    _current_branch = execute(
-        ["git", "symbolic-ref", "--short", "-q", "HEAD"], repo_path
-    ).strip()
-    if _current_branch == "refs/heads/master":
+    _git_branch_before = (
+        execute(["git", "symbolic-ref", "--short", "-q", "HEAD"], repo_path)
+        .replace("refs/heads/", "")
+        .strip()
+    )
+    if _git_branch_before != f"{MASTER_BRANCH}":
         logger.fatal(
-            "Checked-Out Branch must be either 'master' or 'main'! "
-            f"Is: '{_current_branch}'. Aborting..."
+            "Checked-Out Branch must be '{MASTER_BRANCH}'! "
+            f"Is: '{_git_branch_before}'. Aborting..."
         )
         exit(1)
 
@@ -78,12 +79,6 @@ def main() -> int:
         f"There have been {len(tags_since)} new versions since "
         f"'{current_checkmk_server_version}'! "
         f"Next: '{next_checkmk_server_version}'"
-    )
-
-    _git_branch_before = (
-        execute(["git", "symbolic-ref", "-q", "HEAD"], repo_path)
-        .replace("refs/heads/", "")
-        .strip()
     )
 
     def atexit_handler() -> None:
