@@ -200,6 +200,7 @@ def main() -> int:
     if execute(["git", "stash", "list", "--porcelain"], repo_path).strip() != "":
         execute(["git", "stash", "pop"], repo_path)
 
+    atexit.unregister(atexit_handler)
     return 0
 
 
