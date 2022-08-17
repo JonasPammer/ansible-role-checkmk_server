@@ -182,7 +182,7 @@ NOTE: This should result in a new minor version release of this role!
     for pr in _pull_requests:
         if (
             pr.head.ref == PR_BRANCH
-            and "refactor: update default checkmk_server_version" not in pr.title
+            and "refactor: update default checkmk_server_version" in pr.title
         ):
             if found_pr is None:
                 logger.info(f"Found open ci.py PR {pr}.")
