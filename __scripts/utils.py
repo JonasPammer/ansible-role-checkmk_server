@@ -15,6 +15,7 @@ from urllib.request import urlopen
 import verboselogs
 import yaml
 from github import Github
+from github.Tag import Tag
 from rich.console import Console
 from rich.logging import RichHandler
 from rich.traceback import install as install_rich_traceback
@@ -134,7 +135,9 @@ def generate_yaml(checkmk_server_version: str) -> str:
     )
 
 
-def get_checkmk_raw_tags_since(current_checkmk_server_version: str, github_api: Github):
+def get_checkmk_raw_tags_since(
+    current_checkmk_server_version: str, github_api: Github
+) -> list[Tag]:
     """Query https://github.com/tribe29/checkmk/tags and return list of valid
     tags that represent new releases that came out since
     `current_checkmk_server_version`.
