@@ -123,7 +123,7 @@ def main() -> int:
     )
     DESCRIPTION: str = (
         f"Release Date of [{next_checkmk_server_version.name}]"
-        f"({next_checkmk_server_version.commit.url}): "
+        f"({next_checkmk_server_version.commit.html_url}): "
         f"{__date.strftime('%Y-%m-%d')}"
     )
     SCRIPT_MSG: str = (
