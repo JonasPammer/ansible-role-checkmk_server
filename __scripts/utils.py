@@ -281,7 +281,6 @@ def get_log_levels_from_verbosity_or_silent_cli_argument(
     elif verbosity == 2:
         # Detailed information, typically of interest only when diagnosing problems.
         console_log_level = logging.DEBUG
-        console_log_level = logging.DEBUG
     elif verbosity >= 3:
         # Way too verbose for regular debugging,
         # but nice to have when someone is getting desperate
