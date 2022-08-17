@@ -211,9 +211,14 @@ def replace_text_between(
         )
         raise ValueError("Given Text does not contain delimiterB!")
     leadingText: str = originalText.split(delimeterA)[offset]
+    _afterLeadingText: str = delimeterA.join(
+        originalText.split(delimeterA)[offset + 1 : :]
+    )
     if delimeterA == delimeterB:
         offset += 1
-    trailingText: str = delimeterB.join(originalText.split(delimeterB)[offset + 1 : :])
+    trailingText: str = delimeterB.join(
+        _afterLeadingText.split(delimeterB)[offset + 1 : :]
+    )
 
     return leadingText + delimeterA + replacementText + delimeterB + trailingText
 

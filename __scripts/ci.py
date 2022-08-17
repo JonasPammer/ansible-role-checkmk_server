@@ -198,6 +198,20 @@ def main() -> int:
     logger.verbose("Unidiff of 'defaults/main.yml': \n" + _defaults_yml_contents_diff)
     defaults_yml.write_text(defaults_yml_contents_new)
 
+    readme: Path = repo_path.joinpath("README.orig.adoc")
+    readme_contents_old: str = readme.read_text()
+    readme_contents_new: str = replace_text_between(
+        readme_contents_old,
+        'checkmk_server_version: "',
+        '"',
+        next_checkmk_server_version.name.replace("v", ""),
+    )
+    _readme_contents_diff: str = _unidiff_output(
+        readme_contents_old, readme_contents_new
+    )
+    logger.verbose("Unidiff of 'README.orig.adoc': \n" + _readme_contents_diff)
+    readme.write_text(readme_contents_new)
+
     _git_status = execute(["git", "status", "--porcelain"], repo_path)
     if _git_status != "":
         execute(["git", "add", "defaults/main.yml"], repo_path)
