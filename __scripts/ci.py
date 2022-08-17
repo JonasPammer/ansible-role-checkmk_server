@@ -118,8 +118,8 @@ def main() -> int:
 
     __date = next_checkmk_server_version.commit.commit.committer.date
     __url = (
-        f"https://github.com/tribe29/checkmk/compare/{next_checkmk_server_version.name}"
-        f"...v{current_checkmk_server_version}"
+        f"https://github.com/tribe29/checkmk/compare/v{current_checkmk_server_version}"
+        f"...v{next_checkmk_server_version.name}"
     )
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
