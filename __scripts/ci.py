@@ -118,10 +118,10 @@ def main() -> int:
 
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
-        f"to {next_checkmk_server_version}"
+        f"to {next_checkmk_server_version} :arrow_up:"
     )
     SCRIPT_MSG: str = (
-        "Authored by `__scripts/ci.py` python script "
+        "Authored by `__scripts/ci.py` python script"
         f"on {platform.node()} by {getpass.getuser()} "
         f"({execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
     )
