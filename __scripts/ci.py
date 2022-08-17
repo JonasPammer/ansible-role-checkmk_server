@@ -11,6 +11,7 @@ from pathlib import Path
 from time import sleep
 from typing import Iterator
 from urllib import request
+from urllib.error import URLError
 
 import yaml
 from github import Github
@@ -124,7 +125,7 @@ def main() -> int:
             request.urlopen("https://geolocation-db.com/json/&position=true")
         )
         __origin = _origin["city"]
-    except:  # noqa: E722
+    except (URLError, json.JSONDecodeError):
         pass
     __date = next_checkmk_server_version.commit.commit.committer.date
     __url = (
