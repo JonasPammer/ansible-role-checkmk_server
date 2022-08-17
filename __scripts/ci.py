@@ -4,11 +4,13 @@ import argparse
 import atexit
 import difflib
 import getpass
+import json
 import os
 import platform
 from pathlib import Path
 from time import sleep
 from typing import Iterator
+from urllib import request
 
 import yaml
 from github import Github
@@ -116,6 +118,14 @@ def main() -> int:
         exit(1)
     execute(["git", "stash"], repo_path)  # just to be safe
 
+    __origin = "(could not resolve ip address location)"
+    try:
+        _origin = json.load(
+            request.urlopen("https://geolocation-db.com/json/&position=true")
+        )
+        __origin = _origin["city"]
+    except:  # noqa: E722
+        pass
     __date = next_checkmk_server_version.commit.commit.committer.date
     __url = (
         f"https://github.com/tribe29/checkmk/compare/v{current_checkmk_server_version}"
@@ -141,8 +151,9 @@ def main() -> int:
         )
     SCRIPT_MSG: str = (
         ":robot: Authored by `__scripts/ci.py` python script "
-        f"on {platform.node()} by {getpass.getuser()} "
-        f"({execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
+        f"on {platform.node()} by {getpass.getuser()} from {__origin} "
+        f"(latest commit: "
+        f"{execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
     )
     PR_BODY: str = (
         f"{SCRIPT_MSG} \n\n {DESCRIPTION} \n\n "
