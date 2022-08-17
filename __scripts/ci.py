@@ -186,7 +186,7 @@ NOTE: This should result in a new minor version release of this role!
             and "refactor: update default checkmk_server_version" not in pr.title
         ):
             if found_pr is None:
-                logger.verbose(f"Found open ci.py PR {pr}.")
+                logger.info(f"Found open ci.py PR {pr}.")
                 found_pr = pr
                 continue
             logger.warning(
