@@ -107,7 +107,9 @@ def main() -> int:
     """
 
     # ENSURE PRISTINE BRANCH
-    if PR_BRANCH in execute(["git", "ls-remote", "--heads"], repo_path):
+    if f"/refs/heads/{PR_BRANCH}" in execute(
+        ["git", "ls-remote", "--heads"], repo_path
+    ):
         logger.notice(
             f"Branch '{PR_BRANCH}' already exists on remotes. "
             f"Note that this script will force-overwrite it "
