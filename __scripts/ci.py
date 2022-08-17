@@ -137,8 +137,8 @@ def main() -> int:
     defaults_yml_contents_old: str = defaults_yml.read_text()
     defaults_yml_contents_new: str = replace_text_between(
         defaults_yml_contents_old,
-        "#===== BEGIN generate_yaml MANAGED SECTION",
-        "#===== END generate_yaml MANAGED SECTION",
+        "# ===== BEGIN generate_yaml MANAGED SECTION",
+        "# ===== END generate_yaml MANAGED SECTION",
         f"\n\n{generate_yaml(next_checkmk_server_version)}\n",
     )
     _defaults_yml_contents_diff: str = _unidiff_output(
