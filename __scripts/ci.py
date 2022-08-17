@@ -180,9 +180,8 @@ NOTE: This should result in a new minor version release of this role!
     _pull_requests = repo.get_pulls()
     found_pr: PullRequest | None = None
     for pr in _pull_requests:
-        logger.debug(f"{pr} {pr.head}")
         if (
-            pr.head == PR_BRANCH
+            pr.head.ref == PR_BRANCH
             and "refactor: update default checkmk_server_version" not in pr.title
         ):
             if found_pr is None:
