@@ -140,8 +140,9 @@ def main() -> int:
         f"Release Date of [{next_checkmk_server_version.name}]({__url}): "
         f"{__date.strftime('%Y-%m-%d')}"
     )
+    DESCRIPTION_NOTE = ""
     if len(tags_since) > 1:
-        DESCRIPTION += (
+        DESCRIPTION_NOTE = (
             f"\n\nNOTE: There have been **{len(tags_since)}** new versions since "
             f"{current_checkmk_server_version}. "
             f"After this PR has been merged, the github workflow will run again "
@@ -156,7 +157,7 @@ def main() -> int:
         f"{execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
     )
     PR_BODY: str = (
-        f"{SCRIPT_MSG} \n\n {DESCRIPTION} \n\n "
+        f"{SCRIPT_MSG} \n\n {DESCRIPTION} {DESCRIPTION_NOTE} \n\n "
         "NOTE: This should result in a new minor version release of this role!"
     )
 
@@ -200,7 +201,10 @@ def main() -> int:
     _git_status = execute(["git", "status", "--porcelain"], repo_path)
     if _git_status != "":
         execute(["git", "add", "defaults/main.yml"], repo_path)
-        execute(["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG], repo_path)
+        execute(
+            ["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG, "-m", DESCRIPTION],
+            repo_path,
+        )
     if not args.dry_run:
         execute(
             ["git", "push", "--force", "--set-upstream", "origin", PR_BRANCH], repo_path
