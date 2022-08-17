@@ -117,7 +117,10 @@ def main() -> int:
         )
         sleep(5)
     else:
+        # may possibly exist locally:
+        execute(["git", "branch", "-D", PR_BRANCH], repo_path)
         execute(["git", "branch", PR_BRANCH], repo_path)
+
     execute(["git", "fetch"], repo_path)
     execute(["git", "checkout", PR_BRANCH], repo_path)
     atexit.register(atexit_handler)
