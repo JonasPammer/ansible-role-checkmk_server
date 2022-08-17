@@ -116,10 +116,11 @@ def main() -> int:
         exit(1)
     execute(["git", "stash"], repo_path)  # just to be safe
 
+    __date = next_checkmk_server_version.commit.commit.committer.date
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
         f"to {next_checkmk_server_version.name} "
-        f"({next_checkmk_server_version.commit.commit.committer.date.split(' ')[0]}) "
+        f"({__date.strftime('%Y-%m-%d')}) "
         ":arrow_up:"
     )
     SCRIPT_MSG: str = (
