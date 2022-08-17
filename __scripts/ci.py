@@ -132,7 +132,7 @@ def main() -> int:
     )
     if len(tags_since) > 1:
         DESCRIPTION += (
-            f"\n> **NOTE**: There have been **{len(tags_since)}** new versions since "
+            f"\nNOTE: There have been **{len(tags_since)}** new versions since "
             f"{current_checkmk_server_version}. "
             f"After this PR has been merged, the github workflow will run again "
             f"and a new PR will open semi-immideatily. "
@@ -140,7 +140,7 @@ def main() -> int:
             f"for every merged ci.py PR**."
         )
     SCRIPT_MSG: str = (
-        "Authored by `__scripts/ci.py` python script"
+        "Authored by `__scripts/ci.py` python script "
         f"on {platform.node()} by {getpass.getuser()} "
         f"({execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
     )
