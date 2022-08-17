@@ -186,6 +186,7 @@ NOTE: This should result in a new minor version release of this role!
             and "refactor: update default checkmk_server_version" not in pr.title
         ):
             if found_pr is None:
+                logger.verbose(f"Found open ci.py PR {pr}.")
                 found_pr = pr
                 continue
             logger.warning(
@@ -194,19 +195,20 @@ NOTE: This should result in a new minor version release of this role!
             )
             exit(1)
 
-    if not args.dry_run:
-        if found_pr is not None:
-            if next_checkmk_server_version not in found_pr.title:
-                logger.warning(
-                    f"{pr} seems to have been created by ci.py "
-                    f"but it's title does not match "
-                    f"{next_checkmk_server_version}! Aborting..."
-                )
-                exit(1)
+    if found_pr is not None:
+        if next_checkmk_server_version not in found_pr.title:
+            logger.warning(
+                f"{pr} seems to have been created by ci.py "
+                f"but it's title does not match "
+                f"{next_checkmk_server_version}! Aborting..."
+            )
+            exit(1)
+        if not args.dry_run:
             found_pr.edit(
                 title=COMMIT_TITLE, body=PR_BODY, state="open", base=PR_BRANCH
             )
-        else:
+    else:
+        if not args.dry_run:
             pr = repo.create_pull(
                 title=COMMIT_TITLE, body=PR_BODY, head=PR_BRANCH, base=MASTER_BRANCH
             )
