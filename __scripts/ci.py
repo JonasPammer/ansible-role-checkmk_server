@@ -126,6 +126,15 @@ def main() -> int:
         f"({next_checkmk_server_version.commit.html_url}): "
         f"{__date.strftime('%Y-%m-%d')}"
     )
+    if len(tags_since) > 1:
+        DESCRIPTION += (
+            f"NOTE: There have been {len(tags_since)} new versions since "
+            f"{current_checkmk_server_version}. "
+            f"After this PR has been merged, the github workflow will run again "
+            f"and a new PR will open semi-immideatily. "
+            f"Please ensure to create a proper tag/release "
+            f"after and for every merged ci.py PR."
+        )
     SCRIPT_MSG: str = (
         "Authored by `__scripts/ci.py` python script"
         f"on {platform.node()} by {getpass.getuser()} "
