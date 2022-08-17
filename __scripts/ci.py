@@ -117,18 +117,21 @@ def main() -> int:
     execute(["git", "stash"], repo_path)  # just to be safe
 
     __date = next_checkmk_server_version.commit.commit.committer.date
+    __url = (
+        f"https://github.com/tribe29/checkmk/compare/{next_checkmk_server_version.name}"
+        f"...v{current_checkmk_server_version}"
+    )
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
         f"to {next_checkmk_server_version.name} arrow_up:"
     )
     DESCRIPTION: str = (
-        f"Release Date of [{next_checkmk_server_version.name}]"
-        f"({next_checkmk_server_version.commit.html_url}): "
+        f"Release Date of [{next_checkmk_server_version.name}]({__url}): "
         f"{__date.strftime('%Y-%m-%d')}"
     )
     if len(tags_since) > 1:
         DESCRIPTION += (
-            f"\nNOTE: There have been **{len(tags_since)}** new versions since "
+            f"\n> **NOTE**: There have been **{len(tags_since)}** new versions since "
             f"{current_checkmk_server_version}. "
             f"After this PR has been merged, the github workflow will run again "
             f"and a new PR will open semi-immideatily. "
