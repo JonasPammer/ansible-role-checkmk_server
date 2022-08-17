@@ -165,7 +165,7 @@ NOTE: This should result in a new minor version release of this role!
     _defaults_yml_contents_diff: str = _unidiff_output(
         defaults_yml_contents_old, defaults_yml_contents_new
     )
-    logger.verbose(_defaults_yml_contents_diff)
+    logger.verbose("Unidiff of 'defaults/main.yml': \n" + _defaults_yml_contents_diff)
     defaults_yml.write_text(defaults_yml_contents_new)
 
     _git_status = execute(["git", "status", "--porcelain"], repo_path)
