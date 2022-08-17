@@ -123,6 +123,7 @@ def main() -> int:
     )
     COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
+        f"from {current_checkmk_server_version} "
         f"to {next_checkmk_server_version.name} :arrow_up:"
     )
     DESCRIPTION: str = (
