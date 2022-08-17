@@ -130,7 +130,7 @@ def generate_yaml(checkmk_server_version: str) -> str:
     # TODO: quote str's with "
     return yaml.dump(
         {
-            "checkmk_server_version": checkmk_server_version,
+            "checkmk_server_version": checkmk_server_version.replace("v", ""),
             "_checkmk_server_download_checksum": get_all_remote_sums(
                 checkmk_server_version
             ),
