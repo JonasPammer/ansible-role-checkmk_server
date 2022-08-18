@@ -29,7 +29,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
 
     permissions:
-      issues: write
+      contents: write
       pull-requests: write
 
     steps:
@@ -41,7 +41,11 @@ jobs:
         with:
           python-version: "3.x"
 
-      - uses: fregante/setup-git-user@2e28d51939d2a84005a917d2f844090637f435f8 # tag=v1
+      - name: setup git config
+        run: |
+          git config --global user.name 'Jonas Pammer'
+          git config --global user.email 'opensource@jonaspammer.at'
+          git remote -v
 
       - name: install python dependencies
         run: |
