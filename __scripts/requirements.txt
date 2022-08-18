@@ -20,7 +20,7 @@ pycparser==2.21
     # via cffi
 pygithub==1.55
     # via -r __scripts/requirements.in
-pygments==2.12.0
+pygments==2.13.0
     # via rich
 pyjwt==2.4.0
     # via pygithub
