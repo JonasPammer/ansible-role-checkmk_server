@@ -400,6 +400,7 @@ def main() -> None:
             head=SERVER_PR_BRANCH,
             base=SERVER_MASTER_BRANCH,
         )
+        logger.info(f"Created {server_repo.name} PR: {found_server_pr.html_url}")
 
     found_agent_pr = find_pr(
         agent_repo,
@@ -414,6 +415,7 @@ def main() -> None:
             head=AGENT_PR_BRANCH,
             base=AGENT_MASTER_BRANCH,
         )
+        logger.info(f"Created {agent_repo.name} PR: {found_agent_pr.html_url}")
 
     if not args.dry_run and found_server_pr is not None:
         if found_agent_pr is not None:
