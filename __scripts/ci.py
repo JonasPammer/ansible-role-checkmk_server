@@ -231,7 +231,7 @@ def main() -> None:
             f"NOTE: There have been **{len(tags_since)}** new versions since "
             f"{current_checkmk_server_version}. "
             "After this PR has been merged, the github workflow will run again "
-            "and a new PR will open semi-immideatily. "
+            "and a new PR will open semi-immideally. "
             "Please ensure to create a proper tag/release "
             "for **every** merged ci.py PR."
         )
