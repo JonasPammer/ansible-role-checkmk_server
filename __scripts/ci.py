@@ -63,7 +63,7 @@ def _check_and_get_branch(repo_path: Path, toBe: str) -> str:
 
 
 def _checkout_pristine_pr_branch(
-    repo_path: Path, before_branch: str, files: list[str]
+    repo_path: Path, pr_branch: str, before_branch: str, files: list[str]
 ) -> Callable[..., object]:
     def atexit_handler() -> None:
         logger.notice(
@@ -79,11 +79,11 @@ def _checkout_pristine_pr_branch(
         exit(1)
 
     # ENSURE PRISTINE BRANCH
-    if f"/refs/heads/{SERVER_PR_BRANCH}" in execute(
+    if f"/refs/heads/{pr_branch}" in execute(
         ["git", "ls-remote", "--heads"], repo_path
     ):
         logger.notice(
-            f"Branch '{SERVER_PR_BRANCH}' already exists on remote "
+            f"Branch '{pr_branch}' already exists on remote "
             f"of {repo_path.name}. "
             f"Note that this script will force-overwrite it "
             f"to accomodate potentially changed script behaviour."
@@ -91,11 +91,11 @@ def _checkout_pristine_pr_branch(
         sleep(5)
     else:
         # may possibly exist locally:
-        execute(["git", "branch", "-D", SERVER_PR_BRANCH], repo_path)
-        execute(["git", "branch", SERVER_PR_BRANCH], repo_path)
+        execute(["git", "branch", "-D", pr_branch], repo_path)
+        execute(["git", "branch", pr_branch], repo_path)
 
     execute(["git", "fetch"], repo_path)
-    execute(["git", "checkout", SERVER_PR_BRANCH], repo_path)
+    execute(["git", "checkout", pr_branch], repo_path)
     atexit.register(atexit_handler)
 
     execute(["git", "reset"], repo_path)
@@ -107,6 +107,7 @@ def _checkout_pristine_pr_branch(
 
 def _commit_push_and_checkout_before(
     repo_path: Path,
+    pr_branch: str,
     before_branch: str,
     files: list[str],
     dry_run: bool,
@@ -125,7 +126,7 @@ def _commit_push_and_checkout_before(
         )
     if not dry_run:
         execute(
-            ["git", "push", "--force", "--set-upstream", "origin", SERVER_PR_BRANCH],
+            ["git", "push", "--force", "--set-upstream", "origin", pr_branch],
             repo_path,
         )
     logger.verbose(f"Checking out previous branch of {repo_path.name} again..")
@@ -227,6 +228,7 @@ def main() -> None:
     server_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
     server_atexit_handler = _checkout_pristine_pr_branch(
         repo_path=server_repo_path,
+        pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
         files=server_files,
     )
@@ -263,6 +265,7 @@ def main() -> None:
 
     _commit_push_and_checkout_before(
         repo_path=server_repo_path,
+        pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
         files=server_files,
         atexit_handler=server_atexit_handler,
