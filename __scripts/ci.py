@@ -46,20 +46,23 @@ def _unidiff_output(expected: str, actual: str):
     return "".join(diff)
 
 
-def _check_and_get_branch(repo_path: Path, toBe: str) -> str:
+def _clone_repo_and_checkout_branch(
+    repo: Repository, repo_path: Path, branch: str
+) -> str:
+    if not repo_path.joinpath(".git").exists():
+        execute(["git", "clone", repo.clone_url], repo_path.parent)
+
     # https://git-blame.blogspot.com/2013/06/checking-current-branch-programatically.html
-    _git_branch = (
+    _git_branch_before = (
         execute(["git", "symbolic-ref", "--short", "-q", "HEAD"], repo_path)
         .replace("refs/heads/", "")
         .strip()
     )
-    if _git_branch != toBe:
-        logger.fatal(
-            f"Checked-Out Branch of {repo_path.name} must be '{SERVER_MASTER_BRANCH}'! "
-            f"Is: '{_git_branch}'. Aborting..."
-        )
-        exit(1)
-    return _git_branch
+
+    if _git_branch_before != branch:
+        execute(["git", "fetch"], repo_path)
+        execute(["git", "checkout", branch], repo_path)
+    return _git_branch_before
 
 
 def _checkout_pristine_pr_branch(
@@ -154,8 +157,8 @@ def main() -> None:
         "JonasPammer/ansible-role-checkmk_server"
     )
     server_repo_path: Path = Path.cwd()
-    server_local_git_branch_before = _check_and_get_branch(
-        server_repo_path, SERVER_MASTER_BRANCH
+    server_local_git_branch_before = _clone_repo_and_checkout_branch(
+        server_repo, server_repo_path, SERVER_MASTER_BRANCH
     )
 
     server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
