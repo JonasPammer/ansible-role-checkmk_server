@@ -235,25 +235,27 @@ def main() -> None:
             "Please ensure to create a proper tag/release "
             "for **every** merged ci.py PR."
         )
-
-    SERVER_COMMIT_TITLE: str = (
-        "refactor: update default checkmk_server_version "
-        f"from {current_checkmk_server_version} "
-        f"to {next_checkmk_server_version.name} :arrow_up:"
-    )
-    SERVER_COMMIT_DESCRIPTION: str = (
+    COMMIT_DESCRIPTION = (
         f"*Release Date of {next_checkmk_server_version.name}: "
         f"{next_checkmk_server_version_date.strftime('%Y-%m-%d')}*"
         "\n"
         "*GitHub Compare URL (for the interested): "
         f"{_next_checkmk_server_version_compare_url}*"
         "\n\n"
-        "Accompanying `ansible-role-checkmk_agent` PR: "
-        "https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO"
     )
-    SERVER_PR_BODY: str = (
-        f"{SCRIPT_MSG} \n\n {SERVER_COMMIT_DESCRIPTION} \n\n {PR_NOTE}"
+
+    SERVER_COMMIT_TITLE: str = (
+        "refactor: update default checkmk_server_version "
+        f"from {current_checkmk_server_version} "
+        f"to {next_checkmk_server_version.name} :arrow_up:"
     )
+    AGENT_COMMIT_TITLE: str = (
+        "refactor: update default checkmk_agent_version "
+        f"from {current_checkmk_agent_version} "
+        f"to {next_checkmk_server_version.name} :arrow_up:"
+    )
+    SERVER_PR_BODY: str = f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n {PR_NOTE}"
+    AGENT_PR_BODY: str = SERVER_PR_BODY
 
     server_repo_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
     server_atexit_handler = _checkout_pristine_pr_branch(
@@ -302,7 +304,7 @@ def main() -> None:
         dry_run=args.dry_run,
         commit_title=SERVER_COMMIT_TITLE,
         script_msg=SCRIPT_MSG,
-        description=SERVER_COMMIT_DESCRIPTION,
+        description=COMMIT_DESCRIPTION,
     )
 
     server_pull_requests = server_repo.get_pulls()
