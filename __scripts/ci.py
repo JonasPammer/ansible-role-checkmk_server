@@ -224,7 +224,6 @@ def _make_agent_changes(agent_repo_path: Path, next_checkmk_server_version: Tag)
         next_checkmk_server_version.name.replace("v", ""),
     )
     write_and_log(readme, readme_contents_old, readme_contents_new)
-    pass
 
 
 def main() -> None:
