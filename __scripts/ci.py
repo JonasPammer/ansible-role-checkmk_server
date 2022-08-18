@@ -166,6 +166,38 @@ def find_pr(
     return found_pr
 
 
+def _make_changes(server_repo_path: Path, next_checkmk_server_version: Tag):
+    server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
+    server_defaults_yml_contents_old: str = server_defaults_yml.read_text()
+    server_defaults_yml_contents_new: str = replace_text_between(
+        server_defaults_yml_contents_old,
+        "# ===== BEGIN generate_yaml MANAGED SECTION",
+        "# ===== END generate_yaml MANAGED SECTION",
+        f"\n\n{generate_yaml(next_checkmk_server_version.name)}\n",
+    )
+    _server_defaults_yml_contents_diff: str = unidiff_output(
+        server_defaults_yml_contents_old, server_defaults_yml_contents_new
+    )
+    logger.verbose(
+        "Unidiff of 'defaults/main.yml': \n" + _server_defaults_yml_contents_diff
+    )
+    server_defaults_yml.write_text(server_defaults_yml_contents_new)
+
+    server_readme: Path = server_repo_path.joinpath("README.orig.adoc")
+    server_readme_contents_old: str = server_readme.read_text()
+    server_readme_contents_new: str = replace_text_between(
+        server_readme_contents_old,
+        'checkmk_server_version: "',
+        '"',
+        next_checkmk_server_version.name.replace("v", ""),
+    )
+    _readme_contents_diff: str = unidiff_output(
+        server_readme_contents_old, server_readme_contents_new
+    )
+    logger.verbose("Unidiff of 'README.orig.adoc': \n" + _readme_contents_diff)
+    server_readme.write_text(server_readme_contents_new)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     add_argparse_verbosity_option(parser)
@@ -294,34 +326,7 @@ def main() -> None:
     )
 
     # MAKE CHANGES
-    server_defaults_yml_contents_old: str = server_defaults_yml.read_text()
-    server_defaults_yml_contents_new: str = replace_text_between(
-        server_defaults_yml_contents_old,
-        "# ===== BEGIN generate_yaml MANAGED SECTION",
-        "# ===== END generate_yaml MANAGED SECTION",
-        f"\n\n{generate_yaml(next_checkmk_server_version.name)}\n",
-    )
-    _server_defaults_yml_contents_diff: str = unidiff_output(
-        server_defaults_yml_contents_old, server_defaults_yml_contents_new
-    )
-    logger.verbose(
-        "Unidiff of 'defaults/main.yml': \n" + _server_defaults_yml_contents_diff
-    )
-    server_defaults_yml.write_text(server_defaults_yml_contents_new)
-
-    server_readme: Path = server_repo_path.joinpath("README.orig.adoc")
-    server_readme_contents_old: str = server_readme.read_text()
-    server_readme_contents_new: str = replace_text_between(
-        server_readme_contents_old,
-        'checkmk_server_version: "',
-        '"',
-        next_checkmk_server_version.name.replace("v", ""),
-    )
-    _readme_contents_diff: str = unidiff_output(
-        server_readme_contents_old, server_readme_contents_new
-    )
-    logger.verbose("Unidiff of 'README.orig.adoc': \n" + _readme_contents_diff)
-    server_readme.write_text(server_readme_contents_new)
+    _make_changes(server_repo_path, next_checkmk_server_version)
 
     commit_push_and_checkout_before(
         repo_path=server_repo_path,
