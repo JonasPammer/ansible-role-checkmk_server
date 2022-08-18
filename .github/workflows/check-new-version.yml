@@ -41,6 +41,8 @@ jobs:
         with:
           python-version: "3.x"
 
+      - uses: fregante/setup-git-user@2e28d51939d2a84005a917d2f844090637f435f8 # tag=v1
+
       - name: install python dependencies
         run: |
           python3 -m pip install -r __scripts/requirements.txt
