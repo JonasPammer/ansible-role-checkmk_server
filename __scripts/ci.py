@@ -245,7 +245,7 @@ def main() -> None:
         f"*Release Date of {next_checkmk_server_version.name}: "
         f"{next_checkmk_server_version_date.strftime('%Y-%m-%d')}*"
         "\n"
-        "GitHub Compare URL (for the interested / for the record): "
+        "GitHub Compare URL (for the interested): "
         f"{_next_checkmk_server_version_compare_url}"
         "\n"
         "*Accompanying `ansible-role-checkmk_agent` PR: "
