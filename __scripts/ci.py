@@ -245,11 +245,11 @@ def main() -> None:
         f"*Release Date of {next_checkmk_server_version.name}: "
         f"{next_checkmk_server_version_date.strftime('%Y-%m-%d')}*"
         "\n"
-        "GitHub Compare URL (for the interested): "
-        f"{_next_checkmk_server_version_compare_url}"
+        "*GitHub Compare URL (for the interested): "
+        f"{_next_checkmk_server_version_compare_url}*"
         "\n\n"
-        "*Accompanying `ansible-role-checkmk_agent` PR: "
-        "https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO*"
+        "Accompanying `ansible-role-checkmk_agent` PR: "
+        "https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO"
     )
     SERVER_PR_BODY: str = (
         f"{SCRIPT_MSG} \n\n {SERVER_COMMIT_DESCRIPTION} \n\n {PR_NOTE}"
