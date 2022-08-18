@@ -64,7 +64,7 @@ def clone_repo_and_checkout_branch(
                 f"https://x-access-token:{ os.environ['AUTO_UPDATE_PAT'] }"
                 f"@github.com/{repo.full_name}",
             ],
-            repo_path.parent,
+            repo_path,
         )
 
     # https://git-blame.blogspot.com/2013/06/checking-current-branch-programatically.html
