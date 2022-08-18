@@ -144,9 +144,9 @@ def commit_push_and_checkout_before(
 def find_pr(
     repo: Repository, branch: str, loose_str: str, next_checkmk_server_version: Tag
 ) -> PullRequest | None:
-    server_pull_requests = repo.get_pulls()
+    pull_requests = repo.get_pulls()
     found_pr: PullRequest | None = None
-    for pr in server_pull_requests:
+    for pr in pull_requests:
         if pr.head.ref == branch and loose_str in pr.title:
             if found_pr is None:
                 logger.info(f"Found open ci.py PR in {repo.name}: {pr}.")
@@ -208,7 +208,7 @@ def _make_agent_changes(agent_repo_path: Path, next_checkmk_server_version: Tag)
         "# ===== BEGIN generate_yaml MANAGED SECTION",
         "# ===== END generate_yaml MANAGED SECTION",
         "\ncheckmk_agent_version: "
-        + "{next_checkmk_server_version.name.replace('v', '')}\n",
+        + f"{next_checkmk_server_version.name.replace('v', '')}\n",
     )
     write_and_log(
         default_yml,
