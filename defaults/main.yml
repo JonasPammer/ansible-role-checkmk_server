@@ -17,18 +17,21 @@ checkmk_server_install_cache_valid_time: "3600"
 # NOTE: When updating manually, do not forget to
 #       also update version in checkmk_agent role!!
 # ===== BEGIN generate_yaml MANAGED SECTION
-checkmk_server_version: "2.0.0p25"
+
 _checkmk_server_download_checksum:
-  CentOS_7: sha1:e0dc364be8047092313d211c1772da75447ab085
-  CentOS_8: sha1:1cfd94362489c45cd83cec946b18a4091ec58d86
-  Debian_bullseye: sha1:d4fef819b48a165e0d6c6145ce943bde15dbc928
-  Debian_buster: sha1:f44fdafc2a36054eb70eda5d03671314b553a51a
-  Debian_stretch: sha1:eb4eff690a03ccf95e4cdb8661ddc4d5363bd282
-  Ubuntu_bionic: sha1:50f499930077cee2f781b5a470fe310b52ff97d9
-  Ubuntu_focal: sha1:0af9980caa00464576058ea89d2d0c56e665f993
-  Ubuntu_hirsute: sha1:c89597e9d6dea0b3ac099294281cae6a18863f20
-  Ubuntu_impish: sha1:205efff39b6f23dd48ff84b0349d3f6983273715
-  Ubuntu_xenial: sha1:b7c05640603fe4b826057b59dd751543e5e5b77a
+  CentOS_7: sha1:87affa588da9c56b6a80ac425a7d4f3ab1d9028c
+  CentOS_8: sha1:cb3a4b8bf35ba6f939710cf4acfb9b7da34c1f45
+  Debian_bullseye: sha1:c896a0cdfa2a648229e160c1660a94ba445c5e50
+  Debian_buster: sha1:7213547a2f5e336b31a057ef0773f5a88ed42b0d
+  Debian_stretch: sha1:3fc6bc7f2c71dac3240b3cf2f5ec5523a4f2457d
+  Ubuntu_bionic: sha1:b08c77f31796754af0942e0100fe58675b2b8b54
+  Ubuntu_focal: sha1:cce6a669ad56c8a7cbb47a9f50ac31964fe4c96f
+  Ubuntu_hirsute: sha1:9947418875f973e2015619f7c3bedd7c7b1c393b
+  Ubuntu_impish: sha1:6995f3fd86fa894071ebef05108a30568b15a251
+  Ubuntu_jammy: sha1:03902a04795ea5a9d0a5fd71b8d933f8956a4e1e
+  Ubuntu_xenial: sha1:c5555ed1cb2dad304a07bc4a326e11d7f5349930
+checkmk_server_version: 2.0.0p26
+
 # ===== END generate_yaml MANAGED SECTION
 checkmk_server_download_checksum: "{{
   _checkmk_server_download_checksum[ansible_distribution ~ '_' ~ ansible_distribution_release]|default(
