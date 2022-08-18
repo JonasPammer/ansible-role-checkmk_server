@@ -48,6 +48,6 @@ jobs:
       - name: Run ci.py
         id: script_output
         run: |
-          python3 -m __scripts.ci
+          python3 -m __scripts.ci -v
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
