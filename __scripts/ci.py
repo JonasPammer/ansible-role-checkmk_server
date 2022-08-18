@@ -308,9 +308,6 @@ def main() -> None:
     SCRIPT_MSG: str = (
         ":robot: Authored by `__scripts/ci.py` python script "
         f"on {platform.node()} by {getpass.getuser()} from {_script_executor_origin} "
-        f"(latest commit: "
-        + execute(["git", "rev-parse", "--verify", "HEAD"], server_repo_path).strip()
-        + ")"
     )
     PR_NOTE = (
         "**This PR should result in the release of a new minor version for this role**!"
