@@ -67,17 +67,21 @@ def main() -> None:
     init_logger(args.verbose, args.silent)
 
     github_api: Github = Github(os.environ["GITHUB_TOKEN"])
-    repo: Repository = github_api.get_repo("JonasPammer/ansible-role-checkmk_server")
-    repo_path: Path = Path.cwd()
+    server_repo: Repository = github_api.get_repo(
+        "JonasPammer/ansible-role-checkmk_server"
+    )
+    server_repo_path: Path = Path.cwd()
 
-    current_defaults_yml = yaml.safe_load(Path("defaults/main.yml").read_text())
-    current_checkmk_server_version = current_defaults_yml["checkmk_server_version"]
+    server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
+    current_checkmk_server_version = yaml.safe_load(server_defaults_yml.read_text())[
+        "checkmk_server_version"
+    ]
 
     # TODO: DRY and implement agent update/pr mechanic
 
     # https://git-blame.blogspot.com/2013/06/checking-current-branch-programatically.html
     _git_branch_before = (
-        execute(["git", "symbolic-ref", "--short", "-q", "HEAD"], repo_path)
+        execute(["git", "symbolic-ref", "--short", "-q", "HEAD"], server_repo_path)
         .replace("refs/heads/", "")
         .strip()
     )
@@ -88,7 +92,7 @@ def main() -> None:
         )
         exit(1)
     _git_stash_list_before = execute(
-        ["git", "stash", "list", "--porcelain"], repo_path
+        ["git", "stash", "list", "--porcelain"], server_repo_path
     ).strip()
 
     tags_since = get_checkmk_raw_tags_since(current_checkmk_server_version, github_api)
@@ -112,14 +116,14 @@ def main() -> None:
             "Checking out the branch we were previously on "
             "and popping stash..."
         )
-        execute(["git", "checkout", _git_branch_before], repo_path)
-        _pop_git_stash_if(_git_stash_list_before, repo_path)
+        execute(["git", "checkout", _git_branch_before], server_repo_path)
+        _pop_git_stash_if(_git_stash_list_before, server_repo_path)
 
-    _git_status_before = execute(["git", "status", "--porcelain"], repo_path)
+    _git_status_before = execute(["git", "status", "--porcelain"], server_repo_path)
     if _git_status_before != "":
         logger.error("Working directory is not clean! Aborting...")
         exit(1)
-    execute(["git", "stash"], repo_path)  # just to be safe
+    execute(["git", "stash"], server_repo_path)  # just to be safe
 
     __origin = "(could not resolve ip address location)"
     try:
@@ -160,7 +164,8 @@ def main() -> None:
         ":robot: Authored by `__scripts/ci.py` python script "
         f"on {platform.node()} by {getpass.getuser()} from {__origin} "
         f"(latest commit: "
-        f"{execute(['git', 'rev-parse', '--verify', 'HEAD'], repo_path).strip()})"
+        + execute(["git", "rev-parse", "--verify", "HEAD"], server_repo_path).strip()
+        + ")"
     )
     PR_BODY: str = (
         f"{SCRIPT_MSG} \n\n {DESCRIPTION} {DESCRIPTION_NOTE} \n\n "
@@ -169,7 +174,7 @@ def main() -> None:
 
     # ENSURE PRISTINE BRANCH
     if f"/refs/heads/{PR_BRANCH}" in execute(
-        ["git", "ls-remote", "--heads"], repo_path
+        ["git", "ls-remote", "--heads"], server_repo_path
     ):
         logger.notice(
             f"Branch '{PR_BRANCH}' already exists on remotes. "
@@ -179,59 +184,61 @@ def main() -> None:
         sleep(5)
     else:
         # may possibly exist locally:
-        execute(["git", "branch", "-D", PR_BRANCH], repo_path)
-        execute(["git", "branch", PR_BRANCH], repo_path)
+        execute(["git", "branch", "-D", PR_BRANCH], server_repo_path)
+        execute(["git", "branch", PR_BRANCH], server_repo_path)
 
-    execute(["git", "fetch"], repo_path)
-    execute(["git", "checkout", PR_BRANCH], repo_path)
+    execute(["git", "fetch"], server_repo_path)
+    execute(["git", "checkout", PR_BRANCH], server_repo_path)
     atexit.register(atexit_handler)
 
-    execute(["git", "reset", "--hard", f"{MASTER_BRANCH}"], repo_path)
-    execute(["git", "clean", "-dfx"], repo_path)
+    execute(["git", "reset", "--hard", f"{MASTER_BRANCH}"], server_repo_path)
+    execute(["git", "clean", "-dfx"], server_repo_path)
 
     # MAKE CHANGES
-    defaults_yml: Path = repo_path.joinpath("defaults/main.yml")
-    defaults_yml_contents_old: str = defaults_yml.read_text()
-    defaults_yml_contents_new: str = replace_text_between(
-        defaults_yml_contents_old,
+    server_defaults_yml_contents_old: str = server_defaults_yml.read_text()
+    server_defaults_yml_contents_new: str = replace_text_between(
+        server_defaults_yml_contents_old,
         "# ===== BEGIN generate_yaml MANAGED SECTION",
         "# ===== END generate_yaml MANAGED SECTION",
         f"\n\n{generate_yaml(next_checkmk_server_version.name)}\n",
     )
-    _defaults_yml_contents_diff: str = _unidiff_output(
-        defaults_yml_contents_old, defaults_yml_contents_new
+    _server_defaults_yml_contents_diff: str = _unidiff_output(
+        server_defaults_yml_contents_old, server_defaults_yml_contents_new
     )
-    logger.verbose("Unidiff of 'defaults/main.yml': \n" + _defaults_yml_contents_diff)
-    defaults_yml.write_text(defaults_yml_contents_new)
+    logger.verbose(
+        "Unidiff of 'defaults/main.yml': \n" + _server_defaults_yml_contents_diff
+    )
+    server_defaults_yml.write_text(server_defaults_yml_contents_new)
 
-    readme: Path = repo_path.joinpath("README.orig.adoc")
-    readme_contents_old: str = readme.read_text()
-    readme_contents_new: str = replace_text_between(
-        readme_contents_old,
+    server_readme: Path = server_repo_path.joinpath("README.orig.adoc")
+    server_readme_contents_old: str = server_readme.read_text()
+    server_readme_contents_new: str = replace_text_between(
+        server_readme_contents_old,
         'checkmk_server_version: "',
         '"',
         next_checkmk_server_version.name.replace("v", ""),
     )
     _readme_contents_diff: str = _unidiff_output(
-        readme_contents_old, readme_contents_new
+        server_readme_contents_old, server_readme_contents_new
     )
     logger.verbose("Unidiff of 'README.orig.adoc': \n" + _readme_contents_diff)
-    readme.write_text(readme_contents_new)
+    server_readme.write_text(server_readme_contents_new)
 
-    _git_status = execute(["git", "status", "--porcelain"], repo_path)
+    _git_status = execute(["git", "status", "--porcelain"], server_repo_path)
     if _git_status != "":
-        execute(["git", "add", "defaults/main.yml"], repo_path)
-        execute(["git", "add", "README.orig.adoc"], repo_path)
+        execute(["git", "add", "defaults/main.yml"], server_repo_path)
+        execute(["git", "add", "README.orig.adoc"], server_repo_path)
         execute(
             ["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG, "-m", DESCRIPTION],
-            repo_path,
+            server_repo_path,
         )
     if not args.dry_run:
         execute(
-            ["git", "push", "--force", "--set-upstream", "origin", PR_BRANCH], repo_path
+            ["git", "push", "--force", "--set-upstream", "origin", PR_BRANCH],
+            server_repo_path,
         )
 
-    _pull_requests = repo.get_pulls()
+    _pull_requests = server_repo.get_pulls()
     found_pr: PullRequest | None = None
     for pr in _pull_requests:
         if (
@@ -260,13 +267,13 @@ def main() -> None:
             found_pr.edit(title=COMMIT_TITLE, body=PR_BODY, state="open")
     else:
         if not args.dry_run:
-            repo.create_pull(
+            server_repo.create_pull(
                 title=COMMIT_TITLE, body=PR_BODY, head=PR_BRANCH, base=MASTER_BRANCH
             )
 
     logger.verbose("Checking out previous branch and working tree again..")
-    execute(["git", "checkout", _git_branch_before], repo_path)
-    _pop_git_stash_if(_git_stash_list_before, repo_path)
+    execute(["git", "checkout", _git_branch_before], server_repo_path)
+    _pop_git_stash_if(_git_stash_list_before, server_repo_path)
 
     atexit.unregister(atexit_handler)
 
