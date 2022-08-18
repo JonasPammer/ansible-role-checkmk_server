@@ -1,5 +1,5 @@
 ---
-name: CI (Lint + Molecule)
+name: Check for new CheckMK Version
 "on":
   workflow_dispatch:
     inputs:
@@ -23,7 +23,7 @@ permissions:
 
 jobs:
   check-new-version:
-    name: Check New Version
+    name: Run __scripts/ci.py
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master'
 
