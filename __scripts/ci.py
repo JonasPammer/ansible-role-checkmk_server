@@ -30,10 +30,9 @@ from .utils import init_logger
 from .utils import logger
 from .utils import replace_text_between
 
-# FIXME / TODO: *MASTER_BRANCH'es are only temporary. revert to 'master' when merged!
-SERVER_MASTER_BRANCH: str = "feat-checkmk_server_version-autoupdate"
+SERVER_MASTER_BRANCH: str = "master"
 SERVER_PR_BRANCH: str = "checkmk_server_version-autoupdate"
-AGENT_MASTER_BRANCH: str = "feat-checkmk_agent_version-autoupdate"
+AGENT_MASTER_BRANCH: str = "master"
 AGENT_PR_BRANCH: str = "checkmk_agent_version-autoupdate"
 
 
