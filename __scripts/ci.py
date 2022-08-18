@@ -32,8 +32,8 @@ from .utils import replace_text_between
 # FIXME / TODO: *MASTER_BRANCH'es are only temporary. revert to 'master' when merged!
 SERVER_MASTER_BRANCH: str = "feat-checkmk_server_version-autoupdate"
 SERVER_PR_BRANCH: str = "checkmk_server_version-autoupdate"
-CLIENT_MASTER_BRANCH: str = "feat-checkmk_client_version-autoupdate"
-CLIENT_PR_BRANCH: str = "checkmk_client_version-autoupdate"
+AGENT_MASTER_BRANCH: str = "feat-checkmk_agent_version-autoupdate"
+AGENT_PR_BRANCH: str = "checkmk_agent_version-autoupdate"
 
 
 def _unidiff_output(expected: str, actual: str):
@@ -161,10 +161,29 @@ def main() -> None:
         server_repo, server_repo_path, SERVER_MASTER_BRANCH
     )
 
+    agent_repo: Repository = github_api.get_repo(
+        "JonasPammer/ansible-role-checkmk_agent"
+    )
+    agent_repo_path: Path = server_repo_path.joinpath("__scripts", agent_repo.name)
+    # agent_local_git_branch_before = _clone_repo_and_checkout_branch(
+    #     agent_repo, agent_repo_path, AGENT_MASTER_BRANCH
+    # )
+
     server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
     current_checkmk_server_version = yaml.safe_load(server_defaults_yml.read_text())[
         "checkmk_server_version"
     ]
+    agent_defaults_yml: Path = agent_repo_path.joinpath("defaults/main.yml")
+    current_checkmk_agent_version = yaml.safe_load(agent_defaults_yml.read_text())[
+        "checkmk_agent_version"
+    ]
+
+    if current_checkmk_server_version != current_checkmk_agent_version:
+        logger.fatal(
+            "Version mismatch between current checkmk_server_version "
+            "and checkmk_agent_version!! Aborting, please fix.."
+        )
+        exit(1)
 
     tags_since = get_checkmk_raw_tags_since(current_checkmk_server_version, github_api)
     if len(tags_since) == 0:

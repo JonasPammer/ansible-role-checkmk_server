@@ -14,6 +14,8 @@ checkmk_server_prerequisites: "{{
   _checkmk__server_prerequisites['default']) }}"
 checkmk_server_install_cache_valid_time: "3600"
 
+# NOTE: When updating manually, do not forget to
+#       also update version in checkmk_agent role!!
 # ===== BEGIN generate_yaml MANAGED SECTION
 checkmk_server_version: "2.0.0p25"
 _checkmk_server_download_checksum:
