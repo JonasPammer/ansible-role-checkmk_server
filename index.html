@@ -818,11 +818,37 @@ this is often shown as <code>my-site</code> in the CheckMK documentation example
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2.0.0p25"</span></code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_download_checksum</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">OS-specific</span><span class="pi">,</span> <span class="nv">see /defaults directory</span><span class="pi">]</span>
+<span class="na">checkmk_server_version</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2.0.0p25"</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Version of CheckMK RAW edition to install</p>
+<p>Version of CheckMK RAW edition to install.</p>
+</div>
+<div class="paragraph">
+<p>The default value of these variables is semi-automatically being updated
+to the latest non-beta CheckMk RAW v2 Release through the help of a CI Workflow
+and some accompanying python scripts which can be found in <code>__scripts</code>.</p>
+</div>
+<div class="paragraph">
+<p>Every said update is accompanied with a new release of at least a minor version bump.
+See <a href="#changelog">🗒 Changelog</a> for an overview.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+Even though you could pin the version of this role to get a pinned version of checkmk,
+I recommend that you install the latest version of this role and
+change these variables yourself instead as I do not backport
+actual patches made to this role into older versions
+(if that is even possible).
+</td>
+</tr>
+</table>
 </div>
 <div class="sect2">
 <h3 id="variables--installation">Role Variables used for installing</h3>
@@ -851,7 +877,6 @@ repository if <code>dnf</code> is the system&#8217;s package manager (as defined
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="yaml"><span class="na">checkmk_server_download_package</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">OS-specific</span><span class="pi">,</span> <span class="nv">see /defaults directory</span><span class="pi">]</span>
-<span class="na">checkmk_server_download_checksum</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">OS-specific</span><span class="pi">,</span> <span class="nv">see /defaults directory</span><span class="pi">]</span>
 <span class="na">checkmk_server_download_url</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://download.checkmk.com/checkmk/{{</span><span class="nv"> </span><span class="s">checkmk_server_version</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">checkmk_server_download_package</span><span class="nv"> </span><span class="s">}}"</span>
 <span class="na">checkmk_server_download_pubkey_url</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://download.checkmk.com/checkmk/Check_MK-pubkey.gpg"</span>
 <span class="na">checkmk_server_download_dest</span><span class="pi">:</span> <span class="s2">"</span><span class="s">{{</span><span class="nv"> </span><span class="s">checkmk_server_download_dest_folder</span><span class="nv"> </span><span class="s">}}/{{</span><span class="nv"> </span><span class="s">checkmk_server_download_package</span><span class="nv"> </span><span class="s">}}"</span>
@@ -1605,7 +1630,7 @@ SOFTWARE.</pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-08-05 10:16:25 UTC
+Last updated 2022-08-18 14:28:06 UTC
 </div>
 </div>
 </body>
