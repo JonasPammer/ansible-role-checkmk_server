@@ -66,7 +66,8 @@ def main() -> None:
     args = parser.parse_args()
     init_logger(args.verbose, args.silent)
 
-    github_api: Github = Github(os.environ["GITHUB_TOKEN"])
+    _login_or_token = None if args.dry_run else os.environ["GITHUB_TOKEN"]
+    github_api: Github = Github(_login_or_token)
     server_repo: Repository = github_api.get_repo(
         "JonasPammer/ansible-role-checkmk_server"
     )
