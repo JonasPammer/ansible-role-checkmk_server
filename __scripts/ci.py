@@ -28,9 +28,11 @@ from .utils import init_logger
 from .utils import logger
 from .utils import replace_text_between
 
-
-PR_BRANCH: str = "checkmk_server_version-autoupdate"
-MASTER_BRANCH: str = "feat-checkmk_server_version-autoupdate"
+# FIXME / TODO: *MASTER_BRANCH'es are only temporary. revert to 'master' when merged!
+SERVER_MASTER_BRANCH: str = "feat-checkmk_server_version-autoupdate"
+SERVER_PR_BRANCH: str = "checkmk_server_version-autoupdate"
+CLIENT_MASTER_BRANCH: str = "feat-checkmk_client_version-autoupdate"
+CLIENT_PR_BRANCH: str = "checkmk_client_version-autoupdate"
 
 
 def _unidiff_output(expected: str, actual: str):
@@ -52,7 +54,7 @@ def _check_and_get_branch(repo_path: Path, toBe: str) -> str:
     )
     if _git_branch != toBe:
         logger.fatal(
-            f"Checked-Out Branch of {repo_path.name} must be '{MASTER_BRANCH}'! "
+            f"Checked-Out Branch of {repo_path.name} must be '{SERVER_MASTER_BRANCH}'! "
             f"Is: '{_git_branch}'. Aborting..."
         )
         exit(1)
@@ -79,7 +81,7 @@ def main() -> None:
     )
     server_repo_path: Path = Path.cwd()
     server_local_git_branch_before = _check_and_get_branch(
-        server_repo_path, MASTER_BRANCH
+        server_repo_path, SERVER_MASTER_BRANCH
     )
 
     server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
@@ -162,22 +164,22 @@ def main() -> None:
     )
 
     # ENSURE PRISTINE BRANCH
-    if f"/refs/heads/{PR_BRANCH}" in execute(
+    if f"/refs/heads/{SERVER_PR_BRANCH}" in execute(
         ["git", "ls-remote", "--heads"], server_repo_path
     ):
         logger.notice(
-            f"Branch '{PR_BRANCH}' already exists on remotes. "
+            f"Branch '{SERVER_PR_BRANCH}' already exists on remotes. "
             f"Note that this script will force-overwrite it "
             f"to accomodate potentially changed script behaviour."
         )
         sleep(5)
     else:
         # may possibly exist locally:
-        execute(["git", "branch", "-D", PR_BRANCH], server_repo_path)
-        execute(["git", "branch", PR_BRANCH], server_repo_path)
+        execute(["git", "branch", "-D", SERVER_PR_BRANCH], server_repo_path)
+        execute(["git", "branch", SERVER_PR_BRANCH], server_repo_path)
 
     execute(["git", "fetch"], server_repo_path)
-    execute(["git", "checkout", PR_BRANCH], server_repo_path)
+    execute(["git", "checkout", SERVER_PR_BRANCH], server_repo_path)
     atexit.register(atexit_handler)
 
     execute(["git", "reset"], server_repo_path)
@@ -225,7 +227,7 @@ def main() -> None:
         )
     if not args.dry_run:
         execute(
-            ["git", "push", "--force", "--set-upstream", "origin", PR_BRANCH],
+            ["git", "push", "--force", "--set-upstream", "origin", SERVER_PR_BRANCH],
             server_repo_path,
         )
 
@@ -233,7 +235,7 @@ def main() -> None:
     found_pr: PullRequest | None = None
     for pr in _pull_requests:
         if (
-            pr.head.ref == PR_BRANCH
+            pr.head.ref == SERVER_PR_BRANCH
             and "refactor: update default checkmk_server_version" in pr.title
         ):
             if found_pr is None:
@@ -259,7 +261,10 @@ def main() -> None:
     else:
         if not args.dry_run:
             server_repo.create_pull(
-                title=COMMIT_TITLE, body=PR_BODY, head=PR_BRANCH, base=MASTER_BRANCH
+                title=COMMIT_TITLE,
+                body=PR_BODY,
+                head=SERVER_PR_BRANCH,
+                base=SERVER_MASTER_BRANCH,
             )
 
     logger.verbose("Checking out previous branch again..")
