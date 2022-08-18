@@ -43,6 +43,22 @@ def _unidiff_output(expected: str, actual: str):
     return "".join(diff)
 
 
+def _check_and_get_branch(repo_path: Path, toBe: str) -> str:
+    # https://git-blame.blogspot.com/2013/06/checking-current-branch-programatically.html
+    _git_branch = (
+        execute(["git", "symbolic-ref", "--short", "-q", "HEAD"], repo_path)
+        .replace("refs/heads/", "")
+        .strip()
+    )
+    if _git_branch != toBe:
+        logger.fatal(
+            f"Checked-Out Branch of {repo_path.name} must be '{MASTER_BRANCH}'! "
+            f"Is: '{_git_branch}'. Aborting..."
+        )
+        exit(1)
+    return _git_branch
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     add_argparse_verbosity_option(parser)
@@ -57,30 +73,19 @@ def main() -> None:
 
     _login_or_token = None if args.dry_run else os.environ["GITHUB_TOKEN"]
     github_api: Github = Github(_login_or_token)
+
     server_repo: Repository = github_api.get_repo(
         "JonasPammer/ansible-role-checkmk_server"
     )
     server_repo_path: Path = Path.cwd()
+    server_local_git_branch_before = _check_and_get_branch(
+        server_repo_path, MASTER_BRANCH
+    )
 
     server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
     current_checkmk_server_version = yaml.safe_load(server_defaults_yml.read_text())[
         "checkmk_server_version"
     ]
-
-    # TODO: DRY and implement agent update/pr mechanic
-
-    # https://git-blame.blogspot.com/2013/06/checking-current-branch-programatically.html
-    _git_branch_before = (
-        execute(["git", "symbolic-ref", "--short", "-q", "HEAD"], server_repo_path)
-        .replace("refs/heads/", "")
-        .strip()
-    )
-    if _git_branch_before != f"{MASTER_BRANCH}":
-        logger.fatal(
-            "Checked-Out Branch must be '{MASTER_BRANCH}'! "
-            f"Is: '{_git_branch_before}'. Aborting..."
-        )
-        exit(1)
 
     tags_since = get_checkmk_raw_tags_since(current_checkmk_server_version, github_api)
     if len(tags_since) == 0:
@@ -102,7 +107,7 @@ def main() -> None:
             "The program terminated unexpectedly! "
             "Checking out the branch we were previously on..."
         )
-        execute(["git", "checkout", _git_branch_before], server_repo_path)
+        execute(["git", "checkout", server_local_git_branch_before], server_repo_path)
 
     _git_status_before = execute(["git", "status", "--porcelain"], server_repo_path)
     if any(s in _git_status_before for s in ["defaults/main.yml", "README.orig.adoc"]):
@@ -258,7 +263,7 @@ def main() -> None:
             )
 
     logger.verbose("Checking out previous branch again..")
-    execute(["git", "checkout", _git_branch_before], server_repo_path)
+    execute(["git", "checkout", server_local_git_branch_before], server_repo_path)
 
     atexit.unregister(atexit_handler)
 
