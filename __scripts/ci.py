@@ -51,6 +51,21 @@ def clone_repo_and_checkout_branch(
 ) -> str:
     if not repo_path.joinpath(".git").exists():
         execute(["git", "clone", repo.clone_url], repo_path.parent)
+    if "AUTO_UPDATE_PAT" in os.environ:
+        logger.notice(
+            "Detected AUTO_UPDATE_PAT. Changing 'origin' to https://x-access-token:…"
+        )
+        execute(
+            [
+                "git",
+                "remote",
+                "set-url",
+                "origin",
+                f"https://x-access-token:{ os.environ['AUTO_UPDATE_PAT'] }"
+                f"@github.com/{repo.full_name}",
+            ],
+            repo_path.parent,
+        )
 
     # https://git-blame.blogspot.com/2013/06/checking-current-branch-programatically.html
     _git_branch_before = (
