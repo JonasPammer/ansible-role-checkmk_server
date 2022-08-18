@@ -300,7 +300,9 @@ def init_logger(verbosity: int = 0, silent: bool = False) -> None:
         rotate_log_level,
     ) = get_log_levels_from_verbosity_or_silent_cli_argument(verbosity, silent)
     logger.addHandler(
-        RichHandler(level=logging.getLevelName(console_log_level), markup=True)
+        RichHandler(
+            level=logging.getLevelName(console_log_level), markup=True, console=console
+        )
     )
     logger.setLevel(console_log_level)
     install_rich_traceback(show_locals=True)
