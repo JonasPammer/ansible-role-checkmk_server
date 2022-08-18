@@ -194,65 +194,70 @@ def main() -> None:
         )
         exit(0)
     next_checkmk_server_version = tags_since[0]
+    next_checkmk_server_version_date = (
+        next_checkmk_server_version.commit.commit.committer.date
+    )
+    _next_checkmk_server_version_compare_url = (
+        f"https://github.com/tribe29/checkmk/compare/v{current_checkmk_server_version}"
+        f"...v{next_checkmk_server_version.name}"
+    )
     console.print(
         f"There have been {len(tags_since)} new versions since "
         f"'{current_checkmk_server_version}'! "
         f"Next: '{next_checkmk_server_version.name}'"
     )
 
-    __origin = "(could not resolve ip address location)"
+    _script_executor_origin = "(could not resolve ip address location)"
     try:
         _origin = json.load(
             request.urlopen("https://geolocation-db.com/json/&position=true")
         )
-        __origin = _origin["city"]
+        _script_executor_origin = _origin["city"]
     except (URLError, json.JSONDecodeError):
         pass
-    __date = next_checkmk_server_version.commit.commit.committer.date
-    __url = (
-        f"https://github.com/tribe29/checkmk/compare/v{current_checkmk_server_version}"
-        f"...v{next_checkmk_server_version.name}"
-    )
-    COMMIT_TITLE: str = (
-        "refactor: update default checkmk_server_version "
-        f"from {current_checkmk_server_version} "
-        f"to {next_checkmk_server_version.name} :arrow_up:"
-    )
-    DESCRIPTION: str = (
-        f"Release Date of [{next_checkmk_server_version.name}]({__url}): "
-        f"{__date.strftime('%Y-%m-%d')}"
-        f"\n\n"
-        f"* Accompanying `ansible-role-checkmk_agent` PR: "
-        f"https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO"
-    )
-    DESCRIPTION_NOTE = ""
-    if len(tags_since) > 1:
-        DESCRIPTION_NOTE = (
-            f"\n\nNOTE: There have been **{len(tags_since)}** new versions since "
-            f"{current_checkmk_server_version}. "
-            f"*After this PR has been merged, the github workflow will run again "
-            f"and a new PR will open semi-immideatily*. "
-            f"Please **ensure to create a proper tag/release "
-            f"for every merged ci.py PR**."
-        )
     SCRIPT_MSG: str = (
         ":robot: Authored by `__scripts/ci.py` python script "
-        f"on {platform.node()} by {getpass.getuser()} from {__origin} "
+        f"on {platform.node()} by {getpass.getuser()} from {_script_executor_origin} "
         f"(latest commit: "
         + execute(["git", "rev-parse", "--verify", "HEAD"], server_repo_path).strip()
         + ")"
     )
-    PR_BODY: str = (
-        f"{SCRIPT_MSG} \n\n {DESCRIPTION} {DESCRIPTION_NOTE} \n\n "
-        "NOTE: This should result in a new minor version release of this role!"
+    PR_NOTE = (
+        "**This PR should result in the release of a new minor version for this role**!"
+    )
+    if True:
+        PR_NOTE += (
+            f"\n\nNOTE: There have been **{len(tags_since)}** new versions since "
+            f"{current_checkmk_server_version}. "
+            "After this PR has been merged, the github workflow will run again "
+            "and a new PR will open semi-immideatily. "
+            "Please ensure to create a proper tag/release "
+            "for **every** merged ci.py PR."
+        )
+
+    SERVER_COMMIT_TITLE: str = (
+        "refactor: update default checkmk_server_version "
+        f"from {current_checkmk_server_version} "
+        f"to {next_checkmk_server_version.name} :arrow_up:"
+    )
+    SERVER_COMMIT_DESCRIPTION: str = (
+        f"*Release Date of [{next_checkmk_server_version.name}]"
+        f"({_next_checkmk_server_version_compare_url}): "
+        f"{next_checkmk_server_version_date.strftime('%Y-%m-%d')}*"
+        f"\n"
+        f"*Accompanying `ansible-role-checkmk_agent` PR: "
+        f"https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO*"
+    )
+    SERVER_PR_BODY: str = (
+        f"{SCRIPT_MSG} \n\n {SERVER_COMMIT_DESCRIPTION} \n\n {PR_NOTE}"
     )
 
-    server_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
+    server_repo_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
     server_atexit_handler = _checkout_pristine_pr_branch(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
-        files=server_files,
+        files=server_repo_files,
     )
 
     # MAKE CHANGES
@@ -289,33 +294,33 @@ def main() -> None:
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
-        files=server_files,
+        files=server_repo_files,
         atexit_handler=server_atexit_handler,
         dry_run=args.dry_run,
-        commit_title=COMMIT_TITLE,
+        commit_title=SERVER_COMMIT_TITLE,
         script_msg=SCRIPT_MSG,
-        description=DESCRIPTION,
+        description=SERVER_COMMIT_DESCRIPTION,
     )
 
-    _pull_requests = server_repo.get_pulls()
-    found_pr: PullRequest | None = None
-    for pr in _pull_requests:
+    server_pull_requests = server_repo.get_pulls()
+    found_server_pr: PullRequest | None = None
+    for pr in server_pull_requests:
         if (
             pr.head.ref == SERVER_PR_BRANCH
             and "refactor: update default checkmk_server_version" in pr.title
         ):
-            if found_pr is None:
+            if found_server_pr is None:
                 logger.info(f"Found open ci.py PR {pr}.")
-                found_pr = pr
+                found_server_pr = pr
                 continue
             logger.warning(
-                f"Found more than one open ci.py PRs ({found_pr}, {pr})?? "
-                "Aborting..."
+                f"Found more than one open ci.py PRs in {server_repo.name} "
+                f"({found_server_pr}, {pr})?? Aborting..."
             )
             exit(1)
 
-    if found_pr is not None:
-        if next_checkmk_server_version.name not in found_pr.title:
+    if found_server_pr is not None:
+        if next_checkmk_server_version.name not in found_server_pr.title:
             logger.warning(
                 f"{pr} seems to have been created by ci.py "
                 f"but it's title does not match "
@@ -323,12 +328,14 @@ def main() -> None:
             )
             exit(1)
         if not args.dry_run:
-            found_pr.edit(title=COMMIT_TITLE, body=PR_BODY, state="open")
+            found_server_pr.edit(
+                title=SERVER_COMMIT_TITLE, body=SERVER_PR_BODY, state="open"
+            )
     else:
         if not args.dry_run:
             server_repo.create_pull(
-                title=COMMIT_TITLE,
-                body=PR_BODY,
+                title=SERVER_COMMIT_TITLE,
+                body=SERVER_PR_BODY,
                 head=SERVER_PR_BRANCH,
                 base=SERVER_MASTER_BRANCH,
             )
