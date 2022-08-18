@@ -95,7 +95,9 @@ def checkout_pristine_pr_branch(
         sleep(5)
     else:
         # may possibly exist locally:
-        execute(["git", "branch", "-D", pr_branch], repo_path)
+        execute(
+            ["git", "branch", "-D", pr_branch], repo_path, is_real_error=lambda _: False
+        )
         execute(["git", "branch", pr_branch], repo_path)
 
     execute(["git", "fetch"], repo_path)
