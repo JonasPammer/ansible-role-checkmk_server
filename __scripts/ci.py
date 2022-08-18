@@ -199,7 +199,7 @@ def main() -> None:
     )
     _next_checkmk_server_version_compare_url = (
         f"https://github.com/tribe29/checkmk/compare/v{current_checkmk_server_version}"
-        f"...v{next_checkmk_server_version.name}"
+        f"...{next_checkmk_server_version.name}"
     )
     console.print(
         f"There have been {len(tags_since)} new versions since "
