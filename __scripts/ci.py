@@ -227,7 +227,8 @@ def main() -> None:
     )
     if True:
         PR_NOTE += (
-            f"\n\nNOTE: There have been **{len(tags_since)}** new versions since "
+            "\n\n"
+            f"NOTE: There have been **{len(tags_since)}** new versions since "
             f"{current_checkmk_server_version}. "
             "After this PR has been merged, the github workflow will run again "
             "and a new PR will open semi-immideatily. "
@@ -241,12 +242,14 @@ def main() -> None:
         f"to {next_checkmk_server_version.name} :arrow_up:"
     )
     SERVER_COMMIT_DESCRIPTION: str = (
-        f"*Release Date of [{next_checkmk_server_version.name}]"
-        f"({_next_checkmk_server_version_compare_url}): "
+        f"*Release Date of {next_checkmk_server_version.name}: "
         f"{next_checkmk_server_version_date.strftime('%Y-%m-%d')}*"
-        f"\n"
-        f"*Accompanying `ansible-role-checkmk_agent` PR: "
-        f"https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO*"
+        "\n"
+        "GitHub Compare URL (for the interested / for the record): "
+        f"{_next_checkmk_server_version_compare_url}"
+        "\n"
+        "*Accompanying `ansible-role-checkmk_agent` PR: "
+        "https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO*"
     )
     SERVER_PR_BODY: str = (
         f"{SCRIPT_MSG} \n\n {SERVER_COMMIT_DESCRIPTION} \n\n {PR_NOTE}"
