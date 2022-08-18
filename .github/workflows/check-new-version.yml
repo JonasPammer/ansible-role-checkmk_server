@@ -12,6 +12,7 @@ name: Check for new CheckMK Version
     branches:
       - master
     paths:
+      - ".github/workflows/check-new-version.yml"
       # as per __scripts/ci.py
       - "defaults/main.yml"
   schedule:
@@ -48,3 +49,5 @@ jobs:
         id: script_output
         run: |
           python3 -m __scripts.ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
