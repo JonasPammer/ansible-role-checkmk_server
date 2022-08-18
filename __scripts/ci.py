@@ -18,6 +18,7 @@ import yaml
 from github import Github
 from github.PullRequest import PullRequest
 from github.Repository import Repository
+from github.Tag import Tag
 
 from .utils import add_argparse_silent_option
 from .utils import add_argparse_verbosity_option
@@ -136,6 +137,33 @@ def _commit_push_and_checkout_before(
     execute(["git", "checkout", before_branch], repo_path)
 
     atexit.unregister(atexit_handler)
+
+
+def _find_pr(
+    repo: Repository, branch: str, loose_str: str, next_checkmk_server_version: Tag
+) -> PullRequest | None:
+    server_pull_requests = repo.get_pulls()
+    found_pr: PullRequest | None = None
+    for pr in server_pull_requests:
+        if pr.head.ref == branch and loose_str in pr.title:
+            if found_pr is None:
+                logger.info(f"Found open ci.py PR {pr}.")
+                found_pr = pr
+                continue
+            logger.warning(
+                f"Found more than one open ci.py PRs in {repo.name} "
+                f"({found_pr}, {pr})?? Aborting..."
+            )
+            exit(1)
+
+    if found_pr is not None and next_checkmk_server_version.name not in found_pr.title:
+        logger.warning(
+            f"{found_pr} of {repo} seems to have been created by ci.py "
+            f"but it's title does not contain "
+            f"'{next_checkmk_server_version.name}'! Aborting..."
+        )
+        exit(1)
+    return found_pr
 
 
 def main() -> None:
@@ -307,43 +335,27 @@ def main() -> None:
         description=COMMIT_DESCRIPTION,
     )
 
-    server_pull_requests = server_repo.get_pulls()
-    found_server_pr: PullRequest | None = None
-    for pr in server_pull_requests:
-        if (
-            pr.head.ref == SERVER_PR_BRANCH
-            and "refactor: update default checkmk_server_version" in pr.title
-        ):
-            if found_server_pr is None:
-                logger.info(f"Found open ci.py PR {pr}.")
-                found_server_pr = pr
-                continue
-            logger.warning(
-                f"Found more than one open ci.py PRs in {server_repo.name} "
-                f"({found_server_pr}, {pr})?? Aborting..."
-            )
-            exit(1)
+    found_server_pr = _find_pr(
+        server_repo,
+        SERVER_PR_BRANCH,
+        "refactor: update default checkmk_server_version",
+        next_checkmk_server_version,
+    )
+    if not args.dry_run and found_server_pr is None:
+        found_server_pr = server_repo.create_pull(
+            title=SERVER_COMMIT_TITLE,
+            body=SERVER_PR_BODY,
+            head=SERVER_PR_BRANCH,
+            base=SERVER_MASTER_BRANCH,
+        )
 
-    if found_server_pr is not None:
-        if next_checkmk_server_version.name not in found_server_pr.title:
-            logger.warning(
-                f"{pr} seems to have been created by ci.py "
-                f"but it's title does not match "
-                f"{next_checkmk_server_version.name}! Aborting..."
-            )
-            exit(1)
-        if not args.dry_run:
-            found_server_pr.edit(
-                title=SERVER_COMMIT_TITLE, body=SERVER_PR_BODY, state="open"
-            )
-    else:
-        if not args.dry_run:
-            server_repo.create_pull(
-                title=SERVER_COMMIT_TITLE,
-                body=SERVER_PR_BODY,
-                head=SERVER_PR_BRANCH,
-                base=SERVER_MASTER_BRANCH,
-            )
+    # todo create agent pr
+
+    if not args.dry_run and found_server_pr is not None:
+        found_server_pr.edit(
+            title=SERVER_COMMIT_TITLE, body=SERVER_PR_BODY, state="open"
+        )
+    # todo edit agent pr
 
 
 if __name__ == "__main__":
