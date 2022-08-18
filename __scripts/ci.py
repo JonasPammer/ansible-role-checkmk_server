@@ -104,18 +104,6 @@ def main() -> None:
         f"Next: '{next_checkmk_server_version.name}'"
     )
 
-    def atexit_handler() -> None:
-        logger.notice(
-            "The program terminated unexpectedly! "
-            "Checking out the branch we were previously on..."
-        )
-        execute(["git", "checkout", server_local_git_branch_before], server_repo_path)
-
-    _git_status_before = execute(["git", "status", "--porcelain"], server_repo_path)
-    if any(s in _git_status_before for s in ["defaults/main.yml", "README.orig.adoc"]):
-        logger.error("Working directory is not clean! Aborting...")
-        exit(1)
-
     __origin = "(could not resolve ip address location)"
     try:
         _origin = json.load(
@@ -162,6 +150,18 @@ def main() -> None:
         f"{SCRIPT_MSG} \n\n {DESCRIPTION} {DESCRIPTION_NOTE} \n\n "
         "NOTE: This should result in a new minor version release of this role!"
     )
+
+    def atexit_handler() -> None:
+        logger.notice(
+            "The program terminated unexpectedly! "
+            "Checking out the branch we were previously on..."
+        )
+        execute(["git", "checkout", server_local_git_branch_before], server_repo_path)
+
+    _git_status_before = execute(["git", "status", "--porcelain"], server_repo_path)
+    if any(s in _git_status_before for s in ["defaults/main.yml", "README.orig.adoc"]):
+        logger.error("Working directory is not clean! Aborting...")
+        exit(1)
 
     # ENSURE PRISTINE BRANCH
     if f"/refs/heads/{SERVER_PR_BRANCH}" in execute(
