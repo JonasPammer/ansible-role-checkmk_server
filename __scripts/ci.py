@@ -329,8 +329,8 @@ def main() -> None:
         f"*Release Date of {next_checkmk_server_version.name}: "
         f"{next_checkmk_server_version_date.strftime('%Y-%m-%d')}*"
         "\n"
-        "*GitHub Compare URL (for the interested): "
-        f"{_next_checkmk_server_version_compare_url}*"
+        "*GitHub Compare URL (for the interested):* "
+        f"{_next_checkmk_server_version_compare_url}"
         "\n\n"
     )
 
@@ -408,7 +408,7 @@ def main() -> None:
         "refactor: update default checkmk_agent_version",
         next_checkmk_server_version,
     )
-    if not args.dry_run and found_server_pr is None:
+    if not args.dry_run and found_agent_pr is None:
         found_agent_pr = agent_repo.create_pull(
             title=AGENT_COMMIT_TITLE,
             body=AGENT_PR_BODY,
@@ -420,7 +420,7 @@ def main() -> None:
     if not args.dry_run and found_server_pr is not None:
         if found_agent_pr is not None:
             SERVER_PR_BODY += (
-                "\n\n"
+                "\n\n---\n"
                 f"Accompanying `{agent_repo.name}` PR: " + found_agent_pr.html_url
             )
         found_server_pr.edit(
@@ -430,7 +430,7 @@ def main() -> None:
     if not args.dry_run and found_agent_pr is not None:
         if found_server_pr is not None:
             AGENT_PR_BODY += (
-                "\n\n"
+                "\n\n---\n"
                 f"Accompanying `{server_repo.name}` PR: " + found_server_pr.html_url
             )
         found_agent_pr.edit(title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="open")
