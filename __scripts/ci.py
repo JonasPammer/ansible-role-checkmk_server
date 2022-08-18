@@ -166,36 +166,64 @@ def find_pr(
     return found_pr
 
 
-def _make_changes(server_repo_path: Path, next_checkmk_server_version: Tag):
-    server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
-    server_defaults_yml_contents_old: str = server_defaults_yml.read_text()
-    server_defaults_yml_contents_new: str = replace_text_between(
-        server_defaults_yml_contents_old,
+def write_and_log(file: Path, old_content: str, new_content: str):
+    _server_defaults_yml_contents_diff: str = unidiff_output(old_content, new_content)
+    logger.verbose(f"Unidiff of '{file}': \n" + _server_defaults_yml_contents_diff)
+    file.write_text(new_content)
+
+
+def _make_server_changes(server_repo_path: Path, next_checkmk_server_version: Tag):
+    default_yml: Path = server_repo_path.joinpath("defaults/main.yml")
+    default_yml_contents_old: str = default_yml.read_text()
+    default_yml_contents_new: str = replace_text_between(
+        default_yml_contents_old,
         "# ===== BEGIN generate_yaml MANAGED SECTION",
         "# ===== END generate_yaml MANAGED SECTION",
         f"\n\n{generate_yaml(next_checkmk_server_version.name)}\n",
     )
-    _server_defaults_yml_contents_diff: str = unidiff_output(
-        server_defaults_yml_contents_old, server_defaults_yml_contents_new
+    write_and_log(
+        default_yml,
+        default_yml_contents_old,
+        default_yml_contents_new,
     )
-    logger.verbose(
-        "Unidiff of 'defaults/main.yml': \n" + _server_defaults_yml_contents_diff
-    )
-    server_defaults_yml.write_text(server_defaults_yml_contents_new)
 
-    server_readme: Path = server_repo_path.joinpath("README.orig.adoc")
-    server_readme_contents_old: str = server_readme.read_text()
-    server_readme_contents_new: str = replace_text_between(
-        server_readme_contents_old,
+    readme: Path = server_repo_path.joinpath("README.orig.adoc")
+    readme_contents_old: str = readme.read_text()
+    readme_contents_new: str = replace_text_between(
+        readme_contents_old,
         'checkmk_server_version: "',
         '"',
         next_checkmk_server_version.name.replace("v", ""),
     )
-    _readme_contents_diff: str = unidiff_output(
-        server_readme_contents_old, server_readme_contents_new
+    write_and_log(readme, readme_contents_old, readme_contents_new)
+
+
+def _make_agent_changes(agent_repo_path: Path, next_checkmk_server_version: Tag):
+    default_yml: Path = agent_repo_path.joinpath("defaults/main.yml")
+    default_yml_contents_old: str = default_yml.read_text()
+    default_yml_contents_new: str = replace_text_between(
+        default_yml_contents_old,
+        "# ===== BEGIN generate_yaml MANAGED SECTION",
+        "# ===== END generate_yaml MANAGED SECTION",
+        "\ncheckmk_agent_version: "
+        + "{next_checkmk_server_version.name.replace('v', '')}\n",
     )
-    logger.verbose("Unidiff of 'README.orig.adoc': \n" + _readme_contents_diff)
-    server_readme.write_text(server_readme_contents_new)
+    write_and_log(
+        default_yml,
+        default_yml_contents_old,
+        default_yml_contents_new,
+    )
+
+    readme: Path = agent_repo_path.joinpath("README.orig.adoc")
+    readme_contents_old: str = readme.read_text()
+    readme_contents_new: str = replace_text_between(
+        readme_contents_old,
+        'checkmk_agent_version: "',
+        '"',
+        next_checkmk_server_version.name.replace("v", ""),
+    )
+    write_and_log(readme, readme_contents_old, readme_contents_new)
+    pass
 
 
 def main() -> None:
@@ -225,9 +253,9 @@ def main() -> None:
         "JonasPammer/ansible-role-checkmk_agent"
     )
     agent_repo_path: Path = server_repo_path.joinpath("__scripts", agent_repo.name)
-    # agent_local_git_branch_before = _clone_repo_and_checkout_branch(
-    #     agent_repo, agent_repo_path, AGENT_MASTER_BRANCH
-    # )
+    agent_local_git_branch_before = clone_repo_and_checkout_branch(
+        agent_repo, agent_repo_path, AGENT_MASTER_BRANCH
+    )
 
     server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
     current_checkmk_server_version = yaml.safe_load(server_defaults_yml.read_text())[
@@ -324,10 +352,7 @@ def main() -> None:
         before_branch=server_local_git_branch_before,
         files=server_repo_files,
     )
-
-    # MAKE CHANGES
-    _make_changes(server_repo_path, next_checkmk_server_version)
-
+    _make_server_changes(server_repo_path, next_checkmk_server_version)
     commit_push_and_checkout_before(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
@@ -336,6 +361,26 @@ def main() -> None:
         atexit_handler=server_atexit_handler,
         dry_run=args.dry_run,
         commit_title=SERVER_COMMIT_TITLE,
+        script_msg=SCRIPT_MSG,
+        description=COMMIT_DESCRIPTION,
+    )
+
+    agent_repo_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
+    agent_atexit_handler = checkout_pristine_pr_branch(
+        repo_path=agent_repo_path,
+        pr_branch=AGENT_PR_BRANCH,
+        before_branch=agent_local_git_branch_before,
+        files=agent_repo_files,
+    )
+    _make_agent_changes(agent_repo_path, next_checkmk_server_version)
+    commit_push_and_checkout_before(
+        repo_path=agent_repo_path,
+        pr_branch=AGENT_PR_BRANCH,
+        before_branch=agent_local_git_branch_before,
+        files=agent_repo_files,
+        atexit_handler=agent_atexit_handler,
+        dry_run=args.dry_run,
+        commit_title=AGENT_COMMIT_TITLE,
         script_msg=SCRIPT_MSG,
         description=COMMIT_DESCRIPTION,
     )
@@ -354,13 +399,27 @@ def main() -> None:
             base=SERVER_MASTER_BRANCH,
         )
 
-    # todo create agent pr
+    found_agent_pr = find_pr(
+        agent_repo,
+        AGENT_PR_BRANCH,
+        "refactor: update default checkmk_agent_version",
+        next_checkmk_server_version,
+    )
+    if not args.dry_run and found_server_pr is None:
+        found_agent_pr = agent_repo.create_pull(
+            title=AGENT_COMMIT_TITLE,
+            body=AGENT_PR_BODY,
+            head=AGENT_PR_BRANCH,
+            base=AGENT_MASTER_BRANCH,
+        )
 
     if not args.dry_run and found_server_pr is not None:
         found_server_pr.edit(
             title=SERVER_COMMIT_TITLE, body=SERVER_PR_BODY, state="open"
         )
-    # todo edit agent pr
+
+    if not args.dry_run and found_agent_pr is not None:
+        found_agent_pr.edit(title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="open")
 
 
 if __name__ == "__main__":
