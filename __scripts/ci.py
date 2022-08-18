@@ -9,6 +9,7 @@ import os
 import platform
 from pathlib import Path
 from time import sleep
+from typing import Callable
 from typing import Iterator
 from urllib import request
 from urllib.error import URLError
@@ -59,6 +60,78 @@ def _check_and_get_branch(repo_path: Path, toBe: str) -> str:
         )
         exit(1)
     return _git_branch
+
+
+def _checkout_pristine_pr_branch(
+    repo_path: Path, before_branch: str, files: list[str]
+) -> Callable[..., object]:
+    def atexit_handler() -> None:
+        logger.notice(
+            "The program terminated unexpectedly! "
+            f"Checking out the {repo_path.name} branch "
+            "we were previously on..."
+        )
+        execute(["git", "checkout", before_branch], repo_path)
+
+    _git_status_before = execute(["git", "status", "--porcelain"], repo_path)
+    if any(s in _git_status_before for s in files):
+        logger.error("Working directory is not clean! Aborting...")
+        exit(1)
+
+    # ENSURE PRISTINE BRANCH
+    if f"/refs/heads/{SERVER_PR_BRANCH}" in execute(
+        ["git", "ls-remote", "--heads"], repo_path
+    ):
+        logger.notice(
+            f"Branch '{SERVER_PR_BRANCH}' already exists on remote "
+            f"of {repo_path.name}. "
+            f"Note that this script will force-overwrite it "
+            f"to accomodate potentially changed script behaviour."
+        )
+        sleep(5)
+    else:
+        # may possibly exist locally:
+        execute(["git", "branch", "-D", SERVER_PR_BRANCH], repo_path)
+        execute(["git", "branch", SERVER_PR_BRANCH], repo_path)
+
+    execute(["git", "fetch"], repo_path)
+    execute(["git", "checkout", SERVER_PR_BRANCH], repo_path)
+    atexit.register(atexit_handler)
+
+    execute(["git", "reset"], repo_path)
+    execute(["git", "clean", "-dfx"], repo_path)
+    for f in files:
+        execute(["git", "checkout", "HEAD", "--", f], repo_path)
+    return atexit_handler
+
+
+def _commit_push_and_checkout_before(
+    repo_path: Path,
+    before_branch: str,
+    files: list[str],
+    dry_run: bool,
+    atexit_handler: Callable[..., object],
+    commit_title: str,
+    script_msg: str,
+    description: str,
+):
+    _git_status = execute(["git", "status", "--porcelain"], repo_path)
+    if _git_status != "":
+        for f in files:
+            execute(["git", "add", f], repo_path)
+        execute(
+            ["git", "commit", "-m", commit_title, "-m", script_msg, "-m", description],
+            repo_path,
+        )
+    if not dry_run:
+        execute(
+            ["git", "push", "--force", "--set-upstream", "origin", SERVER_PR_BRANCH],
+            repo_path,
+        )
+    logger.verbose(f"Checking out previous branch of {repo_path.name} again..")
+    execute(["git", "checkout", before_branch], repo_path)
+
+    atexit.unregister(atexit_handler)
 
 
 def main() -> None:
@@ -151,41 +224,12 @@ def main() -> None:
         "NOTE: This should result in a new minor version release of this role!"
     )
 
-    def atexit_handler() -> None:
-        logger.notice(
-            "The program terminated unexpectedly! "
-            "Checking out the branch we were previously on..."
-        )
-        execute(["git", "checkout", server_local_git_branch_before], server_repo_path)
-
-    _git_status_before = execute(["git", "status", "--porcelain"], server_repo_path)
-    if any(s in _git_status_before for s in ["defaults/main.yml", "README.orig.adoc"]):
-        logger.error("Working directory is not clean! Aborting...")
-        exit(1)
-
-    # ENSURE PRISTINE BRANCH
-    if f"/refs/heads/{SERVER_PR_BRANCH}" in execute(
-        ["git", "ls-remote", "--heads"], server_repo_path
-    ):
-        logger.notice(
-            f"Branch '{SERVER_PR_BRANCH}' already exists on remotes. "
-            f"Note that this script will force-overwrite it "
-            f"to accomodate potentially changed script behaviour."
-        )
-        sleep(5)
-    else:
-        # may possibly exist locally:
-        execute(["git", "branch", "-D", SERVER_PR_BRANCH], server_repo_path)
-        execute(["git", "branch", SERVER_PR_BRANCH], server_repo_path)
-
-    execute(["git", "fetch"], server_repo_path)
-    execute(["git", "checkout", SERVER_PR_BRANCH], server_repo_path)
-    atexit.register(atexit_handler)
-
-    execute(["git", "reset"], server_repo_path)
-    execute(["git", "clean", "-dfx"], server_repo_path)
-    execute(["git", "checkout", "HEAD", "--", "defaults/main.yml"], server_repo_path)
-    execute(["git", "checkout", "HEAD", "--", "README.orig.adoc"], server_repo_path)
+    server_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
+    server_atexit_handler = _checkout_pristine_pr_branch(
+        repo_path=server_repo_path,
+        before_branch=server_local_git_branch_before,
+        files=server_files,
+    )
 
     # MAKE CHANGES
     server_defaults_yml_contents_old: str = server_defaults_yml.read_text()
@@ -217,19 +261,16 @@ def main() -> None:
     logger.verbose("Unidiff of 'README.orig.adoc': \n" + _readme_contents_diff)
     server_readme.write_text(server_readme_contents_new)
 
-    _git_status = execute(["git", "status", "--porcelain"], server_repo_path)
-    if _git_status != "":
-        execute(["git", "add", "defaults/main.yml"], server_repo_path)
-        execute(["git", "add", "README.orig.adoc"], server_repo_path)
-        execute(
-            ["git", "commit", "-m", COMMIT_TITLE, "-m", SCRIPT_MSG, "-m", DESCRIPTION],
-            server_repo_path,
-        )
-    if not args.dry_run:
-        execute(
-            ["git", "push", "--force", "--set-upstream", "origin", SERVER_PR_BRANCH],
-            server_repo_path,
-        )
+    _commit_push_and_checkout_before(
+        repo_path=server_repo_path,
+        before_branch=server_local_git_branch_before,
+        files=server_files,
+        atexit_handler=server_atexit_handler,
+        dry_run=args.dry_run,
+        commit_title=COMMIT_TITLE,
+        script_msg=SCRIPT_MSG,
+        description=DESCRIPTION,
+    )
 
     _pull_requests = server_repo.get_pulls()
     found_pr: PullRequest | None = None
@@ -266,11 +307,6 @@ def main() -> None:
                 head=SERVER_PR_BRANCH,
                 base=SERVER_MASTER_BRANCH,
             )
-
-    logger.verbose("Checking out previous branch again..")
-    execute(["git", "checkout", server_local_git_branch_before], server_repo_path)
-
-    atexit.unregister(atexit_handler)
 
 
 if __name__ == "__main__":
