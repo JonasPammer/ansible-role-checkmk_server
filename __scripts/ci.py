@@ -43,17 +43,6 @@ def _unidiff_output(expected: str, actual: str):
     return "".join(diff)
 
 
-def _pop_git_stash_if(old: str, repo_path: Path) -> None:
-    if old != "":
-        logger.notice(
-            "git contains a stash that has not been created by this script run. "
-            "Please resolve by 'git stash pop'ing yourself! "
-        )
-        return
-    if execute(["git", "stash", "list", "--porcelain"], repo_path).strip() != "":
-        execute(["git", "stash", "pop"], repo_path)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser()
     add_argparse_verbosity_option(parser)
@@ -92,9 +81,6 @@ def main() -> None:
             f"Is: '{_git_branch_before}'. Aborting..."
         )
         exit(1)
-    _git_stash_list_before = execute(
-        ["git", "stash", "list", "--porcelain"], server_repo_path
-    ).strip()
 
     tags_since = get_checkmk_raw_tags_since(current_checkmk_server_version, github_api)
     if len(tags_since) == 0:
@@ -114,17 +100,14 @@ def main() -> None:
     def atexit_handler() -> None:
         logger.notice(
             "The program terminated unexpectedly! "
-            "Checking out the branch we were previously on "
-            "and popping stash..."
+            "Checking out the branch we were previously on..."
         )
         execute(["git", "checkout", _git_branch_before], server_repo_path)
-        _pop_git_stash_if(_git_stash_list_before, server_repo_path)
 
     _git_status_before = execute(["git", "status", "--porcelain"], server_repo_path)
-    if _git_status_before != "":
+    if any(s in _git_status_before for s in ["defaults/main.yml", "README.orig.adoc"]):
         logger.error("Working directory is not clean! Aborting...")
         exit(1)
-    execute(["git", "stash"], server_repo_path)  # just to be safe
 
     __origin = "(could not resolve ip address location)"
     try:
@@ -192,8 +175,10 @@ def main() -> None:
     execute(["git", "checkout", PR_BRANCH], server_repo_path)
     atexit.register(atexit_handler)
 
-    execute(["git", "reset", "--hard", f"{MASTER_BRANCH}"], server_repo_path)
+    execute(["git", "reset"], server_repo_path)
     execute(["git", "clean", "-dfx"], server_repo_path)
+    execute(["git", "checkout", "HEAD", "--", "defaults/main.yml"], server_repo_path)
+    execute(["git", "checkout", "HEAD", "--", "README.orig.adoc"], server_repo_path)
 
     # MAKE CHANGES
     server_defaults_yml_contents_old: str = server_defaults_yml.read_text()
@@ -272,9 +257,8 @@ def main() -> None:
                 title=COMMIT_TITLE, body=PR_BODY, head=PR_BRANCH, base=MASTER_BRANCH
             )
 
-    logger.verbose("Checking out previous branch and working tree again..")
+    logger.verbose("Checking out previous branch again..")
     execute(["git", "checkout", _git_branch_before], server_repo_path)
-    _pop_git_stash_if(_git_stash_list_before, server_repo_path)
 
     atexit.unregister(atexit_handler)
 
