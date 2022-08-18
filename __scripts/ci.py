@@ -310,7 +310,7 @@ def main() -> None:
     PR_NOTE = (
         "**This PR should result in the release of a new minor version for this role**!"
     )
-    if True:
+    if len(tags_since) > 1:
         PR_NOTE += (
             "\n\n"
             f"NOTE: There have been **{len(tags_since)}** new versions since "
