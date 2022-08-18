@@ -247,7 +247,7 @@ def main() -> None:
         "\n"
         "GitHub Compare URL (for the interested): "
         f"{_next_checkmk_server_version_compare_url}"
-        "\n"
+        "\n\n"
         "*Accompanying `ansible-role-checkmk_agent` PR: "
         "https://github.com/JonasPammer/ansible-role-checkmk_agent/pull/TODO*"
     )
