@@ -50,5 +50,5 @@ jobs:
         run: |
           python3 -m __scripts.ci -v
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.AUTO_UPDATE_PAT }}
           AUTO_UPDATE_PAT: ${{ secrets.AUTO_UPDATE_PAT }}
