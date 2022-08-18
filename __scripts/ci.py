@@ -416,11 +416,21 @@ def main() -> None:
         )
 
     if not args.dry_run and found_server_pr is not None:
+        if found_agent_pr is not None:
+            SERVER_PR_BODY += (
+                "\n\n"
+                f"Accompanying `{agent_repo.name}` PR: " + found_agent_pr.html_url
+            )
         found_server_pr.edit(
             title=SERVER_COMMIT_TITLE, body=SERVER_PR_BODY, state="open"
         )
 
     if not args.dry_run and found_agent_pr is not None:
+        if found_server_pr is not None:
+            AGENT_PR_BODY += (
+                "\n\n"
+                f"Accompanying `{server_repo.name}` PR: " + found_server_pr.html_url
+            )
         found_agent_pr.edit(title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="open")
 
 
