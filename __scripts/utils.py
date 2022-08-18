@@ -181,10 +181,8 @@ def get_checkmk_raw_tags_since(
             continue
         new_tags_since.append(tag)
 
-    # TODO: v2.1.0 needs to be before v2.1.0p[x] (but after v2.1.0b[x]), not at the end
-    # (which currently "means" to the program that its the latest)
-
-    return new_tags_since[::-1]
+    new_tags_since = sorted(new_tags_since, key=lambda tag: tag.name)
+    return new_tags_since
 
 
 def replace_text_between(
