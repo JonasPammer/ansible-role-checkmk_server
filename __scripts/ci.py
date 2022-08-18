@@ -149,7 +149,7 @@ def find_pr(
     for pr in server_pull_requests:
         if pr.head.ref == branch and loose_str in pr.title:
             if found_pr is None:
-                logger.info(f"Found open ci.py PR {pr}.")
+                logger.info(f"Found open ci.py PR in {repo.name}: {pr}.")
                 found_pr = pr
                 continue
             logger.warning(
