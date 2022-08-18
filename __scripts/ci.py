@@ -37,7 +37,7 @@ AGENT_MASTER_BRANCH: str = "feat-checkmk_agent_version-autoupdate"
 AGENT_PR_BRANCH: str = "checkmk_agent_version-autoupdate"
 
 
-def _unidiff_output(expected: str, actual: str):
+def unidiff_output(expected: str, actual: str):
     """Returns a string containing the unified diff of two multiline
     strings."""
     diff: Iterator[str] = difflib.unified_diff(
@@ -47,7 +47,7 @@ def _unidiff_output(expected: str, actual: str):
     return "".join(diff)
 
 
-def _clone_repo_and_checkout_branch(
+def clone_repo_and_checkout_branch(
     repo: Repository, repo_path: Path, branch: str
 ) -> str:
     if not repo_path.joinpath(".git").exists():
@@ -66,7 +66,7 @@ def _clone_repo_and_checkout_branch(
     return _git_branch_before
 
 
-def _checkout_pristine_pr_branch(
+def checkout_pristine_pr_branch(
     repo_path: Path, pr_branch: str, before_branch: str, files: list[str]
 ) -> Callable[..., object]:
     def atexit_handler() -> None:
@@ -109,7 +109,7 @@ def _checkout_pristine_pr_branch(
     return atexit_handler
 
 
-def _commit_push_and_checkout_before(
+def commit_push_and_checkout_before(
     repo_path: Path,
     pr_branch: str,
     before_branch: str,
@@ -139,7 +139,7 @@ def _commit_push_and_checkout_before(
     atexit.unregister(atexit_handler)
 
 
-def _find_pr(
+def find_pr(
     repo: Repository, branch: str, loose_str: str, next_checkmk_server_version: Tag
 ) -> PullRequest | None:
     server_pull_requests = repo.get_pulls()
@@ -185,7 +185,7 @@ def main() -> None:
         "JonasPammer/ansible-role-checkmk_server"
     )
     server_repo_path: Path = Path.cwd()
-    server_local_git_branch_before = _clone_repo_and_checkout_branch(
+    server_local_git_branch_before = clone_repo_and_checkout_branch(
         server_repo, server_repo_path, SERVER_MASTER_BRANCH
     )
 
@@ -286,7 +286,7 @@ def main() -> None:
     AGENT_PR_BODY: str = SERVER_PR_BODY
 
     server_repo_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
-    server_atexit_handler = _checkout_pristine_pr_branch(
+    server_atexit_handler = checkout_pristine_pr_branch(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
@@ -301,7 +301,7 @@ def main() -> None:
         "# ===== END generate_yaml MANAGED SECTION",
         f"\n\n{generate_yaml(next_checkmk_server_version.name)}\n",
     )
-    _server_defaults_yml_contents_diff: str = _unidiff_output(
+    _server_defaults_yml_contents_diff: str = unidiff_output(
         server_defaults_yml_contents_old, server_defaults_yml_contents_new
     )
     logger.verbose(
@@ -317,13 +317,13 @@ def main() -> None:
         '"',
         next_checkmk_server_version.name.replace("v", ""),
     )
-    _readme_contents_diff: str = _unidiff_output(
+    _readme_contents_diff: str = unidiff_output(
         server_readme_contents_old, server_readme_contents_new
     )
     logger.verbose("Unidiff of 'README.orig.adoc': \n" + _readme_contents_diff)
     server_readme.write_text(server_readme_contents_new)
 
-    _commit_push_and_checkout_before(
+    commit_push_and_checkout_before(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
@@ -335,7 +335,7 @@ def main() -> None:
         description=COMMIT_DESCRIPTION,
     )
 
-    found_server_pr = _find_pr(
+    found_server_pr = find_pr(
         server_repo,
         SERVER_PR_BRANCH,
         "refactor: update default checkmk_server_version",
