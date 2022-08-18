@@ -99,9 +99,24 @@ this is often shown as `my-site` in the CheckMK documentation examples.
 
 [source,yaml]
 ----
+checkmk_server_download_checksum: [OS-specific, see /defaults directory]
 checkmk_server_version: "2.0.0p25"
 ----
-Version of CheckMK RAW edition to install
+Version of CheckMK RAW edition to install.
+
+The default value of these variables is semi-automatically being updated
+to the latest non-beta CheckMk RAW v2 Release through the help of a CI Workflow
+and some accompanying python scripts which can be found in `__scripts`.
+
+Every said update is accompanied with a new release of at least a minor version bump.
+See <<changelog>> for an overview.
+
+[NOTE]
+Even though you could pin the version of this role to get a pinned version of checkmk,
+I recommend that you install the latest version of this role and
+change these variables yourself instead as I do not backport
+actual patches made to this role into older versions
+(if that is even possible).
 
 
 [[variables--installation]]
@@ -126,7 +141,6 @@ checkmk_server_install_cache_valid_time: "3600"
 [source,yaml]
 ----
 checkmk_server_download_package: [OS-specific, see /defaults directory]
-checkmk_server_download_checksum: [OS-specific, see /defaults directory]
 checkmk_server_download_url: "https://download.checkmk.com/checkmk/{{ checkmk_server_version }}/{{ checkmk_server_download_package }}"
 checkmk_server_download_pubkey_url: "https://download.checkmk.com/checkmk/Check_MK-pubkey.gpg"
 checkmk_server_download_dest: "{{ checkmk_server_download_dest_folder }}/{{ checkmk_server_download_package }}"

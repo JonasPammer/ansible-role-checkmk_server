@@ -1,0 +1,5 @@
+PyGitHub>=1,<2
+pyyaml
+rich>=12
+types-PyYAML
+verboselogs>=1.7,<2
