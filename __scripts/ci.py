@@ -515,17 +515,17 @@ def main() -> None:
         server_repo,
         SERVER_MASTER_BRANCH,
         repo_other=agent_repo,
-        new_version=next_checkmk_server_version,
-        new_tag=next_server_role_tag_version,
-        new_tag_other=next_agent_role_tag_version,
+        new_version=next_checkmk_server_version.name,
+        new_tag=str(next_server_role_tag_version),
+        new_tag_other=str(next_agent_role_tag_version),
     )
     next_agent_role_tag_create_url: str = get_prefilled_new_release_url(
         agent_repo,
         AGENT_MASTER_BRANCH,
         repo_other=server_repo,
-        new_version=next_checkmk_server_version,
-        new_tag=next_agent_role_tag_version,
-        new_tag_other=next_server_role_tag_version,
+        new_version=next_checkmk_server_version.name,
+        new_tag=str(next_agent_role_tag_version),
+        new_tag_other=str(next_server_role_tag_version),
     )
 
     if latest_released_checkmk_server_version != current_checkmk_server_version:
