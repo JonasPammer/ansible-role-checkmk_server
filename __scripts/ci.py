@@ -218,7 +218,7 @@ def create_or_update_missing_release_issue(
     for pr in repo.get_pulls():
         pr_files = pr.get_files()
         for file in filter(
-            lambda f: any(s == f.name for s in SERVER_REPO_FILES), pr_files
+            lambda f: any(s == f.filename for s in SERVER_REPO_FILES), pr_files
         ):
             if "version: " in file.patch:
                 open_version_change_prs.append(pr)
