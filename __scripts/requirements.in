@@ -1,5 +1,6 @@
 PyGitHub>=1,<2
 pyyaml
 rich
+semver
 types-PyYAML
 verboselogs
