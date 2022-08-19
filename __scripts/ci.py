@@ -554,7 +554,7 @@ def main() -> None:
     else:
         close_missing_release_issues(
             server_repo,
-            latest_released_checkmk_server_version,
+            server_role_tags[0][0],
             current_checkmk_server_version,
         )
 
@@ -570,7 +570,7 @@ def main() -> None:
     else:
         close_missing_release_issues(
             server_repo,
-            latest_released_checkmk_agent_version,
+            agent_role_tags[0][0],
             current_checkmk_agent_version,
         )
 
