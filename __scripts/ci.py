@@ -311,6 +311,9 @@ def commit_push_and_checkout_before(
             ["git", "push", "--force", "--set-upstream", "origin", pr_branch],
             repo_path,
         )
+    # eliminate windows bug
+    for f in files:
+        execute(["git", "add", f], repo_path)
     logger.verbose(f"Checking out previous branch of {repo_path.name} again..")
     execute(["git", "checkout", before_branch], repo_path)
 
