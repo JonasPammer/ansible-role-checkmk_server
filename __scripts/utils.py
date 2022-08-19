@@ -4,6 +4,7 @@ import hashlib
 import logging
 import os
 import pathlib
+import stat
 import subprocess
 from argparse import ArgumentParser
 from functools import lru_cache
@@ -357,3 +358,9 @@ def execute(
             f"See above for more information."
         )
         raise ex
+
+
+def on_rm_error(func, path, exc_info):
+    #from: https://stackoverflow.com/questions/4829043/how-to-remove-read-only-attrib-directory-with-python-in-windows
+    os.chmod(path, stat.S_IWRITE)
+    os.unlink(path)

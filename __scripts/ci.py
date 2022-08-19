@@ -26,7 +26,7 @@ from github.Repository import Repository
 from github.Tag import Tag
 from semver import VersionInfo
 
-from .utils import add_argparse_silent_option
+from .utils import add_argparse_silent_option, on_rm_error
 from .utils import add_argparse_verbosity_option
 from .utils import console
 from .utils import execute
@@ -447,7 +447,7 @@ def main() -> None:
     )
     agent_repo_path: Path = server_repo_path.joinpath("__scripts", agent_repo.name)
     if agent_repo_path.exists():
-        shutil.rmtree(agent_repo_path)
+        shutil.rmtree(agent_repo_path, onerror=on_rm_error)
     (
         agent_local_git_branch_before,
         agent_atexit_handler,
