@@ -508,7 +508,7 @@ def main() -> None:
     )["checkmk_agent_version"]
 
     next_server_role_tag_version: VersionInfo = server_role_tags[0][1].bump_patch()
-    next_agent_role_tag_version: VersionInfo = server_role_tags[0][1].bump_patch()
+    next_agent_role_tag_version: VersionInfo = agent_role_tags[0][1].bump_patch()
     next_server_role_tag_create_url: str = get_prefilled_new_release_url(
         server_repo,
         SERVER_MASTER_BRANCH,
