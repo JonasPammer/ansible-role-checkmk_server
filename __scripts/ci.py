@@ -180,7 +180,7 @@ def create_or_update_missing_release_issue(
         f"> {next_role_tag_create_url}"
     )
     ISSUE_BODY = GENERAL_BODY + BODY_TIP
-    logger.error(ISSUE_BODY)
+    logger.error(ISSUE_BODY.replace("\n\n", ""))
     ISSUE_BODY += f"\n\n {SCRIPT_MSG}"
 
     found_issue: Issue | None = None
