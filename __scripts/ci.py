@@ -19,6 +19,7 @@ from urllib.error import URLError
 
 import yaml
 from github import Github
+from github import UnknownObjectException
 from github.Issue import Issue
 from github.Label import Label
 from github.PullRequest import PullRequest
@@ -225,15 +226,21 @@ def create_or_update_missing_release_issue(
                 break  # file loop
 
     for pr in open_version_change_prs:
-        labels: list[Label | str] = pr.labels + ["do-not-merge"]
+        labels: list[Label | str] = pr.labels
+        if not any("do-not-merge" == str(label) for label in labels):
+            try:
+                labels.append(repo.get_label("do-not-merge"))
+            except UnknownObjectException:
+                logger.warning(f"Could not find 'do-not-merge' label in {repo}.")
         _opt = "**Please re-open this PR if said Issue has been resolved.**"
         if ":robot:" not in pr.body:
             _opt = (
                 "*This PR will re-open itself automatically on a new ci.py run "
                 "once said Issue has been resolved!*"
             )
-        pr.edit(state="closed", labels=labels)
-        pr.create_comment(
+        pr.set_labels(*labels)
+        pr.edit(state="closed")
+        pr.create_issue_comment(
             GENERAL_BODY + "\n\n"
             "Closing this pull request until "
             f"#{found_issue.number} has been resolved! {_opt}"
