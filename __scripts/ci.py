@@ -542,6 +542,7 @@ def main() -> None:
         new_tag_other=str(next_server_role_tag_version),
     )
 
+    _exit: bool = False
     if latest_released_checkmk_server_version != current_checkmk_server_version:
         create_or_update_missing_release_issue(
             server_repo,
@@ -550,7 +551,7 @@ def main() -> None:
             current_checkmk_version=current_checkmk_server_version,
             next_role_tag_create_url=next_server_role_tag_create_url,
         )
-        exit(1)
+        _exit = True
     else:
         close_missing_release_issues(
             server_repo,
@@ -573,6 +574,9 @@ def main() -> None:
             agent_role_tags[0][0],
             current_checkmk_agent_version,
         )
+    if _exit:
+        exit(1)
+    del _exit
 
     _PR_NOTE1_BASE = (
         "**This PR should result in the release of a new minor version "
