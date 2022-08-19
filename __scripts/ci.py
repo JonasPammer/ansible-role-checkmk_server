@@ -74,7 +74,7 @@ def unidiff_output(expected: str, actual: str):
 
 def clone_repo_and_checkout_branch(
     repo: Repository, repo_path: Path, branch: str
-) -> str:
+) -> tuple[str, Callable[..., object]]:
     if not repo_path.joinpath(".git").exists():
         execute(["git", "clone", repo.clone_url], repo_path.parent)
     if "AUTO_UPDATE_PAT" in os.environ:
@@ -103,7 +103,16 @@ def clone_repo_and_checkout_branch(
     if _git_branch_before != branch:
         execute(["git", "fetch"], repo_path)
         execute(["git", "checkout", branch], repo_path)
-    return _git_branch_before
+
+    def atexit_handler() -> None:
+        logger.notice(
+            "The program terminated unexpectedly! "
+            f"Checking out the {repo_path.name} branch "
+            "we were previously on..."
+        )
+        execute(["git", "checkout", _git_branch_before], repo_path)
+
+    return _git_branch_before, atexit_handler
 
 
 def get_prefilled_new_release_url(
@@ -231,15 +240,7 @@ def create_or_update_missing_release_issue(
 
 def checkout_pristine_pr_branch(
     repo_path: Path, pr_branch: str, before_branch: str, files: list[str]
-) -> Callable[..., object]:
-    def atexit_handler() -> None:
-        logger.notice(
-            "The program terminated unexpectedly! "
-            f"Checking out the {repo_path.name} branch "
-            "we were previously on..."
-        )
-        execute(["git", "checkout", before_branch], repo_path)
-
+) -> None:
     _git_status_before = execute(["git", "status", "--porcelain"], repo_path)
     if any(s in _git_status_before for s in files):
         logger.error("Working directory is not clean! Aborting...")
@@ -265,12 +266,10 @@ def checkout_pristine_pr_branch(
 
     execute(["git", "fetch"], repo_path)
     execute(["git", "checkout", pr_branch], repo_path)
-    atexit.register(atexit_handler)
 
     execute(["git", "reset"], repo_path)
     for f in files:
         execute(["git", "checkout", "HEAD", "--", f], repo_path)
-    return atexit_handler
 
 
 def commit_push_and_checkout_before(
@@ -434,7 +433,10 @@ def main() -> None:
         "JonasPammer/ansible-role-checkmk_server"
     )
     server_repo_path: Path = Path.cwd()
-    server_local_git_branch_before = clone_repo_and_checkout_branch(
+    (
+        server_local_git_branch_before,
+        server_atexit_handler,
+    ) = clone_repo_and_checkout_branch(
         server_repo, server_repo_path, SERVER_MASTER_BRANCH
     )
 
@@ -443,9 +445,10 @@ def main() -> None:
     )
     agent_repo_path: Path = server_repo_path.joinpath("__scripts", agent_repo.name)
     shutil.rmtree(agent_repo_path)
-    agent_local_git_branch_before = clone_repo_and_checkout_branch(
-        agent_repo, agent_repo_path, AGENT_MASTER_BRANCH
-    )
+    (
+        agent_local_git_branch_before,
+        agent_atexit_handler,
+    ) = clone_repo_and_checkout_branch(agent_repo, agent_repo_path, AGENT_MASTER_BRANCH)
 
     server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
     current_checkmk_server_version = yaml.safe_load(
@@ -599,7 +602,7 @@ def main() -> None:
         f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n" f"{AGENT_PR_NOTE1} {PR_NOTE2}"
     )
 
-    server_atexit_handler = checkout_pristine_pr_branch(
+    checkout_pristine_pr_branch(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
@@ -618,7 +621,7 @@ def main() -> None:
         description=COMMIT_DESCRIPTION,
     )
 
-    agent_atexit_handler = checkout_pristine_pr_branch(
+    checkout_pristine_pr_branch(
         repo_path=agent_repo_path,
         pr_branch=AGENT_PR_BRANCH,
         before_branch=agent_local_git_branch_before,
