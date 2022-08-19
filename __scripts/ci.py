@@ -140,7 +140,7 @@ def get_prefilled_new_release_url(
 def close_missing_release_issues(
     repo: Repository, latest_released_role_tag: Tag, current_checkmk_version: str
 ):
-    for issue in repo.get_issues(state=open):
+    for issue in repo.get_issues(state="open"):
         if FIND_MISSING_RELEASE_BASE_TITLE not in issue.title:
             continue
         logger.info(
