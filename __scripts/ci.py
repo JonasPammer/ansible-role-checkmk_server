@@ -119,7 +119,6 @@ def checkout_pristine_pr_branch(
     atexit.register(atexit_handler)
 
     execute(["git", "reset"], repo_path)
-    execute(["git", "clean", "-dfx"], repo_path)
     for f in files:
         execute(["git", "checkout", "HEAD", "--", f], repo_path)
     return atexit_handler
