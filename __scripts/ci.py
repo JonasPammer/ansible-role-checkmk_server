@@ -26,7 +26,7 @@ from github.Repository import Repository
 from github.Tag import Tag
 from semver import VersionInfo
 
-from .utils import add_argparse_silent_option, on_rm_error
+from .utils import add_argparse_silent_option
 from .utils import add_argparse_verbosity_option
 from .utils import console
 from .utils import execute
@@ -34,6 +34,7 @@ from .utils import generate_yaml
 from .utils import get_checkmk_raw_tags_since
 from .utils import init_logger
 from .utils import logger
+from .utils import on_rm_error
 from .utils import replace_text_between
 
 SERVER_MASTER_BRANCH: str = "master"
