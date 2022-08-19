@@ -114,6 +114,7 @@ def clone_repo_and_checkout_branch(
             "we were previously on..."
         )
         execute(["git", "checkout", _git_branch_before], repo_path)
+    atexit.register(atexit_handler)
 
     return _git_branch_before, atexit_handler
 
