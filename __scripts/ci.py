@@ -226,6 +226,11 @@ def create_or_update_missing_release_issue(
                 break  # file loop
 
     for pr in open_version_change_prs:
+        logger.info(
+            f"Closing {pr} of {repo} as the default checkmk version "
+            f"in the latest role release does not match the current version! "
+            f"May reopen again when {found_issue.html_url} is resolved. "
+        )
         labels: list[Label | str] = pr.labels
         if not any("do-not-merge" == str(label) for label in labels):
             try:
