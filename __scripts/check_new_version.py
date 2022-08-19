@@ -37,7 +37,7 @@ def main() -> None:
     current_checkmk_server_version = args.checkmk_server_version
 
     if current_checkmk_server_version is None:
-        current_defaults_yml = yaml.safe_load(Path("defaults/main.yml").read_text())
+        current_defaults_yml = yaml.safe_load(Path("defaults/main.yml").read_text(encoding="utf8"))
         current_checkmk_server_version = current_defaults_yml["checkmk_server_version"]
 
     tags_since = get_checkmk_raw_tags_since(current_checkmk_server_version, github_api)

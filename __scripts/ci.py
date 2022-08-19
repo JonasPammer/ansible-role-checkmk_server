@@ -189,7 +189,7 @@ def write_and_log(file: Path, old_content: str, new_content: str):
 
 def _make_server_changes(server_repo_path: Path, next_checkmk_server_version: Tag):
     default_yml: Path = server_repo_path.joinpath("defaults/main.yml")
-    default_yml_contents_old: str = default_yml.read_text()
+    default_yml_contents_old: str = default_yml.read_text(encoding="utf8")
     default_yml_contents_new: str = replace_text_between(
         default_yml_contents_old,
         "# ===== BEGIN generate_yaml MANAGED SECTION",
@@ -203,7 +203,7 @@ def _make_server_changes(server_repo_path: Path, next_checkmk_server_version: Ta
     )
 
     readme: Path = server_repo_path.joinpath("README.orig.adoc")
-    readme_contents_old: str = readme.read_text()
+    readme_contents_old: str = readme.read_text(encoding="utf8")
     readme_contents_new: str = replace_text_between(
         readme_contents_old,
         'checkmk_server_version: "',
@@ -215,7 +215,7 @@ def _make_server_changes(server_repo_path: Path, next_checkmk_server_version: Ta
 
 def _make_agent_changes(agent_repo_path: Path, next_checkmk_server_version: Tag):
     default_yml: Path = agent_repo_path.joinpath("defaults/main.yml")
-    default_yml_contents_old: str = default_yml.read_text()
+    default_yml_contents_old: str = default_yml.read_text(encoding="utf8")
     default_yml_contents_new: str = replace_text_between(
         default_yml_contents_old,
         "# ===== BEGIN generate_yaml MANAGED SECTION",
@@ -230,7 +230,7 @@ def _make_agent_changes(agent_repo_path: Path, next_checkmk_server_version: Tag)
     )
 
     readme: Path = agent_repo_path.joinpath("README.orig.adoc")
-    readme_contents_old: str = readme.read_text()
+    readme_contents_old: str = readme.read_text(encoding="utf8")
     readme_contents_new: str = replace_text_between(
         readme_contents_old,
         'checkmk_agent_version: "',
@@ -272,11 +272,11 @@ def main() -> None:
     )
 
     server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
-    current_checkmk_server_version = yaml.safe_load(server_defaults_yml.read_text())[
+    current_checkmk_server_version = yaml.safe_load(server_defaults_yml.read_text(encoding="utf8"))[
         "checkmk_server_version"
     ]
     agent_defaults_yml: Path = agent_repo_path.joinpath("defaults/main.yml")
-    current_checkmk_agent_version = yaml.safe_load(agent_defaults_yml.read_text())[
+    current_checkmk_agent_version = yaml.safe_load(agent_defaults_yml.read_text(encoding="utf8"))[
         "checkmk_agent_version"
     ]
 
