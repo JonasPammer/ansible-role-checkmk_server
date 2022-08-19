@@ -184,7 +184,7 @@ def create_or_update_missing_release_issue(
     ISSUE_BODY += f"\n\n {SCRIPT_MSG}"
 
     found_issue: Issue | None = None
-    for issue in repo.get_issues(state=all):
+    for issue in repo.get_issues(state="all"):
         if (
             FIND_MISSING_RELEASE_BASE_TITLE in issue.title
             and current_checkmk_version in issue.title
