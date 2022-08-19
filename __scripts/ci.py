@@ -251,6 +251,7 @@ def create_or_update_missing_release_issue(
             f"#{found_issue.number} has been resolved! {_opt}"
             f"\n\n{SCRIPT_MSG}"
         )
+        pr.edit(state="closed")
 
 
 def checkout_pristine_pr_branch(
