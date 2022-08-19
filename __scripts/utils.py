@@ -361,6 +361,6 @@ def execute(
 
 
 def on_rm_error(func, path, exc_info):
-    #from: https://stackoverflow.com/questions/4829043/how-to-remove-read-only-attrib-directory-with-python-in-windows
+    # from: https://stackoverflow.com/questions/4829043/how-to-remove-read-only-attrib-directory-with-python-in-windows
     os.chmod(path, stat.S_IWRITE)
     os.unlink(path)
