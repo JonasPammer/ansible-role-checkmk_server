@@ -174,7 +174,7 @@ def create_or_update_missing_release_issue(
         "\n\n"
         "Automated Version Updating is halted until a new version is released. "
         "For convenience you can use the following link to create a new release: \n"
-        f"{next_role_tag_create_url}"
+        f"> {next_role_tag_create_url}"
     )
     ISSUE_BODY = GENERAL_BODY + BODY_TIP
     logger.error(ISSUE_BODY)
@@ -588,13 +588,13 @@ def main() -> None:
         f"from {current_checkmk_server_version} "
         f"to {next_checkmk_server_version.name} :arrow_up:"
     )
-    SERVER_PR_NOTE1 = _PR_NOTE1_BASE + "\n" + next_server_role_tag_create_url
+    SERVER_PR_NOTE1 = _PR_NOTE1_BASE + "\n> " + next_server_role_tag_create_url
     AGENT_COMMIT_TITLE: str = (
         "refactor: update default checkmk_agent_version "
         f"from {current_checkmk_agent_version} "
         f"to {next_checkmk_server_version.name} :arrow_up:"
     )
-    AGENT_PR_NOTE1 = _PR_NOTE1_BASE + "\n" + next_agent_role_tag_create_url
+    AGENT_PR_NOTE1 = _PR_NOTE1_BASE + "\n> " + next_agent_role_tag_create_url
     SERVER_PR_BODY: str = (
         f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n" f"{SERVER_PR_NOTE1} {PR_NOTE2}"
     )
