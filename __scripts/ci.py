@@ -184,7 +184,7 @@ def find_pr(
 def write_and_log(file: Path, old_content: str, new_content: str):
     _server_defaults_yml_contents_diff: str = unidiff_output(old_content, new_content)
     logger.verbose(f"Unidiff of '{file}': \n" + _server_defaults_yml_contents_diff)
-    file.write_text(new_content)
+    file.write_text(new_content, encoding="utf-8")
 
 
 def _make_server_changes(server_repo_path: Path, next_checkmk_server_version: Tag):
