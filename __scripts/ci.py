@@ -7,18 +7,23 @@ import getpass
 import json
 import os
 import platform
+from html import escape
 from pathlib import Path
 from time import sleep
 from typing import Callable
+from typing import Final
 from typing import Iterator
 from urllib import request
 from urllib.error import URLError
 
 import yaml
 from github import Github
+from github.Issue import Issue
+from github.Label import Label
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from github.Tag import Tag
+from semver import VersionInfo
 
 from .utils import add_argparse_silent_option
 from .utils import add_argparse_verbosity_option
@@ -34,6 +39,26 @@ SERVER_MASTER_BRANCH: str = "master"
 SERVER_PR_BRANCH: str = "checkmk_server_version-autoupdate"
 AGENT_MASTER_BRANCH: str = "master"
 AGENT_PR_BRANCH: str = "checkmk_agent_version-autoupdate"
+
+SERVER_REPO_FILES: list[str] = ["defaults/main.yml", "README.orig.adoc"]
+AGENT_REPO_FILES: list[str] = ["defaults/main.yml", "README.orig.adoc"]
+
+FIND_MISSING_RELEASE_BASE_TITLE: Final[
+    str
+] = "[check-new-versions.yml] Please create a new release"
+
+__script_executor_origin = "(could not resolve ip address location)"
+try:
+    _origin = json.load(
+        request.urlopen("https://geolocation-db.com/json/&position=true")
+    )
+    __script_executor_origin = _origin["city"]
+except (URLError, json.JSONDecodeError):
+    pass
+SCRIPT_MSG: str = (
+    ":robot: *Authored by `__scripts/ci.py` python script "
+    f"on {platform.node()} by {getpass.getuser()} from {__script_executor_origin}* "
+)
 
 
 def unidiff_output(expected: str, actual: str):
@@ -78,6 +103,129 @@ def clone_repo_and_checkout_branch(
         execute(["git", "fetch"], repo_path)
         execute(["git", "checkout", branch], repo_path)
     return _git_branch_before
+
+
+def get_prefilled_new_release_url(
+    repo: Repository,
+    master: str,
+    repo_other: Repository,
+    new_version: str,
+    new_tag: str,
+    new_tag_other: str,
+):
+    return (
+        f"{repo.html_url}/releases/new"
+        f"?tag={escape(new_tag)}"
+        f"&target={escape(master)}"
+        f"&title=update%20default%20to%20{escape(new_version)}"
+        f"&body=Accompanying%20%60{escape(repo_other.name)}%60%20release%3A%20"
+        f"%5B{escape(new_tag_other)}%5D"
+        f"%28https%3A%2F%2Fgithub.com%2FJonasPammer%2Fansible-role-checkmk_server"
+        f"%2Freleases%2Ftag%2F{escape(new_tag_other)}%29"
+    )
+
+
+def close_missing_release_issues(
+    repo: Repository, latest_released_role_tag: Tag, current_checkmk_version: str
+):
+    for issue in repo.get_issues(state=open):
+        if FIND_MISSING_RELEASE_BASE_TITLE not in issue.title:
+            continue
+        logger.info(
+            f"Closing {issue} of {repo} as the default checkmk version "
+            f"in the latest role release matches the current version! "
+        )
+        issue.create_comment(
+            "Closing this Issue as the default checkmk version "
+            f"defined in the latest release ([{latest_released_role_tag.name}]"
+            f"({latest_released_role_tag.commit.html_url})) "
+            f"now matches the current check version of {current_checkmk_version}! "
+            f"\n\n {SCRIPT_MSG}"
+        )
+        issue.edit(state="closed")
+
+
+def create_or_update_missing_release_issue(
+    repo: Repository,
+    latest_released_role_tag: Tag,
+    latest_released_checkmk_version: str,
+    current_checkmk_version: str,
+    next_role_tag_create_url: str,
+):
+    GENERAL_BODY = (
+        "The default checkmk version has recently been updated "
+        f"from {latest_released_checkmk_version} "
+        f"(in [{latest_released_role_tag}]"
+        f"({latest_released_role_tag.commit.html_url})) "
+        f"to {current_checkmk_version}, "
+        "but no new GitHub release/tag has been created for it. "
+    )
+    BODY_TIP = (
+        "\n\n"
+        "Automated Version Updating is halted until a new version is released. "
+        "For convenience you can use the following link to create a new release: "
+        f"{next_role_tag_create_url}"
+    )
+    ISSUE_BODY = GENERAL_BODY + BODY_TIP
+    logger.error(ISSUE_BODY)
+    ISSUE_BODY += f"\n\n {SCRIPT_MSG}"
+
+    found_issue: Issue | None = None
+    for issue in repo.get_issues(state=all):
+        if (
+            FIND_MISSING_RELEASE_BASE_TITLE in issue.title
+            and current_checkmk_version in issue.title
+        ):
+            if found_issue is not None:
+                logger.error(
+                    f"Found 2 'missing release {current_checkmk_version}' issues?! "
+                    f"{issue} {found_issue}"
+                )
+                exit(1)
+            found_issue = issue
+
+    ACTUAL_ISSUE_TITLE = (
+        FIND_MISSING_RELEASE_BASE_TITLE + f" for {current_checkmk_version}"
+    )
+    if found_issue is None:
+        found_issue = repo.create_issue(
+            title=ACTUAL_ISSUE_TITLE, body=ISSUE_BODY, assignee=repo.owner, labels=[]
+        )
+    else:
+        found_issue.edit(
+            title=ACTUAL_ISSUE_TITLE,
+            body=ISSUE_BODY,
+            assignee=repo.owner,
+            state="open",
+            labels=[],
+        )
+
+    # close PRs
+    open_version_change_prs: list[PullRequest] = []
+    for pr in repo.get_pulls():
+        pr_files = pr.get_files()
+        for file in filter(
+            lambda f: any(s == f.name for s in SERVER_REPO_FILES), pr_files
+        ):
+            if "version: " in file.patch:
+                open_version_change_prs.append(pr)
+                break  # file loop
+
+    for pr in open_version_change_prs:
+        labels: list[Label | str] = pr.labels + ["do-not-merge"]
+        _opt = "**Please re-open this PR if said Issue has been resolved.**"
+        if ":robot:" not in pr.body:
+            _opt = (
+                "*This PR will re-open itself automatically on a new ci.py run "
+                "once said Issue has been resolved!*"
+            )
+        pr.edit(state="closed", labels=labels)
+        pr.create_comment(
+            GENERAL_BODY + "\n\n"
+            "Closing this pull request until "
+            f"#{found_issue.number} has been resolved! {_opt}"
+            f"\n\n{SCRIPT_MSG}"
+        )
 
 
 def checkout_pristine_pr_branch(
@@ -154,10 +302,36 @@ def commit_push_and_checkout_before(
     atexit.unregister(atexit_handler)
 
 
+def get_sorted_semver_tags(repo: Repository) -> list[tuple[Tag, VersionInfo]]:
+    """Query given repository and return list of tags that represent valid
+    semantic versions strings.
+
+    :param repo:
+        `GitHub.Repository` Object used to query tags from GitHub's API
+    :return:
+        A list of tuples in which the first (0) item is the `github.Tag`
+        and the second (1) item is a `VersionInfo` object that has
+        been crufted by using the tag's name.
+        The list is sorted so the latest version will always be on top ([0]).
+    """
+    tags_since: list[tuple[Tag, VersionInfo]] = []
+    for tag in repo.get_tags():
+        # https://galaxy.ansible.com/docs/contributing/version.html
+        if not VersionInfo.isvalid(tag.name):
+            logger.debug(
+                f"Tag '{tag.name}' of '{repo.name}' does not match SemVer. "
+                "Skipping.."
+            )
+            continue
+        tags_since.append((tag, VersionInfo.parse(tag.name)))
+    # sort using VersionInfo's dunders
+    return sorted(tags_since, key=lambda tup: tup[1], reverse=True)
+
+
 def find_pr(
     repo: Repository, branch: str, loose_str: str, next_checkmk_server_version: Tag
 ) -> PullRequest | None:
-    pull_requests = repo.get_pulls()
+    pull_requests = repo.get_pulls(state="open")
     found_pr: PullRequest | None = None
     for pr in pull_requests:
         if pr.head.ref == branch and loose_str in pr.title:
@@ -309,23 +483,83 @@ def main() -> None:
         f"Next: '{next_checkmk_server_version.name}'"
     )
 
-    _script_executor_origin = "(could not resolve ip address location)"
-    try:
-        _origin = json.load(
-            request.urlopen("https://geolocation-db.com/json/&position=true")
+    server_role_tags: Final[list[tuple[Tag, VersionInfo]]] = get_sorted_semver_tags(
+        server_repo
+    )
+    agent_role_tags: Final[list[tuple[Tag, VersionInfo]]] = get_sorted_semver_tags(
+        agent_repo
+    )
+
+    latest_released_checkmk_server_version: str = yaml.safe_load(
+        server_repo.get_contents(
+            "defaults/main.yml", ref=server_role_tags[0][0].commit.sha
+        ).decoded_content
+    )["checkmk_server_version"]
+    latest_released_checkmk_agent_version: str = yaml.safe_load(
+        server_repo.get_contents(
+            "defaults/main.yml", ref=agent_role_tags[0][0].commit.sha
+        ).decoded_content
+    )["checkmk_agent_version"]
+
+    next_server_role_tag_version: VersionInfo = server_role_tags[0][1].bump_minor()
+    next_agent_role_tag_version: VersionInfo = server_role_tags[0][1].bump_minor()
+    next_server_role_tag_create_url: str = get_prefilled_new_release_url(
+        server_repo,
+        SERVER_MASTER_BRANCH,
+        repo_other=agent_repo,
+        new_version=next_checkmk_server_version,
+        new_tag=next_server_role_tag_version,
+        new_tag_other=next_agent_role_tag_version,
+    )
+    next_agent_role_tag_create_url: str = get_prefilled_new_release_url(
+        agent_repo,
+        AGENT_MASTER_BRANCH,
+        repo_other=server_repo,
+        new_version=next_checkmk_server_version,
+        new_tag=next_agent_role_tag_version,
+        new_tag_other=next_server_role_tag_version,
+    )
+
+    if latest_released_checkmk_server_version != current_checkmk_server_version:
+        create_or_update_missing_release_issue(
+            server_repo,
+            latest_released_role_tag=server_role_tags[0][0],
+            latest_released_checkmk_version=latest_released_checkmk_server_version,
+            current_checkmk_version=current_checkmk_server_version,
+            next_role_tag_create_url=next_server_role_tag_create_url,
         )
-        _script_executor_origin = _origin["city"]
-    except (URLError, json.JSONDecodeError):
-        pass
-    SCRIPT_MSG: str = (
-        ":robot: Authored by `__scripts/ci.py` python script "
-        f"on {platform.node()} by {getpass.getuser()} from {_script_executor_origin} "
+        exit(1)
+    else:
+        close_missing_release_issues(
+            server_repo,
+            latest_released_checkmk_server_version,
+            current_checkmk_server_version,
+        )
+
+    if latest_released_checkmk_agent_version != current_checkmk_agent_version:
+        create_or_update_missing_release_issue(
+            server_repo,
+            latest_released_role_tag=agent_role_tags[0][0],
+            latest_released_checkmk_version=latest_released_checkmk_agent_version,
+            current_checkmk_version=current_checkmk_agent_version,
+            next_role_tag_create_url=next_agent_role_tag_create_url,
+        )
+        exit(1)
+    else:
+        close_missing_release_issues(
+            server_repo,
+            latest_released_checkmk_agent_version,
+            current_checkmk_agent_version,
+        )
+
+    _PR_NOTE1_BASE = (
+        "**This PR should result in the release of a new minor version "
+        "for this role**! "
+        "For convenience you can use the following link to create a new release: "
     )
-    PR_NOTE = (
-        "**This PR should result in the release of a new minor version for this role**!"
-    )
+    PR_NOTE2 = ""
     if len(tags_since) > 1:
-        PR_NOTE += (
+        PR_NOTE2 += (
             "\n\n"
             f"NOTE: There have been **{len(tags_since)}** new versions since "
             f"{current_checkmk_server_version}. "
@@ -348,27 +582,32 @@ def main() -> None:
         f"from {current_checkmk_server_version} "
         f"to {next_checkmk_server_version.name} :arrow_up:"
     )
+    SERVER_PR_NOTE1 = _PR_NOTE1_BASE + next_server_role_tag_create_url
     AGENT_COMMIT_TITLE: str = (
         "refactor: update default checkmk_agent_version "
         f"from {current_checkmk_agent_version} "
         f"to {next_checkmk_server_version.name} :arrow_up:"
     )
-    SERVER_PR_BODY: str = f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n {PR_NOTE}"
-    AGENT_PR_BODY: str = SERVER_PR_BODY
+    AGENT_PR_NOTE1 = _PR_NOTE1_BASE + next_agent_role_tag_create_url
+    SERVER_PR_BODY: str = (
+        f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n" f"{SERVER_PR_NOTE1} {PR_NOTE2}"
+    )
+    AGENT_PR_BODY: str = (
+        f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n" f"{AGENT_PR_NOTE1} {PR_NOTE2}"
+    )
 
-    server_repo_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
     server_atexit_handler = checkout_pristine_pr_branch(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
-        files=server_repo_files,
+        files=SERVER_REPO_FILES,
     )
     _make_server_changes(server_repo_path, next_checkmk_server_version)
     commit_push_and_checkout_before(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
         before_branch=server_local_git_branch_before,
-        files=server_repo_files,
+        files=SERVER_REPO_FILES,
         atexit_handler=server_atexit_handler,
         dry_run=args.dry_run,
         commit_title=SERVER_COMMIT_TITLE,
@@ -376,19 +615,18 @@ def main() -> None:
         description=COMMIT_DESCRIPTION,
     )
 
-    agent_repo_files: list[str] = ["defaults/main.yml", "README.orig.adoc"]
     agent_atexit_handler = checkout_pristine_pr_branch(
         repo_path=agent_repo_path,
         pr_branch=AGENT_PR_BRANCH,
         before_branch=agent_local_git_branch_before,
-        files=agent_repo_files,
+        files=AGENT_REPO_FILES,
     )
     _make_agent_changes(agent_repo_path, next_checkmk_server_version)
     commit_push_and_checkout_before(
         repo_path=agent_repo_path,
         pr_branch=AGENT_PR_BRANCH,
         before_branch=agent_local_git_branch_before,
-        files=agent_repo_files,
+        files=AGENT_REPO_FILES,
         atexit_handler=agent_atexit_handler,
         dry_run=args.dry_run,
         commit_title=AGENT_COMMIT_TITLE,
@@ -442,7 +680,7 @@ def main() -> None:
                 "\n\n---\n"
                 f"Accompanying `{server_repo.name}` PR: " + found_server_pr.html_url
             )
-        found_agent_pr.edit(title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="open")
+        found_agent_pr.edit(title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="")
 
 
 if __name__ == "__main__":
