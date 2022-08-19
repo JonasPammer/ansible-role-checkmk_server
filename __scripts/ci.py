@@ -444,7 +444,8 @@ def main() -> None:
         "JonasPammer/ansible-role-checkmk_agent"
     )
     agent_repo_path: Path = server_repo_path.joinpath("__scripts", agent_repo.name)
-    shutil.rmtree(agent_repo_path)
+    if agent_repo_path.exists():
+        shutil.rmtree(agent_repo_path)
     (
         agent_local_git_branch_before,
         agent_atexit_handler,
