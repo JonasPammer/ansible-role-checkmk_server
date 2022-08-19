@@ -476,6 +476,7 @@ def main() -> None:
     )["checkmk_agent_version"]
 
     if current_checkmk_server_version != current_checkmk_agent_version:
+        # TODO this should create an issue tbh
         logger.fatal(
             "Version mismatch between current checkmk_server_version "
             "and checkmk_agent_version!! Aborting, please fix.."
