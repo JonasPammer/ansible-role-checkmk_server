@@ -244,7 +244,6 @@ def create_or_update_missing_release_issue(
                 "once said Issue has been resolved!*"
             )
         pr.set_labels(*labels)
-        pr.edit(state="closed")
         pr.create_issue_comment(
             GENERAL_BODY + "\n\n"
             "Closing this pull request until "
