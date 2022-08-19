@@ -570,7 +570,7 @@ def main() -> None:
         exit(1)
     else:
         close_missing_release_issues(
-            server_repo,
+            agent_repo,
             agent_role_tags[0][0],
             current_checkmk_agent_version,
         )
