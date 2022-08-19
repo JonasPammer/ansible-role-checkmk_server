@@ -103,7 +103,7 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
         of the release in question (which may be the literal "None").
     """
     checkmk_server_version = checkmk_server_version.replace("v", "")
-    logger.verbose(
+    logger.info(
         "Fetching checksums of every distribution. "
         "This may take a while, as we need to download the files!"
     )
