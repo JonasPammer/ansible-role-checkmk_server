@@ -454,13 +454,13 @@ def main() -> None:
     ) = clone_repo_and_checkout_branch(agent_repo, agent_repo_path, AGENT_MASTER_BRANCH)
 
     server_defaults_yml: Path = server_repo_path.joinpath("defaults/main.yml")
-    current_checkmk_server_version = yaml.safe_load(server_defaults_yml.read_text(encoding="utf8"))[
-        "checkmk_server_version"
-    ]
+    current_checkmk_server_version = yaml.safe_load(
+        server_defaults_yml.read_text(encoding="utf8")
+    )["checkmk_server_version"]
     agent_defaults_yml: Path = agent_repo_path.joinpath("defaults/main.yml")
-    current_checkmk_agent_version = yaml.safe_load(agent_defaults_yml.read_text(encoding="utf8"))[
-        "checkmk_agent_version"
-    ]
+    current_checkmk_agent_version = yaml.safe_load(
+        agent_defaults_yml.read_text(encoding="utf8")
+    )["checkmk_agent_version"]
 
     if current_checkmk_server_version != current_checkmk_agent_version:
         logger.fatal(
