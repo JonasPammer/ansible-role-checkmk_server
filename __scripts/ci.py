@@ -497,8 +497,9 @@ def main() -> None:
             "defaults/main.yml", ref=server_role_tags[0][0].commit.sha
         ).decoded_content
     )["checkmk_server_version"]
+
     latest_released_checkmk_agent_version: str = yaml.safe_load(
-        server_repo.get_contents(
+        agent_repo.get_contents(
             "defaults/main.yml", ref=agent_role_tags[0][0].commit.sha
         ).decoded_content
     )["checkmk_agent_version"]
