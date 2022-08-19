@@ -36,7 +36,9 @@ from .utils import init_logger
 from .utils import logger
 from .utils import replace_text_between
 
-SERVER_MASTER_BRANCH: str = "master"
+SERVER_MASTER_BRANCH: str = (
+    "15-ci-extend-cipy-with-nicety-link-to-create-new-minor-release"
+)
 SERVER_PR_BRANCH: str = "checkmk_server_version-autoupdate"
 AGENT_MASTER_BRANCH: str = "master"
 AGENT_PR_BRANCH: str = "checkmk_agent_version-autoupdate"
