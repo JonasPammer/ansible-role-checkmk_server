@@ -168,7 +168,7 @@ def create_or_update_missing_release_issue(
     GENERAL_BODY = (
         "The default checkmk version has recently been updated "
         f"from {latest_released_checkmk_version} "
-        f"(in [{latest_released_role_tag}]"
+        f"(in [{latest_released_role_tag.name}]"
         f"({latest_released_role_tag.commit.html_url})) "
         f"to {current_checkmk_version}, "
         "but no new GitHub release/tag has been created for it. "
