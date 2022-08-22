@@ -678,7 +678,8 @@ def main() -> None:
         "**This PR should result in the release of a new minor version "
         "for this role**! "
         "Please use the following link as a starting point "
-        "for creating the new release: "
+        "for creating the new release "
+        "(ensure to **click on this link *after* merging this PR**): "
     )
     PR_NOTE2 = ""
     if len(tags_since) > 1:
