@@ -218,9 +218,12 @@ def create_or_update_missing_release_issue(
     __issue_params = {"title": ACTUAL_ISSUE_TITLE, "body": ISSUE_BODY}
     if found_issue is None:
         if not dry_run:
-            logger.info(f"Creating 'missing release issue' {__issue_params}")
             found_issue = repo.create_issue(
                 *__issue_params, assignee=repo.owner, labels=[]
+            )
+            logger.info(
+                "Created 'missing release issue' "
+                f"{found_issue.html_url} ({__issue_params})"
             )
         else:
             logger.info(f"Would've created 'missing release issue' {__issue_params}")
@@ -815,12 +818,16 @@ def main() -> None:
             + unidiff_output(found_server_pr.body, SERVER_PR_BODY)
         )
         if not args.dry_run:
-            logger.info(f"Editing {found_server_pr}... {__server_pr_change_log}")
+            logger.info(
+                f"Editing {found_server_pr.html_url}... {__server_pr_change_log}"
+            )
             found_server_pr.edit(
                 title=SERVER_COMMIT_TITLE, body=SERVER_PR_BODY, state="open"
             )
         else:
-            logger.info(f"Would've edited {found_server_pr} {__server_pr_change_log}")
+            logger.info(
+                f"Would've edited {found_server_pr.html_url} {__server_pr_change_log}"
+            )
 
     if found_agent_pr is not None:
         if found_server_pr is not None:
@@ -835,12 +842,14 @@ def main() -> None:
             + unidiff_output(found_agent_pr.body, AGENT_PR_BODY)
         )
         if not args.dry_run:
-            logger.info(f"Editing {found_agent_pr}... {__agent_pr_change_log}")
+            logger.info(f"Editing {found_agent_pr.html_url}... {__agent_pr_change_log}")
             found_agent_pr.edit(
                 title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="open"
             )
         else:
-            logger.info(f"Would've edited {found_agent_pr} {__agent_pr_change_log}")
+            logger.info(
+                f"Would've edited {found_agent_pr.html_url} {__agent_pr_change_log}"
+            )
 
 
 if __name__ == "__main__":
