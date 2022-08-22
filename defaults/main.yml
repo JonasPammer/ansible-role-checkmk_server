@@ -19,18 +19,18 @@ checkmk_server_install_cache_valid_time: "3600"
 # ===== BEGIN generate_yaml MANAGED SECTION
 
 _checkmk_server_download_checksum:
-  CentOS_7: sha1:87affa588da9c56b6a80ac425a7d4f3ab1d9028c
-  CentOS_8: sha1:cb3a4b8bf35ba6f939710cf4acfb9b7da34c1f45
-  Debian_bullseye: sha1:c896a0cdfa2a648229e160c1660a94ba445c5e50
-  Debian_buster: sha1:7213547a2f5e336b31a057ef0773f5a88ed42b0d
-  Debian_stretch: sha1:3fc6bc7f2c71dac3240b3cf2f5ec5523a4f2457d
-  Ubuntu_bionic: sha1:b08c77f31796754af0942e0100fe58675b2b8b54
-  Ubuntu_focal: sha1:cce6a669ad56c8a7cbb47a9f50ac31964fe4c96f
-  Ubuntu_hirsute: sha1:9947418875f973e2015619f7c3bedd7c7b1c393b
-  Ubuntu_impish: sha1:6995f3fd86fa894071ebef05108a30568b15a251
-  Ubuntu_jammy: sha1:03902a04795ea5a9d0a5fd71b8d933f8956a4e1e
-  Ubuntu_xenial: sha1:c5555ed1cb2dad304a07bc4a326e11d7f5349930
-checkmk_server_version: 2.0.0p26
+  CentOS_7: sha1:a5a6ebe3431f814fa24d2e9c4a6e742a408b5658
+  CentOS_8: sha1:d565f8ab19b67a2e8d62136be7ebeeb80d85e5c4
+  Debian_bullseye: sha1:8e82f2fc3692b3756b44d2a64221b754ee9eebc6
+  Debian_buster: sha1:fcca752dd4956943f92a72d492f2991e583b664a
+  Debian_stretch: sha1:0bf3ad00f06fbc591bb8908b30dd8cdba0f2dd33
+  Ubuntu_bionic: sha1:8de78553aa1933ff7b7ca4d0594d07550ff29316
+  Ubuntu_focal: sha1:9334d58a775db6db4cc31bcdc13c97adae0add18
+  Ubuntu_hirsute: sha1:468b16647ec3262f761279b22db3f22031f321be
+  Ubuntu_impish: sha1:9db1330d8654bb2071d2cf1fae0d2a6c4d6635a9
+  Ubuntu_jammy: sha1:a4a8899e83828aef985ae8e212ec9448cf99852d
+  Ubuntu_xenial: sha1:fabe141626d02730d37c10058559309b17ca4507
+checkmk_server_version: 2.0.0p27
 
 # ===== END generate_yaml MANAGED SECTION
 checkmk_server_download_checksum: "{{
