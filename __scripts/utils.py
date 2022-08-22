@@ -344,7 +344,9 @@ def execute(
 
     result = None
     try:
-        result = subprocess.check_output(args, cwd=path.absolute())
+        result = subprocess.check_output(
+            args, cwd=path.absolute(), stderr=subprocess.PIPE
+        )
         logger.verbose(result.decode())
         return result.decode()
     except subprocess.CalledProcessError as ex:
