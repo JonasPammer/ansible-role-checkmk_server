@@ -701,25 +701,6 @@ def main() -> None:
         "\n\n"
     )
 
-    SERVER_COMMIT_TITLE: str = (
-        "refactor: update default checkmk_server_version "
-        f"from {current_checkmk_server_version} "
-        f"to {next_checkmk_server_version.name} :arrow_up:"
-    )
-    SERVER_PR_NOTE1 = _PR_NOTE1_BASE + "\n> " + next_server_role_tag_create_url
-    AGENT_COMMIT_TITLE: str = (
-        "refactor: update default checkmk_agent_version "
-        f"from {current_checkmk_agent_version} "
-        f"to {next_checkmk_server_version.name} :arrow_up:"
-    )
-    AGENT_PR_NOTE1 = _PR_NOTE1_BASE + "\n> " + next_agent_role_tag_create_url
-    SERVER_PR_BODY: str = (
-        f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n" f"{SERVER_PR_NOTE1} {PR_NOTE2}"
-    )
-    AGENT_PR_BODY: str = (
-        f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n" f"{AGENT_PR_NOTE1} {PR_NOTE2}"
-    )
-
     checkout_pristine_pr_branch(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
@@ -729,10 +710,20 @@ def main() -> None:
     server_change_notes: list[str] = _make_server_changes(
         server_repo_path, next_checkmk_server_version
     )
+
     if len(server_change_notes) != 0:
         next_server_role_tag_create_url += escape("NOTES: \n")
         for note in server_change_notes:
             next_server_role_tag_create_url += escape(f"* {note} \n")
+    SERVER_COMMIT_TITLE: str = (
+        "refactor: update default checkmk_server_version "
+        f"from {current_checkmk_server_version} "
+        f"to {next_checkmk_server_version.name} :arrow_up:"
+    )
+    SERVER_PR_NOTE1 = _PR_NOTE1_BASE + "\n> " + next_server_role_tag_create_url
+    SERVER_PR_BODY: str = (
+        f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n" f"{SERVER_PR_NOTE1} {PR_NOTE2}"
+    )
     commit_push_and_checkout_before(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
@@ -752,6 +743,16 @@ def main() -> None:
         files=AGENT_REPO_FILES,
     )
     _make_agent_changes(agent_repo_path, next_checkmk_server_version)
+
+    AGENT_COMMIT_TITLE: str = (
+        "refactor: update default checkmk_agent_version "
+        f"from {current_checkmk_agent_version} "
+        f"to {next_checkmk_server_version.name} :arrow_up:"
+    )
+    AGENT_PR_NOTE1 = _PR_NOTE1_BASE + "\n> " + next_agent_role_tag_create_url
+    AGENT_PR_BODY: str = (
+        f"{SCRIPT_MSG} \n\n {COMMIT_DESCRIPTION} \n\n" f"{AGENT_PR_NOTE1} {PR_NOTE2}"
+    )
     commit_push_and_checkout_before(
         repo_path=agent_repo_path,
         pr_branch=AGENT_PR_BRANCH,
