@@ -2,6 +2,12 @@
 name: Check for new CheckMK Version
 "on":
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run in dry-run mode (Disable pushing changes and do not create any Issues/PRs)"
+        required: true
+        default: false
+        type: boolean
   push:
     branches:
       - master
@@ -49,7 +55,7 @@ jobs:
       - name: Run ci.py
         id: script_output
         run: |
-          python3 -m __scripts.ci -v
+          python3 -m __scripts.ci -v ${{ '--dry-run' if github.event.inputs.lint == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.AUTO_UPDATE_PAT }}
           AUTO_UPDATE_PAT: ${{ secrets.AUTO_UPDATE_PAT }}

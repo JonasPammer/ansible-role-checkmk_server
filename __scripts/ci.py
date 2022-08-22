@@ -518,7 +518,7 @@ def main() -> None:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Disable pushing the changes made and creating the PR.",
+        help="Disable pushing changes and do not create any Issues/PRs.",
     )
     args = parser.parse_args()
     init_logger(args.verbose, args.silent)
