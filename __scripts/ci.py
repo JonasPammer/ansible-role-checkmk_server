@@ -436,7 +436,7 @@ def _get_server_change_notes(
     ]
 
     for key, checksum_new in _new_checksums.items():
-        checksum_old = _old_checksums.get(key, default=None)
+        checksum_old = _old_checksums.get(key, None)
         if checksum_new is not None and checksum_old is None:
             _retv.append(f"CheckMk Added support for {key}")
         elif checksum_new is None and checksum_old is not None:
@@ -445,7 +445,7 @@ def _get_server_change_notes(
             _retv.append(f"Added checksum for {key}")
 
     for key, checksum_old in _old_checksums.items():
-        checksum_new = _new_checksums.get(key, default="None")
+        checksum_new = _new_checksums.get(key, "None")
         if checksum_old is None and checksum_new == "None":
             _retv.append(f"Dropped support for {key} by removing checksum")
 
