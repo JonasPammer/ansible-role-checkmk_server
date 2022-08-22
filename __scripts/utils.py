@@ -22,7 +22,7 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.traceback import install as install_rich_traceback
 
-console = Console(width=240)
+console = Console(width=240, force_terminal=True if "PY_COLORS" in os.environ else None)
 logger = verboselogs.VerboseLogger("ansible-roles")
 
 DEBIAN_DISTROS = {
