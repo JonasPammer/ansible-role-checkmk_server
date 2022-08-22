@@ -53,3 +53,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.AUTO_UPDATE_PAT }}
           AUTO_UPDATE_PAT: ${{ secrets.AUTO_UPDATE_PAT }}
+          PY_COLORS: 1
