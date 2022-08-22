@@ -127,6 +127,7 @@ def get_prefilled_new_release_url(
     new_tag: str,
     new_tag_other: str,
 ):
+    # note: 'body' param must come last to be able to make additions
     return (
         f"{repo.html_url}/releases/new"
         f"?tag={escape(new_tag)}"
@@ -188,7 +189,8 @@ def create_or_update_missing_release_issue(
     BODY_TIP = (
         "\n\n"
         "Automated Version Updating is halted until a new version is released. "
-        "For convenience you can use the following link to create a new release: \n"
+        "Please use the following link as a starting point "
+        "for creating the new release: \n"
         f"> {next_role_tag_create_url}"
     )
     ISSUE_BODY = GENERAL_BODY + BODY_TIP
@@ -419,7 +421,40 @@ def write_and_log(file: Path, old_content: str, new_content: str):
     file.write_text(new_content, encoding="utf-8")
 
 
-def _make_server_changes(server_repo_path: Path, next_checkmk_server_version: Tag):
+def _get_server_change_notes(
+    default_yml_contents_old: str, default_yml_contents_new: str
+) -> list[str]:
+    _retv: list[str] = []
+    parsed_default_yml_contents_old = yaml.safe_load(default_yml_contents_old)
+    parsed_default_yml_contents_new = yaml.safe_load(default_yml_contents_new)
+
+    _old_checksums = parsed_default_yml_contents_old[
+        "_checkmk_server_download_checksum"
+    ]
+    _new_checksums = parsed_default_yml_contents_new[
+        "_checkmk_server_download_checksum"
+    ]
+
+    for key, checksum_new in _new_checksums.items():
+        checksum_old = _old_checksums.get(key, default=None)
+        if checksum_new is not None and checksum_old is None:
+            _retv.append(f"CheckMk Added support for {key}")
+        elif checksum_new is None and checksum_old is not None:
+            _retv.append(f"CheckMk dropped support for {key}")
+        elif checksum_new is not None and checksum_old == "None":
+            _retv.append(f"Added checksum for {key}")
+
+    for key, checksum_old in _old_checksums.items():
+        checksum_new = _new_checksums.get(key, default="None")
+        if checksum_old is None and checksum_new == "None":
+            _retv.append(f"Dropped support for {key} by removing checksum")
+
+    return _retv
+
+
+def _make_server_changes(
+    server_repo_path: Path, next_checkmk_server_version: Tag
+) -> list[str]:
     default_yml: Path = server_repo_path.joinpath("defaults/main.yml")
     default_yml_contents_old: str = default_yml.read_text(encoding="utf8")
     default_yml_contents_new: str = replace_text_between(
@@ -443,6 +478,7 @@ def _make_server_changes(server_repo_path: Path, next_checkmk_server_version: Ta
         next_checkmk_server_version.name.replace("v", ""),
     )
     write_and_log(readme, readme_contents_old, readme_contents_new)
+    return _get_server_change_notes(default_yml_contents_old, default_yml_contents_new)
 
 
 def _make_agent_changes(agent_repo_path: Path, next_checkmk_server_version: Tag):
@@ -638,7 +674,8 @@ def main() -> None:
     _PR_NOTE1_BASE = (
         "**This PR should result in the release of a new minor version "
         "for this role**! "
-        "For convenience you can use the following link to create a new release: "
+        "Please use the following link as a starting point "
+        "for creating the new release: "
     )
     PR_NOTE2 = ""
     if len(tags_since) > 1:
@@ -685,7 +722,13 @@ def main() -> None:
         before_branch=server_local_git_branch_before,
         files=SERVER_REPO_FILES,
     )
-    _make_server_changes(server_repo_path, next_checkmk_server_version)
+    server_change_notes: list[str] = _make_server_changes(
+        server_repo_path, next_checkmk_server_version
+    )
+    if len(server_change_notes) != 0:
+        next_server_role_tag_create_url += escape("NOTES: \n")
+        for note in server_change_notes:
+            next_server_role_tag_create_url += escape(f"* {note} \n")
     commit_push_and_checkout_before(
         repo_path=server_repo_path,
         pr_branch=SERVER_PR_BRANCH,
