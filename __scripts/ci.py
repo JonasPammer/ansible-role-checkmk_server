@@ -440,6 +440,8 @@ def _get_server_change_notes(
 
     for key, checksum_new in _new_checksums.items():
         checksum_old = _old_checksums.get(key, None)
+        console.print(checksum_old + " " + checksum_new)
+
         if checksum_new is not None and checksum_old is None:
             _retv.append(f"CheckMk Added support for {key}")
         elif checksum_new is None and checksum_old is not None:
