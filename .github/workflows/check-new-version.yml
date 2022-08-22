@@ -55,7 +55,7 @@ jobs:
       - name: Run ci.py
         id: script_output
         run: |
-          python3 -m __scripts.ci -v ${{ '--dry-run' if github.event.inputs.lint == 'true' }}
+          python3 -m __scripts.ci -v ${{ (github.event.inputs.lint == 'true' && '--dry-run') || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.AUTO_UPDATE_PAT }}
           AUTO_UPDATE_PAT: ${{ secrets.AUTO_UPDATE_PAT }}
