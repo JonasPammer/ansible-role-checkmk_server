@@ -4,8 +4,13 @@ name: Check for new CheckMK Version
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Run in dry-run mode (Disable pushing changes and do not create any Issues/PRs)"
-        required: true
+        description: "Execute in --dry-run mode (Disable pushing changes and do not create any Issues/PRs)"
+        required: false
+        default: false
+        type: boolean
+      debug_log:
+        description: "Enable debug logs (-vv)."
+        required: false
         default: false
         type: boolean
   push:
@@ -55,7 +60,9 @@ jobs:
       - name: Run ci.py
         id: script_output
         run: |
-          python3 -m __scripts.ci -v ${{ (github.event.inputs.dry_run == 'true' && '--dry-run') || '' }}
+          python3 -m __scripts.ci -v \
+             ${{ (github.event.inputs.dry_run == 'true' && '--dry-run') || '' }} \
+             ${{ (github.event.inputs.debug_log == 'true' && '-v') || '' }}
         env:
           GITHUB_TOKEN: ${{ secrets.AUTO_UPDATE_PAT }}
           AUTO_UPDATE_PAT: ${{ secrets.AUTO_UPDATE_PAT }}
