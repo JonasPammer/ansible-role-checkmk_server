@@ -20,6 +20,7 @@ from github import Github
 from github.Tag import Tag
 from rich.console import Console
 from rich.logging import RichHandler
+from rich.progress import Progress
 from rich.traceback import install as install_rich_traceback
 
 console = Console(width=240, force_terminal=True if "PY_COLORS" in os.environ else None)
@@ -109,10 +110,25 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
         "This may take a while, as we need to download the files!"
     )
     results = {}
+
+    progress: Progress = Progress()
+    progress.start()
+    progress_task = progress.add_task(
+        "Fetch Checksums",
+        total=len(DEBIAN_DISTROS["Debian"])
+        + len(DEBIAN_DISTROS["Ubuntu"])
+        + len(REDHAT_DISTROS["CentOS"]),
+    )
+
     for distro, releases in DEBIAN_DISTROS.items():
         logger.debug(distro + " " + str(releases))
         for release in releases:
             release_name = release[0]
+            progress.update(
+                progress_task,
+                advance=1,
+                description=f"Fetching checksum for {release_name}",
+            )
             url = (
                 f"https://download.checkmk.com/checkmk/"
                 f"{checkmk_server_version}/check-mk-raw-"
@@ -122,12 +138,19 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
     for distro in REDHAT_DISTROS:
         logger.debug(distro + " " + str(REDHAT_DISTROS[distro]))
         for release_name in REDHAT_DISTROS[distro]:
+            progress.update(
+                progress_task,
+                advance=1,
+                description=f"Fetching checksum for {release_name}",
+            )
             url = (
                 f"https://download.checkmk.com/checkmk/"
                 f"{checkmk_server_version}/check-mk-raw-"
                 f"{checkmk_server_version}-el{release_name}-38.x86_64.rpm"
             )
             results[distro + "_" + release_name] = get_remote_sum(url)
+
+    progress.stop()
     return results
 
 
