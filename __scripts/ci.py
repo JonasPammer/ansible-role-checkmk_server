@@ -219,7 +219,7 @@ def create_or_update_missing_release_issue(
     if found_issue is None:
         if not dry_run:
             found_issue = repo.create_issue(
-                *__issue_params, assignee=repo.owner, labels=[]
+                **__issue_params, assignee=repo.owner, labels=[]
             )
             logger.info(
                 "Created 'missing release issue' "
@@ -240,7 +240,7 @@ def create_or_update_missing_release_issue(
                 f"{found_issue.html_url}... {__issue_change_log}"
             )
             found_issue.edit(
-                *__issue_params,
+                **__issue_params,
                 assignee=repo.owner,
                 state="open",
                 labels=[],
@@ -778,7 +778,7 @@ def main() -> None:
             "base": SERVER_MASTER_BRANCH,
         }
         if not args.dry_run:
-            found_server_pr = server_repo.create_pull(*__create_server_pull_params)
+            found_server_pr = server_repo.create_pull(**__create_server_pull_params)
             logger.info(f"Created {server_repo.name} PR: {found_server_pr.html_url}")
         else:
             logger.info(
@@ -799,7 +799,7 @@ def main() -> None:
             "base": AGENT_MASTER_BRANCH,
         }
         if not args.dry_run:
-            found_agent_pr = agent_repo.create_pull(*__create_agent_pull_params)
+            found_agent_pr = agent_repo.create_pull(**__create_agent_pull_params)
             logger.info(f"Created {agent_repo.name} PR: {found_agent_pr.html_url}")
         else:
             logger.info(
