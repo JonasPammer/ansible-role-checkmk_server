@@ -140,14 +140,24 @@ def get_prefilled_new_release_url(
 
 
 def close_missing_release_issues(
-    repo: Repository, latest_released_role_tag: Tag, current_checkmk_version: str
+    repo: Repository,
+    latest_released_role_tag: Tag,
+    current_checkmk_version: str,
+    dry_run: bool,
 ):
     for issue in repo.get_issues(state="open"):
         if FIND_MISSING_RELEASE_BASE_TITLE not in issue.title:
             continue
+        if dry_run:
+            logger.info(
+                f"Would've closed {issue} of {repo} with a comment "
+                "as the default checkmk version in the latest role "
+                "release matches the current version! "
+            )
+            continue
         logger.info(
             f"Closing {issue} of {repo} as the default checkmk version "
-            f"in the latest role release matches the current version! "
+            "in the latest role release matches the current version! "
         )
         issue.create_comment(
             "Closing this Issue as the default checkmk version "
@@ -165,6 +175,7 @@ def create_or_update_missing_release_issue(
     latest_released_checkmk_version: str,
     current_checkmk_version: str,
     next_role_tag_create_url: str,
+    dry_run: bool,
 ):
     GENERAL_BODY = (
         "The default checkmk version has recently been updated "
@@ -192,7 +203,8 @@ def create_or_update_missing_release_issue(
         ):
             if found_issue is not None:
                 logger.error(
-                    f"Found 2 'missing release {current_checkmk_version}' issues?! "
+                    "Found more than one "
+                    f"'missing release {current_checkmk_version}' issues?! "
                     f"{issue} {found_issue}"
                 )
                 exit(1)
@@ -201,18 +213,38 @@ def create_or_update_missing_release_issue(
     ACTUAL_ISSUE_TITLE = (
         FIND_MISSING_RELEASE_BASE_TITLE + f" for {current_checkmk_version}"
     )
+    __issue_params = {"title": ACTUAL_ISSUE_TITLE, "body": ISSUE_BODY}
     if found_issue is None:
-        found_issue = repo.create_issue(
-            title=ACTUAL_ISSUE_TITLE, body=ISSUE_BODY, assignee=repo.owner, labels=[]
-        )
+        if not dry_run:
+            logger.info(f"Creating 'missing release issue' {__issue_params}")
+            found_issue = repo.create_issue(
+                *__issue_params, assignee=repo.owner, labels=[]
+            )
+        else:
+            logger.info(f"Would've created 'missing release issue' {__issue_params}")
     else:
-        found_issue.edit(
-            title=ACTUAL_ISSUE_TITLE,
-            body=ISSUE_BODY,
-            assignee=repo.owner,
-            state="open",
-            labels=[],
+        __issue_change_log = (
+            "\n"
+            + unidiff_output(found_issue.title, ACTUAL_ISSUE_TITLE)
+            + "\n"
+            + unidiff_output(found_issue.body, ISSUE_BODY)
         )
+        if not dry_run:
+            logger.info(
+                "Editing 'missing release issue' "
+                f"{found_issue.html_url}... {__issue_change_log}"
+            )
+            found_issue.edit(
+                *__issue_params,
+                assignee=repo.owner,
+                state="open",
+                labels=[],
+            )
+        else:
+            logger.info(
+                "Would've edited 'missing release issue' "
+                f"{found_issue.html_url} {__issue_change_log}"
+            )
 
     # close PRs
     open_version_change_prs: list[PullRequest] = []
@@ -226,6 +258,12 @@ def create_or_update_missing_release_issue(
                 break  # file loop
 
     for pr in open_version_change_prs:
+        if dry_run:
+            logger.info(
+                f"Would've closed {pr} of {repo} because of "
+                "release and current version mismatch error..."
+            )
+            continue
         logger.info(
             f"Closing {pr} of {repo} as the default checkmk version "
             f"in the latest role release does not match the current version! "
@@ -487,6 +525,10 @@ def main() -> None:
             "and checkmk_agent_version!! Aborting, please fix.."
         )
         exit(1)
+    logger.verbose(
+        f"{server_repo.name} and {agent_repo.name} have "
+        "the same checkmk version! Continuing.."
+    )
 
     tags_since = get_checkmk_raw_tags_since(current_checkmk_server_version, github_api)
     if len(tags_since) == 0:
@@ -556,6 +598,7 @@ def main() -> None:
             latest_released_checkmk_version=latest_released_checkmk_server_version,
             current_checkmk_version=current_checkmk_server_version,
             next_role_tag_create_url=next_server_role_tag_create_url,
+            dry_run=True,
         )
         _exit = True
     else:
@@ -563,6 +606,7 @@ def main() -> None:
             server_repo,
             server_role_tags[0][0],
             current_checkmk_server_version,
+            dry_run=True,
         )
 
     if latest_released_checkmk_agent_version != current_checkmk_agent_version:
@@ -572,6 +616,7 @@ def main() -> None:
             latest_released_checkmk_version=latest_released_checkmk_agent_version,
             current_checkmk_version=current_checkmk_agent_version,
             next_role_tag_create_url=next_agent_role_tag_create_url,
+            dry_run=True,
         )
         exit(1)
     else:
@@ -579,10 +624,16 @@ def main() -> None:
             agent_repo,
             agent_role_tags[0][0],
             current_checkmk_agent_version,
+            dry_run=True,
         )
     if _exit:
         exit(1)
     del _exit
+    logger.verbose(
+        "The checkmk version found in the latest release of both "
+        f"{server_repo.name} and {agent_repo.name} match with the "
+        "respective currently cloned master one. Continuing..."
+    )
 
     _PR_NOTE1_BASE = (
         "**This PR should result in the release of a new minor version "
@@ -672,14 +723,20 @@ def main() -> None:
         "refactor: update default checkmk_server_version",
         next_checkmk_server_version,
     )
-    if not args.dry_run and found_server_pr is None:
-        found_server_pr = server_repo.create_pull(
-            title=SERVER_COMMIT_TITLE,
-            body=SERVER_PR_BODY,
-            head=SERVER_PR_BRANCH,
-            base=SERVER_MASTER_BRANCH,
-        )
-        logger.info(f"Created {server_repo.name} PR: {found_server_pr.html_url}")
+    if found_server_pr is None:
+        __create_server_pull_params = {
+            "title": SERVER_COMMIT_TITLE,
+            "body": SERVER_PR_BODY,
+            "head": SERVER_PR_BRANCH,
+            "base": SERVER_MASTER_BRANCH,
+        }
+        if not args.dry_run:
+            found_server_pr = server_repo.create_pull(*__create_server_pull_params)
+            logger.info(f"Created {server_repo.name} PR: {found_server_pr.html_url}")
+        else:
+            logger.info(
+                f"Would've created {agent_repo.name} PR: {__create_server_pull_params}"
+            )
 
     found_agent_pr = find_pr(
         agent_repo,
@@ -687,32 +744,60 @@ def main() -> None:
         "refactor: update default checkmk_agent_version",
         next_checkmk_server_version,
     )
-    if not args.dry_run and found_agent_pr is None:
-        found_agent_pr = agent_repo.create_pull(
-            title=AGENT_COMMIT_TITLE,
-            body=AGENT_PR_BODY,
-            head=AGENT_PR_BRANCH,
-            base=AGENT_MASTER_BRANCH,
-        )
-        logger.info(f"Created {agent_repo.name} PR: {found_agent_pr.html_url}")
+    if found_agent_pr is None:
+        __create_agent_pull_params = {
+            "title": AGENT_COMMIT_TITLE,
+            "body": AGENT_PR_BODY,
+            "head": AGENT_PR_BRANCH,
+            "base": AGENT_MASTER_BRANCH,
+        }
+        if not args.dry_run:
+            found_agent_pr = agent_repo.create_pull(*__create_agent_pull_params)
+            logger.info(f"Created {agent_repo.name} PR: {found_agent_pr.html_url}")
+        else:
+            logger.info(
+                f"Would've created {agent_repo.name} PR: {__create_agent_pull_params}"
+            )
 
-    if not args.dry_run and found_server_pr is not None:
+    if found_server_pr is not None:
         if found_agent_pr is not None:
             SERVER_PR_BODY += (
                 "\n\n---\n"
                 f"Accompanying `{agent_repo.name}` PR: " + found_agent_pr.html_url
             )
-        found_server_pr.edit(
-            title=SERVER_COMMIT_TITLE, body=SERVER_PR_BODY, state="open"
+        __server_pr_change_log = (
+            "\n"
+            + unidiff_output(found_server_pr.title, SERVER_COMMIT_TITLE)
+            + "\n"
+            + unidiff_output(found_server_pr.body, SERVER_PR_BODY)
         )
+        if not args.dry_run:
+            logger.info(f"Editing {found_server_pr}... {__server_pr_change_log}")
+            found_server_pr.edit(
+                title=SERVER_COMMIT_TITLE, body=SERVER_PR_BODY, state="open"
+            )
+        else:
+            logger.info(f"Would've edited {found_server_pr} {__server_pr_change_log}")
 
-    if not args.dry_run and found_agent_pr is not None:
+    if found_agent_pr is not None:
         if found_server_pr is not None:
             AGENT_PR_BODY += (
                 "\n\n---\n"
                 f"Accompanying `{server_repo.name}` PR: " + found_server_pr.html_url
             )
-        found_agent_pr.edit(title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="")
+        __agent_pr_change_log = (
+            "\n"
+            + unidiff_output(found_agent_pr.title, AGENT_COMMIT_TITLE)
+            + "\n"
+            + unidiff_output(found_agent_pr.body, AGENT_PR_BODY)
+        )
+        if not args.dry_run:
+            logger.info(f"Editing {found_agent_pr}... {__agent_pr_change_log}")
+            found_agent_pr.edit(
+                title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="open"
+            )
+        else:
+            logger.info(f"Would've edited {found_agent_pr} {__agent_pr_change_log}")
 
 
 if __name__ == "__main__":
