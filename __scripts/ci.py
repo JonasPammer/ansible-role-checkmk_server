@@ -439,19 +439,24 @@ def _get_server_change_notes(
     ]
 
     for key, checksum_new in _new_checksums.items():
-        checksum_old = _old_checksums.get(key, None)
-        console.print(checksum_old + " " + checksum_new)
+        checksum_old = _old_checksums.get(key, "NONE")
 
-        if checksum_new is None and checksum_old is not None:
+        if checksum_new == "None" and checksum_old != "None":
+            logger.debug("1")
             _retv.append(f"CheckMk dropped support for {key}")
-        elif checksum_new is not None and checksum_old == "None":
+        elif checksum_new != "None" and checksum_old == "NOT_EXISTENT":
+            logger.debug("2")
             _retv.append(f"Added checksum for {key}")
-        elif checksum_new is not None and checksum_old is None:
+        elif checksum_new != "None" and checksum_old == "None":
+            logger.debug("3")
             _retv.append(f"CheckMk Added support for {key}")
 
+    console.print(_retv)
+
     for key, checksum_old in _old_checksums.items():
-        checksum_new = _new_checksums.get(key, "None")
-        if checksum_old is None and checksum_new == "None":
+        checksum_new = _new_checksums.get(key, "NOT_EXISTENT")
+        if checksum_old == "None" and checksum_new == "NOT_EXISTENT":
+            logger.debug("4")
             _retv.append(f"Dropped support for {key} by removing checksum")
 
     return _retv
