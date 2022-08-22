@@ -8,7 +8,6 @@ import json
 import os
 import platform
 import shutil
-from html import escape
 from pathlib import Path
 from time import sleep
 from typing import Callable
@@ -16,6 +15,7 @@ from typing import Final
 from typing import Iterator
 from urllib import request
 from urllib.error import URLError
+from urllib.parse import quote
 
 import yaml
 from github import Github
@@ -128,15 +128,15 @@ def get_prefilled_new_release_url(
     new_tag_other: str,
 ):
     # note: 'body' param must come last to be able to make additions
-    return (
-        f"{repo.html_url}/releases/new"
-        f"?tag={escape(new_tag)}"
-        f"&target={escape(master)}"
-        f"&title=update%20default%20to%20{escape(new_version)}"
-        f"&body=Accompanying%20%60{escape(repo_other.name)}%60%20release%3A%20"
-        f"%5B{escape(new_tag_other)}%5D"
-        f"%28https%3A%2F%2Fgithub.com%2FJonasPammer%2Fansible-role-checkmk_server"
-        f"%2Freleases%2Ftag%2F{escape(new_tag_other)}%29"
+    return f"{repo.html_url}/releases/new" f"?tag=" + quote(
+        new_tag
+    ) + "&target=" + quote(master) + "&title=" + quote(
+        f"update default to {new_version}"
+    ) + "&body=" + quote(
+        f"Accompanying `{repo_other.name}` release: "
+        f"[{new_tag_other}]"
+        f"(https://github.com/{repo_other.full_name}/releases/tag"
+        f"/{new_tag_other}%)"
     )
 
 
@@ -451,8 +451,6 @@ def _get_server_change_notes(
             logger.debug("3")
             _retv.append(f"CheckMk Added support for {key}")
 
-    console.print(_retv)
-
     for key, checksum_old in _old_checksums.items():
         checksum_new = _new_checksums.get(key, "NOT_EXISTENT")
         if checksum_old == "None" and checksum_new == "NOT_EXISTENT":
@@ -717,13 +715,12 @@ def main() -> None:
     server_change_notes: list[str] = _make_server_changes(
         server_repo_path, next_checkmk_server_version
     )
-    console.print(server_change_notes)
 
     if len(server_change_notes) != 0:
-        next_server_role_tag_create_url += escape("NOTES: \n")
+        next_server_role_tag_create_url += quote("\n\n Note: \n")
         for note in server_change_notes:
             logger.verbose("Adding NOTE '{note}' to `next_server_role_tag_create_url`.")
-            next_server_role_tag_create_url += escape(f"* {note} \n")
+            next_server_role_tag_create_url += quote(f"* {note} \n")
     else:
         logger.debug("No additional release notes determined.")
 
