@@ -712,11 +712,16 @@ def main() -> None:
     server_change_notes: list[str] = _make_server_changes(
         server_repo_path, next_checkmk_server_version
     )
+    console.print(server_change_notes)
 
     if len(server_change_notes) != 0:
         next_server_role_tag_create_url += escape("NOTES: \n")
         for note in server_change_notes:
+            logger.verbose("Adding NOTE '{note}' to `next_server_role_tag_create_url`.")
             next_server_role_tag_create_url += escape(f"* {note} \n")
+    else:
+        logger.debug("No additional release notes determined.")
+
     SERVER_COMMIT_TITLE: str = (
         "refactor: update default checkmk_server_version "
         f"from {current_checkmk_server_version} "
