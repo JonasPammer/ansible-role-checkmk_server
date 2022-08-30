@@ -26,7 +26,8 @@ Below you can find information on…
     galaxy_info:
       role_name: "checkmk_server"
       description: "An ansible role for installing CheckMK RAW edition,
-        setting up an initial site and configuring vital parameters of that site."
+        setting up an initial site and configuring vital parameters of that site.
+        Based on kro512' checkmk_server role."
 
       author: "jonaspammer"
       license: "MIT"
