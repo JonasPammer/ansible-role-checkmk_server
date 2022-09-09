@@ -4,7 +4,7 @@
 #
 #    pip-compile __scripts/requirements.in
 #
-certifi==2022.6.15
+certifi==2022.6.15.1
     # via requests
 cffi==1.15.1
     # via pynacl
