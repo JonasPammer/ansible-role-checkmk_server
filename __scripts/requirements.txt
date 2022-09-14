@@ -14,7 +14,7 @@ commonmark==0.9.1
     # via rich
 deprecated==1.2.13
     # via pygithub
-idna==3.3
+idna==3.4
     # via requests
 pycparser==2.21
     # via cffi
