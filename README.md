@@ -28,6 +28,7 @@ Below you can find information on…
       description: "An ansible role for installing CheckMK RAW edition,
         setting up an initial site and configuring vital parameters of that site.
         Based on kro512' checkmk_server role."
+      standalone: true
 
       author: "jonaspammer"
       license: "MIT"
