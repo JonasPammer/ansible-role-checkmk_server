@@ -19,4 +19,4 @@
       ansible.builtin.command: omd config {{ checkmk_server_site }} set {{ item.var }} {{ item.val }}
       changed_when: true
 
-  when: _register.stdout != item.val|string
+  when: _register.stdout != item.val | string
