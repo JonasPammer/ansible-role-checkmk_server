@@ -8,7 +8,7 @@
   register: checkmk_server__register_command_omd_create
 
 # the output is important as it contains the randomly generated password.
-- name: Log output of omd create command (when admin password is undefined).
+- name: Log output of omd create command (when admin password is undefined). # noqa template-instead-of-copy
   ansible.builtin.copy:
     content: "{{ checkmk_server__register_command_omd_create | to_nice_json }}"
     dest: "{{ checkmk_server_log_dest }}"
