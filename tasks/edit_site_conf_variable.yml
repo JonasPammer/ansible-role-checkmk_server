@@ -7,7 +7,8 @@
   register: _register
   changed_when: false
 
-- block:
+- when: _register.stdout != item.val | string
+  block:
     - name: stop site if site configuration variable {{ item.var }} needs to be changed.
       become_user: "{{ checkmk_server_site }}"
       ansible.builtin.command: omd stop {{ checkmk_server_site }}
@@ -18,5 +19,3 @@
       become_user: "{{ checkmk_server_site }}"
       ansible.builtin.command: omd config {{ checkmk_server_site }} set {{ item.var }} {{ item.val }}
       changed_when: true
-
-  when: _register.stdout != item.val | string
