@@ -38,7 +38,7 @@ types-pyyaml==6.0.12.2
     # via -r __scripts/requirements.in
 typing-extensions==4.4.0
     # via rich
-urllib3==1.26.12
+urllib3==1.26.13
     # via requests
 verboselogs==1.7
     # via -r __scripts/requirements.in
