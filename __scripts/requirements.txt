@@ -34,7 +34,7 @@ rich==12.6.0
     # via -r __scripts/requirements.in
 semver==2.13.0
     # via -r __scripts/requirements.in
-types-pyyaml==6.0.12.2
+types-pyyaml==6.0.12.9
     # via -r __scripts/requirements.in
 typing-extensions==4.4.0
     # via rich
