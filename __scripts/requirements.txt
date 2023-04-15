@@ -18,7 +18,7 @@ idna==3.4
     # via requests
 pycparser==2.21
     # via cffi
-pygithub==1.57
+pygithub==1.58.1
     # via -r __scripts/requirements.in
 pygments==2.13.0
     # via rich
