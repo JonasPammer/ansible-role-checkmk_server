@@ -42,5 +42,5 @@ urllib3==1.26.13
     # via requests
 verboselogs==1.7
     # via -r __scripts/requirements.in
-wrapt==1.14.1
+wrapt==1.15.0
     # via deprecated
