@@ -16,7 +16,7 @@
       "min_ansible_version": "2.11",
       "allow_duplicates": "no",
       "ansible_user_needs_to_become": "True",
-      "use_renovate": "False",
+      "use_renovate": "y",
       "role_name": "checkmk_server",
       "project_slug": "ansible-role-checkmk_server",
       "project_short_purpose": "installing CheckMK RAW edition, setting up an initial site and configuring vital parameters of that site",
