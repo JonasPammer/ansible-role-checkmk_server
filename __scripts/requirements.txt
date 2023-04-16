@@ -36,7 +36,7 @@ semver==3.0.0
     # via -r __scripts/requirements.in
 types-pyyaml==6.0.12.9
     # via -r __scripts/requirements.in
-typing-extensions==4.4.0
+typing-extensions==4.5.0
     # via rich
 urllib3==1.26.13
     # via requests
