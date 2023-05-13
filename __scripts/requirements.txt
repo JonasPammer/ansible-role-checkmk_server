@@ -34,7 +34,7 @@ pycparser==2.21
     # via cffi
 pygithub==1.58.1
     # via -r requirements.in
-pygments==2.15.0
+pygments==2.15.1
     # via rich
 pyjwt[crypto]==2.6.0
     # via pygithub
