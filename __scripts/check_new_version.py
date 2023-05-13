@@ -19,7 +19,9 @@ from .utils import init_logger
     )
 )
 @click.option(
-    "--from", "--checkmk_server_version", "checkmk_server_version",
+    "--from",
+    "--checkmk_server_version",
+    "checkmk_server_version",
     help="If given, this version is assumed as the current checkmk_server_version version "
     "and reading of `./defaults/main.yml` is skipped",
 )

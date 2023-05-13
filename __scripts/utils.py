@@ -49,11 +49,7 @@ DISTROS: dict[str, list[str]] = {
         # 22.04
         "jammy",
     ],
-    "RedHat": [
-      "7",
-      "8",
-      "9" # available after 2.1.0p13
-      ],
+    "RedHat": ["7", "8", "9"],  # available after 2.1.0p13
 }
 DISTROS_LENGTH = (
     len(DISTROS["Debian"]) + len(DISTROS["Ubuntu"]) + len(DISTROS["RedHat"])

@@ -17,9 +17,7 @@ from .utils import init_logger
         max_content_width=120, help_option_names=["--help", "--usage"]
     )
 )
-@click.argument(
-    "checkmk_server_version"
-)
+@click.argument("checkmk_server_version")
 @get_click_verbosity_option()
 @get_click_silent_option()
 def main(checkmk_server_version: str, silent: bool, verbosity: int) -> int:
