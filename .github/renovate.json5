@@ -30,7 +30,7 @@
   configMigration: true,
   lockFileMaintenance: { enabled: true },
   stabilityDays: 7,
-
+  ignorePaths: ["__scripts/requirements*.txt"],
   packageRules: [
     {
       matchPackagePatterns: ["eslint"],
