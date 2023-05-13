@@ -20,7 +20,7 @@ from .utils import init_logger
 @click.argument("checkmk_server_version")
 @get_click_verbosity_option()
 @get_click_silent_option()
-def main(checkmk_server_version: str, silent: bool, verbosity: int) -> int:
+def main(checkmk_server_version: str, silent: bool, verbosity: int):
     """Manually Invoke generate_yaml."""
     init_logger(verbosity=verbosity, silent=silent)
     print(generate_yaml(checkmk_server_version))

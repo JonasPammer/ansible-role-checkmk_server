@@ -22,8 +22,8 @@ from .utils import init_logger
     "--from",
     "--checkmk_server_version",
     "checkmk_server_version",
-    help="If given, this version is assumed as the current checkmk_server_version version "
-    "and reading of `./defaults/main.yml` is skipped",
+    help="If given, reading of `checkmk_server_version` from `./defaults/main.yml`"
+    "is skipped and this is used.",
 )
 @get_click_verbosity_option()
 @get_click_silent_option()
