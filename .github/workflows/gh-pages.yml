@@ -29,7 +29,7 @@ jobs:
           ruby-version: "2.7.0"
 
       - name: set up python 3
-        uses: actions/setup-python@b55428b1882923874294fa556849718a1d7f2ca5 # tag=v4
+        uses: actions/setup-python@57ded4d7d5e986d7296eab16560982c6dd7c923b # v4
         with:
           python-version: "3.x"
 
@@ -57,7 +57,7 @@ jobs:
         run: asciidoctor -b docbook README.adoc
 
       - name: Generate README.md from README.xml using pandoc
-        uses: docker://pandoc/core@sha256:d2c4aa0c26e9480b8ab15eb952f49cb6c33ca5635417e1bb064e715a5a32a9e9
+        uses: docker://pandoc/core@sha256:222badaf55d35aa19a54294721b2669a55737e8a96e78f038b89c2b70bccd13f
         with:
           args: "-f docbook -t markdown_strict README.xml -o README.md --wrap=none"
 
@@ -87,7 +87,7 @@ jobs:
           pre-commit run --files README.md SECURITY.md || true
 
       - name: Commit generated files.
-        uses: stefanzweifel/git-auto-commit-action@49620cd3ed21ee620a48530e81dba0d139c9cb80 # tag=v4
+        uses: stefanzweifel/git-auto-commit-action@3ea6ae190baf489ba007f7c92608f33ce20ef04a # v4
         with:
           commit_message: "${{ env.FIRST_LINE_OF_HEAD_COMMIT_MESSAGE }}\n${{ github.sha }}"
           file_pattern: README.adoc README.md SECURITY.md
@@ -98,7 +98,7 @@ jobs:
         run: asciidoctor --backend=html5 --destination-dir docs --out-file index.html README.adoc
 
       - name: Deploy HTML to GitHub Pages (when branch is master).
-        uses: peaceiris/actions-gh-pages@068dc23d9710f1ba62e86896f84735d869951305 # tag=v3
+        uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3
         with:
           github_token: "${{ secrets.GITHUB_TOKEN }}"
           publish_branch: gh-pages

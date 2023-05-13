@@ -26,6 +26,7 @@
     enabled: true,
   },
   minimumReleaseAge: "7 days",
+  ignorePaths: ["__scripts/requirements*.txt"],
   packageRules: [
     {
       matchPackagePatterns: ["eslint"],
