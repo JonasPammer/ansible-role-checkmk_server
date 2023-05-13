@@ -41,13 +41,8 @@ Below you can find information on…
         - name: EL # (Enterprise Linux)
           versions:
             - "8" # actively tested: rockylinux8
-            - "9" # actively tested: rockylinux9
-        - name: Fedora
-          versions:
-            - "35" # actively tested: fedora35
-            - "36" # actively tested: fedora36
-            - "37" # actively tested: fedora37
-            - "38" # actively tested: fedora38
+            # available after 2.1.0p13
+            # - "9" # actively tested: rockylinux9
         - name: Debian
           versions:
             - buster # actively tested: debian10
@@ -289,34 +284,6 @@ A role may work on different **distributions**, like Red Hat Enterprise Linux (R
 <td style="text-align: left;"><p>2022-07</p></td>
 <td style="text-align: left;"><p>2032-05</p></td>
 <td style="text-align: left;"><p><a href="https://github.com/geerlingguy/docker-rockylinux9-ansible/actions?query=workflow%3ABuild"><img src="https://github.com/geerlingguy/docker-rockylinux9-ansible/workflows/Build/badge.svg?branch=master" alt="CI" /></a></p></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><p>RedHat</p></td>
-<td style="text-align: left;"><p>Fedora 35</p></td>
-<td style="text-align: left;"><p>2021-11</p></td>
-<td style="text-align: left;"><p>2022-11</p></td>
-<td style="text-align: left;"><p><a href="https://github.com/geerlingguy/docker-fedora35-ansible/actions?query=workflow%3ABuild"><img src="https://github.com/geerlingguy/docker-fedora35-ansible/workflows/Build/badge.svg?branch=master" alt="CI" /></a></p></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><p>RedHat</p></td>
-<td style="text-align: left;"><p>Fedora 36</p></td>
-<td style="text-align: left;"><p>2022-05</p></td>
-<td style="text-align: left;"><p>2023-05</p></td>
-<td style="text-align: left;"><p><a href="https://github.com/geerlingguy/docker-fedora36-ansible/actions?query=workflow%3ABuild"><img src="https://github.com/geerlingguy/docker-fedora36-ansible/workflows/Build/badge.svg?branch=master" alt="CI" /></a></p></td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><p>RedHat</p></td>
-<td style="text-align: left;"><p>Fedora 37</p></td>
-<td style="text-align: left;"><p>2022-11</p></td>
-<td style="text-align: left;"><p>2023-12</p></td>
-<td style="text-align: left;"><p><a href="https://github.com/geerlingguy/docker-fedora37-ansible/actions?query=workflow%3ABuild"><img src="https://github.com/geerlingguy/docker-fedora37-ansible/workflows/Build/badge.svg?branch=master" alt="CI" /></a></p></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><p>RedHat</p></td>
-<td style="text-align: left;"><p>Fedora 38</p></td>
-<td style="text-align: left;"><p>2023-03</p></td>
-<td style="text-align: left;"><p>2024-05</p></td>
-<td style="text-align: left;"><p><a href="https://github.com/geerlingguy/docker-fedora38-ansible/actions?query=workflow%3ABuild"><img src="https://github.com/geerlingguy/docker-fedora38-ansible/workflows/Build/badge.svg?branch=master" alt="CI" /></a></p></td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;"><p>Debian</p></td>
