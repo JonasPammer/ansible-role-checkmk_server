@@ -1,40 +1,37 @@
-"""Inform about new checkmk tags after a given version.
-
-Invoke with `python3 -m __scripts.check_new_version`
-"""
 from __future__ import annotations
 
-import argparse
-import logging
 import os
 from pathlib import Path
 
+import click
 import yaml
 from github import Github
 
 from .utils import get_checkmk_raw_tags_since
-from .utils import logger
+from .utils import get_click_silent_option
+from .utils import get_click_verbosity_option
+from .utils import init_logger
 
 
-def main() -> None:
+@click.command(
+    context_settings=dict(
+        max_content_width=120, help_option_names=["--help", "--usage"]
+    )
+)
+@click.option(
+    "--from", "--checkmk_server_version", "checkmk_server_version",
+    help="If given, this version is assumed as the current checkmk_server_version version "
+    "and reading of `./defaults/main.yml` is skipped",
+)
+@get_click_verbosity_option()
+@get_click_silent_option()
+def main(checkmk_server_version: str, silent: bool, verbosity: int) -> None:
+    """Manually Invoke get_checkmk_raw_tags_since."""
+    init_logger(verbosity=verbosity, silent=silent)
     github_api: Github = (
         Github(os.environ["GITHUB_TOKEN"]) if "GITHUB_TOKEN" in os.environ else Github()
     )
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--checkmk_server_version",
-        required=False,
-        help="use given version for the inquery "
-        "instead of reading current value from `./defaults/main.yml`",
-        type=str,
-    )
-    parser.add_argument(
-        "-v", "--verbose", help="increase output verbosity", action="store_true"
-    )
-    args = parser.parse_args()
-    if args.verbose:
-        logger.setLevel(logging.DEBUG)
-    current_checkmk_server_version = args.checkmk_server_version
+    current_checkmk_server_version = checkmk_server_version
 
     if current_checkmk_server_version is None:
         current_defaults_yml = yaml.safe_load(
@@ -55,7 +52,6 @@ def main() -> None:
             f"that come after {current_checkmk_server_version}: \n* "
             + "\n* ".join([t.name for t in tags_since])
         )
-        exit(1)
 
 
 if __name__ == "__main__":

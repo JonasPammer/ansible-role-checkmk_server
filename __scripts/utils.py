@@ -6,7 +6,6 @@ import os
 import pathlib
 import stat
 import subprocess
-from argparse import ArgumentParser
 from functools import lru_cache
 from typing import Any
 from typing import Callable
@@ -14,6 +13,7 @@ from typing import Sequence
 from urllib.error import HTTPError
 from urllib.request import urlopen
 
+import click
 import verboselogs
 import yaml
 from github import Github
@@ -26,18 +26,38 @@ from rich.traceback import install as install_rich_traceback
 console = Console(width=240, force_terminal=True if "PY_COLORS" in os.environ else None)
 logger = verboselogs.VerboseLogger("ansible-roles")
 
-DEBIAN_DISTROS = {
-    "Debian": [["stretch", "9"], ["buster", "10"], ["bullseye", "11"]],
-    "Ubuntu": [
-        ["xenial", "16.04"],
-        ["bionic", "18.04"],
-        ["focal", "20.04"],
-        ["hirsute", "21.04"],
-        ["impish", "21.10"],
-        ["jammy", "22.04"],
+DISTROS: dict[str, list[str]] = {
+    "Debian": [
+        # 9
+        "stretch",
+        # 10
+        "buster",
+        # 11
+        "bullseye",
     ],
+    "Ubuntu": [
+        # 16.04
+        "xenial",
+        # 18.04
+        "bionic",
+        # 20.04
+        "focal",
+        # 21.04
+        "hirsute",
+        # 21.10
+        "impish",
+        # 22.04
+        "jammy",
+    ],
+    "RedHat": [
+      "7",
+      "8",
+      "9" # available after 2.1.0p13
+      ],
 }
-REDHAT_DISTROS = {"RedHat": {"7", "8"}}
+DISTROS_LENGTH = (
+    len(DISTROS["Debian"]) + len(DISTROS["Ubuntu"]) + len(DISTROS["RedHat"])
+)
 
 
 def hash(remote, algorithm="sha1"):
@@ -80,22 +100,36 @@ def get_remote_sum(url: str, algorithm="sha1"):
         If `url` yieled a non-404 HTTP Response Status Code.
     :return:
         The hexdigest of the given file in ansible's <algorithm>:<checksum|url> format,
-        or "None"if the url yieled a HTTP 404 Response Status Code.
+        or "None" if the url yieled a HTTP 404 Response Status Code.
     """
     try:
         logger.debug("Fetching " + url + "...")
         remote = urlopen(url)
-        return "sha1:" + hash(remote, algorithm)
+        return algorithm + ":" + hash(remote, algorithm)
     except HTTPError as e:
         if e.code != 404:
             raise e
         return "None"
 
 
+def get_download_url(checkmk_server_version: str, distro: str, release_name: str):
+    if distro == "RedHat":
+        return (
+            f"https://download.checkmk.com/checkmk/"
+            f"{checkmk_server_version}/check-mk-raw-"
+            f"{checkmk_server_version}-el{release_name}-38.x86_64.rpm"
+        )
+    return (
+        f"https://download.checkmk.com/checkmk/"
+        f"{checkmk_server_version}/check-mk-raw-"
+        f"{checkmk_server_version}_0.{release_name}_amd64.deb"
+    )
+
+
 @lru_cache(maxsize=None)
 def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
-    """Loop over `DEBIAN_DISTROS` / `REDHAT_DISTROS` and generate a dictionary
-    containing all sha's for the given version.
+    """Loop over all distros and generate a dictionary containing all sha's for
+    the given version.
 
     :param checkmk_server_version:
         plain checkmk server version (e.g. "2.1.0p9", not "v2.1.0p9")
@@ -115,39 +149,18 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
     progress.start()
     progress_task = progress.add_task(
         "Fetch Checksums",
-        total=len(DEBIAN_DISTROS["Debian"])
-        + len(DEBIAN_DISTROS["Ubuntu"])
-        + len(REDHAT_DISTROS["RedHat"]),
+        total=DISTROS_LENGTH,
     )
 
-    for distro, releases in DEBIAN_DISTROS.items():
+    for distro, releases in DISTROS.items():
         logger.debug(distro + " " + str(releases))
-        for release in releases:
-            release_name = release[0]
+        for release_name in releases:
             progress.update(
                 progress_task,
                 advance=1,
-                description=f"Fetching checksum for {release_name}",
+                description=f"Fetching checksum for {distro} {release_name}",
             )
-            url = (
-                f"https://download.checkmk.com/checkmk/"
-                f"{checkmk_server_version}/check-mk-raw-"
-                f"{checkmk_server_version}_0.{release_name}_amd64.deb"
-            )
-            results[distro + "_" + release_name] = get_remote_sum(url)
-    for distro in REDHAT_DISTROS:
-        logger.debug(distro + " " + str(REDHAT_DISTROS[distro]))
-        for release_name in REDHAT_DISTROS[distro]:
-            progress.update(
-                progress_task,
-                advance=1,
-                description=f"Fetching checksum for {release_name}",
-            )
-            url = (
-                f"https://download.checkmk.com/checkmk/"
-                f"{checkmk_server_version}/check-mk-raw-"
-                f"{checkmk_server_version}-el{release_name}-38.x86_64.rpm"
-            )
+            url = get_download_url(checkmk_server_version, distro, release_name)
             results[distro + "_" + release_name] = get_remote_sum(url)
 
     progress.stop()
@@ -189,7 +202,7 @@ def get_checkmk_raw_tags_since(
     tags_since = []
     for tag in github_api.get_repo("tribe29/checkmk").get_tags():
         # this needs to be done because
-        # 1) there's alaways a transient tag "v9.9.9p9-rc9" and
+        # 1) there's always a transient tag "v9.9.9p9-rc9" and
         # 2) v1 is still maintained too but this role is developed with only v2 in mind
         if "v2" not in tag.name:
             continue
@@ -249,21 +262,33 @@ def replace_text_between(
     return leadingText + delimeterA + replacementText + delimeterB + trailingText
 
 
-def add_argparse_silent_option(parser: ArgumentParser) -> None:
-    parser.add_argument(
+def on_rm_error(func, path, exc_info):
+    # from https://stackoverflow.com/a/4829285
+    os.chmod(path, stat.S_IWRITE)
+    os.unlink(path)
+
+
+# Copied from JonasPammer/ansible-roles
+def get_click_silent_option() -> Callable[[click.FC], click.FC]:
+    return click.option(
         "-s",
         "--silent",
-        action="store_true",
+        "-q",
+        "--quiet",
+        "silent",
+        default=False,
+        is_flag=True,
         help="Disable LOGGING to console (print's will still be made).",
     )
 
 
-def add_argparse_verbosity_option(parser: ArgumentParser) -> None:
-    parser.add_argument(
+# Copied from JonasPammer/ansible-roles
+def get_click_verbosity_option() -> Callable[[click.FC], click.FC]:
+    return click.option(
         "-v",
         "--verbose",
-        action="count",
-        default=0,
+        "verbosity",
+        count=True,
         help="""
         Can be used up to 3 times (i.e., '-vvv') to
         incrementally increase verbosity of log output (VERBOSE -> DEBUG -> SPAM).
@@ -383,9 +408,3 @@ def execute(
             f"See above for more information."
         )
         raise ex
-
-
-def on_rm_error(func, path, exc_info):
-    # from https://stackoverflow.com/a/4829285
-    os.chmod(path, stat.S_IWRITE)
-    os.unlink(path)

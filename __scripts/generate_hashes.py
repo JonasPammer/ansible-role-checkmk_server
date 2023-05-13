@@ -4,25 +4,28 @@ Invoke with `python3 -m __scripts.generate_hashes`
 """
 from __future__ import annotations
 
-import argparse
-import logging
+import click
 
 from .utils import generate_yaml
-from .utils import logger
+from .utils import get_click_silent_option
+from .utils import get_click_verbosity_option
+from .utils import init_logger
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("checkmk_server_version", type=str)
-    parser.add_argument(
-        "-v", "--verbose", help="increase output verbosity", action="store_true"
+@click.command(
+    context_settings=dict(
+        max_content_width=120, help_option_names=["--help", "--usage"]
     )
-    args = parser.parse_args()
-    if args.verbose:
-        logger.setLevel(logging.DEBUG)
-
-    print(generate_yaml(args.checkmk_server_version))
-    exit(1)
+)
+@click.argument(
+    "checkmk_server_version"
+)
+@get_click_verbosity_option()
+@get_click_silent_option()
+def main(checkmk_server_version: str, silent: bool, verbosity: int) -> int:
+    """Manually Invoke generate_yaml."""
+    init_logger(verbosity=verbosity, silent=silent)
+    print(generate_yaml(checkmk_server_version))
 
 
 if __name__ == "__main__":
