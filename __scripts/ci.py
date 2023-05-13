@@ -380,7 +380,7 @@ def get_sorted_semver_tags(repo: Repository) -> list[tuple[Tag, VersionInfo]]:
     tags_since: list[tuple[Tag, VersionInfo]] = []
     for tag in repo.get_tags():
         # https://galaxy.ansible.com/docs/contributing/version.html
-        if not VersionInfo.isvalid(tag.name):
+        if not VersionInfo.is_valid(tag.name):
             logger.debug(
                 f"Tag '{tag.name}' of '{repo.name}' does not match SemVer. "
                 "Skipping.."

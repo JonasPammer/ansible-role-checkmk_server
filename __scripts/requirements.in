@@ -4,3 +4,4 @@ rich
 semver
 types-PyYAML
 verboselogs
+pip-tools
