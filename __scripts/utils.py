@@ -37,7 +37,7 @@ DEBIAN_DISTROS = {
         ["jammy", "22.04"],
     ],
 }
-REDHAT_DISTROS = {"CentOS": {"7", "8"}}
+REDHAT_DISTROS = {"RedHat": {"7", "8"}}
 
 
 def hash(remote, algorithm="sha1"):
@@ -117,7 +117,7 @@ def get_all_remote_sums(checkmk_server_version: str) -> dict[str, str]:
         "Fetch Checksums",
         total=len(DEBIAN_DISTROS["Debian"])
         + len(DEBIAN_DISTROS["Ubuntu"])
-        + len(REDHAT_DISTROS["CentOS"]),
+        + len(REDHAT_DISTROS["RedHat"]),
     )
 
     for distro, releases in DEBIAN_DISTROS.items():

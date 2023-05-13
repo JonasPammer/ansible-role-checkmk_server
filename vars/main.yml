@@ -12,10 +12,10 @@ _checkmk__server_download_package:
   default: *_checkmk_server_download__debian
 
 _checkmk__server_prerequisites:
-  CentOS_7:
+  RedHat_7:
     - cronie
     - python-passlib
-  CentOS_8:
+  RedHat: # 8+
     - cronie
     - graphviz-gd
     - python3-passlib
