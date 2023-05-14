@@ -167,6 +167,14 @@ Allows external access to the status data for this site. A distributed monitorin
 
 Enable/Disable configuration of site configuration by this role.
 
+    checkmk_server_omd_config_show_command: "omd config {{ checkmk_server_site }} show {{ item.var }}"
+    checkmk_server_omd_config_set_command: "omd config {{ checkmk_server_site }} set {{ item.var }} {{ item.val }}"
+
+    checkmk_server_omd_stop_command: "omd stop {{ checkmk_server_site }}"
+    checkmk_server_omd_stop_changed_when: '"killing" in __register.stdout'
+
+Shouldn’t need to be changed but can
+
 ### General
 
     checkmk_server_site_conf_admin_mail:
