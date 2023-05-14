@@ -84,6 +84,12 @@ checkmk_apache_service: "{{ apache__service|default(
   _checkmk__apache_service['default']) }}"
 
 # CONFIG
+checkmk_server_omd_config_show_command: "omd config {{ checkmk_server_site }} show {{ item.var }}"
+checkmk_server_omd_config_set_command: "omd config {{ checkmk_server_site }} set {{ item.var }} {{ item.val }}"
+
+checkmk_server_omd_stop_command: "omd stop {{ checkmk_server_site }}"
+checkmk_server_omd_stop_changed_when: '"killing" in __register.stdout'
+
 checkmk_server_site_conf: true
 
 ## General
