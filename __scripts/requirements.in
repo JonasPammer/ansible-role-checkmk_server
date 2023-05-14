@@ -5,3 +5,4 @@ semver
 types-PyYAML
 verboselogs
 pip-tools
+Click>=8.0

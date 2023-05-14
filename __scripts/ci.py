@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import argparse
 import atexit
 import difflib
 import getpass
@@ -17,6 +16,7 @@ from urllib import request
 from urllib.error import URLError
 from urllib.parse import quote
 
+import click
 import yaml
 from github import Github
 from github import UnknownObjectException
@@ -27,12 +27,12 @@ from github.Repository import Repository
 from github.Tag import Tag
 from semver import VersionInfo
 
-from .utils import add_argparse_silent_option
-from .utils import add_argparse_verbosity_option
 from .utils import console
 from .utils import execute
 from .utils import generate_yaml
 from .utils import get_checkmk_raw_tags_since
+from .utils import get_click_silent_option
+from .utils import get_click_verbosity_option
 from .utils import init_logger
 from .utils import logger
 from .utils import on_rm_error
@@ -516,18 +516,23 @@ def _make_agent_changes(agent_repo_path: Path, next_checkmk_server_version: Tag)
     write_and_log(readme, readme_contents_old, readme_contents_new)
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    add_argparse_verbosity_option(parser)
-    add_argparse_silent_option(parser)
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Disable pushing changes and do not create any Issues/PRs.",
+@click.command(
+    context_settings=dict(
+        max_content_width=120, help_option_names=["--help", "--usage"]
     )
-    args = parser.parse_args()
-    init_logger(args.verbose, args.silent)
-
+)
+@click.option(
+    "--dry-run",
+    "--dry",
+    "dry_run",
+    default=False,
+    is_flag=True,
+    help="Disable pushing changes and do not create any Issues/PRs.",
+)
+@get_click_verbosity_option()
+@get_click_silent_option()
+def main(dry_run: bool, silent: bool, verbosity: int) -> None:
+    init_logger(verbosity=verbosity, silent=silent)
     _login_or_token = os.environ["GITHUB_TOKEN"]
     github_api: Github = Github(_login_or_token)
 
@@ -739,7 +744,7 @@ def main() -> None:
         before_branch=server_local_git_branch_before,
         files=SERVER_REPO_FILES,
         atexit_handler=server_atexit_handler,
-        dry_run=args.dry_run,
+        dry_run=dry_run,
         commit_title=SERVER_COMMIT_TITLE,
         script_msg=SCRIPT_MSG,
         description=COMMIT_DESCRIPTION,
@@ -768,7 +773,7 @@ def main() -> None:
         before_branch=agent_local_git_branch_before,
         files=AGENT_REPO_FILES,
         atexit_handler=agent_atexit_handler,
-        dry_run=args.dry_run,
+        dry_run=dry_run,
         commit_title=AGENT_COMMIT_TITLE,
         script_msg=SCRIPT_MSG,
         description=COMMIT_DESCRIPTION,
@@ -787,7 +792,7 @@ def main() -> None:
             "head": SERVER_PR_BRANCH,
             "base": SERVER_MASTER_BRANCH,
         }
-        if not args.dry_run:
+        if not dry_run:
             found_server_pr = server_repo.create_pull(**__create_server_pull_params)
             logger.info(f"Created {server_repo.name} PR: {found_server_pr.html_url}")
         else:
@@ -808,7 +813,7 @@ def main() -> None:
             "head": AGENT_PR_BRANCH,
             "base": AGENT_MASTER_BRANCH,
         }
-        if not args.dry_run:
+        if not dry_run:
             found_agent_pr = agent_repo.create_pull(**__create_agent_pull_params)
             logger.info(f"Created {agent_repo.name} PR: {found_agent_pr.html_url}")
         else:
@@ -828,7 +833,7 @@ def main() -> None:
             + "\n"
             + unidiff_output(found_server_pr.body, SERVER_PR_BODY)
         )
-        if not args.dry_run:
+        if not dry_run:
             logger.info(
                 f"Editing {found_server_pr.html_url}... {__server_pr_change_log}"
             )
@@ -852,7 +857,7 @@ def main() -> None:
             + "\n"
             + unidiff_output(found_agent_pr.body, AGENT_PR_BODY)
         )
-        if not args.dry_run:
+        if not dry_run:
             logger.info(f"Editing {found_agent_pr.html_url}... {__agent_pr_change_log}")
             found_agent_pr.edit(
                 title=AGENT_COMMIT_TITLE, body=AGENT_PR_BODY, state="open"

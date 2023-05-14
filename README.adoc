@@ -53,13 +53,8 @@ galaxy_info:
     - name: EL # (Enterprise Linux)
       versions:
         - "8" # actively tested: rockylinux8
-        - "9" # actively tested: rockylinux9
-    - name: Fedora
-      versions:
-        - "35" # actively tested: fedora35
-        - "36" # actively tested: fedora36
-        - "37" # actively tested: fedora37
-        - "38" # actively tested: fedora38
+        # available after 2.1.0p13
+        # - "9" # actively tested: rockylinux9
     - name: Debian
       versions:
         - buster # actively tested: debian10
@@ -375,30 +370,6 @@ even though there is no test for this exact distribution.
 | 2022-07
 | 2032-05
 | https://github.com/geerlingguy/docker-rockylinux9-ansible/actions?query=workflow%3ABuild[image:https://github.com/geerlingguy/docker-rockylinux9-ansible/workflows/Build/badge.svg?branch=master[CI]]
-
-| RedHat
-| Fedora 35
-| 2021-11
-| 2022-11
-| https://github.com/geerlingguy/docker-fedora35-ansible/actions?query=workflow%3ABuild[image:https://github.com/geerlingguy/docker-fedora35-ansible/workflows/Build/badge.svg?branch=master[CI]]
-
-| RedHat
-| Fedora 36
-| 2022-05
-| 2023-05
-| https://github.com/geerlingguy/docker-fedora36-ansible/actions?query=workflow%3ABuild[image:https://github.com/geerlingguy/docker-fedora36-ansible/workflows/Build/badge.svg?branch=master[CI]]
-
-| RedHat
-| Fedora 37
-| 2022-11
-| 2023-12
-| https://github.com/geerlingguy/docker-fedora37-ansible/actions?query=workflow%3ABuild[image:https://github.com/geerlingguy/docker-fedora37-ansible/workflows/Build/badge.svg?branch=master[CI]]
-
-| RedHat
-| Fedora 38
-| 2023-03
-| 2024-05
-| https://github.com/geerlingguy/docker-fedora38-ansible/actions?query=workflow%3ABuild[image:https://github.com/geerlingguy/docker-fedora38-ansible/workflows/Build/badge.svg?branch=master[CI]]
 
 | Debian
 | Ubuntu 1604

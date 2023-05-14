@@ -22,10 +22,6 @@ name: CI (Lint + Molecule)
           - debian11
           - rockylinux8
           - rockylinux9
-          - fedora35
-          - fedora36
-          - fedora37
-          - fedora38
           - ALL
       ansible_version:
         description: "Select Ansible Versions to run"
@@ -96,8 +92,6 @@ jobs:
     name: Molecule
     runs-on: ubuntu-latest
     strategy:
-      # half length of matrix's distro list:
-      max-parallel: 6
       matrix:
         distro:
           - ubuntu1804
@@ -106,11 +100,8 @@ jobs:
           - debian10
           - debian11
           - rockylinux8
-          - rockylinux9
-          - fedora35
-          - fedora36
-          - fedora37
-          - fedora38
+          # available after 2.1.0p13
+          # - rockylinux9
 
     env:
       WORKFLOW_DISPATCH_IF: >-

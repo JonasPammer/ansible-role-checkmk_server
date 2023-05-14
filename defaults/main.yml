@@ -19,8 +19,8 @@ checkmk_server_install_cache_valid_time: "3600"
 # ===== BEGIN generate_yaml MANAGED SECTION
 
 _checkmk_server_download_checksum:
-  CentOS_7: sha1:a5a6ebe3431f814fa24d2e9c4a6e742a408b5658
-  CentOS_8: sha1:d565f8ab19b67a2e8d62136be7ebeeb80d85e5c4
+  RedHat_7: sha1:a5a6ebe3431f814fa24d2e9c4a6e742a408b5658
+  RedHat_8: sha1:d565f8ab19b67a2e8d62136be7ebeeb80d85e5c4
   Debian_bullseye: sha1:8e82f2fc3692b3756b44d2a64221b754ee9eebc6
   Debian_buster: sha1:fcca752dd4956943f92a72d492f2991e583b664a
   Debian_stretch: sha1:0bf3ad00f06fbc591bb8908b30dd8cdba0f2dd33
