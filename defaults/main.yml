@@ -19,18 +19,19 @@ checkmk_server_install_cache_valid_time: "3600"
 # ===== BEGIN generate_yaml MANAGED SECTION
 
 _checkmk_server_download_checksum:
-  RedHat_7: sha1:a5a6ebe3431f814fa24d2e9c4a6e742a408b5658
-  RedHat_8: sha1:d565f8ab19b67a2e8d62136be7ebeeb80d85e5c4
-  Debian_bullseye: sha1:8e82f2fc3692b3756b44d2a64221b754ee9eebc6
-  Debian_buster: sha1:fcca752dd4956943f92a72d492f2991e583b664a
-  Debian_stretch: sha1:0bf3ad00f06fbc591bb8908b30dd8cdba0f2dd33
-  Ubuntu_bionic: sha1:8de78553aa1933ff7b7ca4d0594d07550ff29316
-  Ubuntu_focal: sha1:9334d58a775db6db4cc31bcdc13c97adae0add18
-  Ubuntu_hirsute: sha1:468b16647ec3262f761279b22db3f22031f321be
-  Ubuntu_impish: sha1:9db1330d8654bb2071d2cf1fae0d2a6c4d6635a9
-  Ubuntu_jammy: sha1:a4a8899e83828aef985ae8e212ec9448cf99852d
-  Ubuntu_xenial: sha1:fabe141626d02730d37c10058559309b17ca4507
-checkmk_server_version: 2.0.0p27
+  Debian_bullseye: sha1:c99c530424c9aca96ee642ffa99d8045fe412414
+  Debian_buster: sha1:6f296b09e2fe923c944b3887e7a9389739697ae3
+  Debian_stretch: sha1:f769bf65768d64410f9f5f8839d4102c3a054a5b
+  RedHat_7: sha1:b85f09088d0e04043b5a3b531af338ccb0ef2be6
+  RedHat_8: sha1:5d834efe252cfde8122bc536b978bc44779eb5f7
+  RedHat_9: None
+  Ubuntu_bionic: sha1:e2980a356cd4c4ed09d8deb733ed3d4f61fdf5b6
+  Ubuntu_focal: sha1:49138fa70290244ee1c6081d1997dcb1f4b380ad
+  Ubuntu_hirsute: None
+  Ubuntu_impish: None
+  Ubuntu_jammy: sha1:368c778f168c9a0777ab91f5303c89eab591ed5f
+  Ubuntu_xenial: sha1:44184911922c5f8df0dd91617a655f50e4dbc942
+checkmk_server_version: 2.0.0p28
 
 # ===== END generate_yaml MANAGED SECTION
 checkmk_server_download_checksum: "{{
