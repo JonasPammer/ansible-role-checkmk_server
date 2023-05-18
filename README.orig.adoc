@@ -15,9 +15,10 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-https://galaxy.ansible.com/jonaspammer/checkmk_server[image:https://img.shields.io/badge/available%20on%20ansible%20galaxy-jonaspammer.checkmk_server-brightgreen[Version on Galaxy]]
-// Very Relevant Status Badges
-https://github.com/JonasPammer/ansible-role-checkmk_server/actions/workflows/ci.yml[image:https://github.com/JonasPammer/ansible-role-checkmk_server/actions/workflows/ci.yml/badge.svg[Testing CI]]
+
+[IMPORTANT]
+This role is deprecated in favor of the
+https://github.com/Checkmk/ansible-collection-tribe29.checkmk[official role from tribe29].
 
 
 An Ansible role for installing
