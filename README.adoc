@@ -8,9 +8,10 @@ Jonas Pammer <opensource@jonaspammer.at>;
 :no_change_needed: These variables do not need to be changed under normal circumstances, and certainly not if you are using the default version of the server.
 
 
-https://galaxy.ansible.com/jonaspammer/checkmk_server[image:https://img.shields.io/badge/available%20on%20ansible%20galaxy-jonaspammer.checkmk_server-brightgreen[Version on Galaxy]]
-// Very Relevant Status Badges
-https://github.com/JonasPammer/ansible-role-checkmk_server/actions/workflows/ci.yml[image:https://github.com/JonasPammer/ansible-role-checkmk_server/actions/workflows/ci.yml/badge.svg[Testing CI]]
+
+[IMPORTANT]
+This role is deprecated in favor of the
+https://github.com/Checkmk/ansible-collection-tribe29.checkmk[official role from tribe29].
 
 
 An Ansible role for installing
@@ -39,9 +40,7 @@ Below you can find information on…
 ---
 galaxy_info:
   role_name: "checkmk_server"
-  description: "An ansible role for installing CheckMK RAW edition,
-    setting up an initial site and configuring vital parameters of that site.
-    Based on kro512' checkmk_server role."
+  description: "Deprecated in favor of the official checkmk_server role."
   standalone: true
 
   author: "jonaspammer"
